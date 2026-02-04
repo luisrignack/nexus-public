@@ -1,0 +1,254 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.security.internal;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.sonatype.nexus.common.Description;
+import org.sonatype.nexus.common.QualifierUtil;
+import org.sonatype.nexus.common.event.EventAware;
+import org.sonatype.nexus.common.event.EventHelper;
+import org.sonatype.nexus.distributed.event.service.api.common.AuthorizationChangedDistributedEvent;
+import org.sonatype.nexus.security.authz.AuthorizationConfigurationChanged;
+import org.sonatype.nexus.security.role.RoleIdentifier;
+import org.sonatype.nexus.security.user.RoleMappingUserManager;
+import org.sonatype.nexus.security.user.UserManager;
+import org.sonatype.nexus.security.user.UserNotFoundException;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.crypto.hash.Sha1Hash;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import static org.sonatype.nexus.common.app.FeatureFlags.PRINCIPAL_PERMISSIONS_CACHE_ENABLED_NAMED_VALUE;
+
+/**
+ * Default {@link AuthorizingRealm}.
+ *
+ * This realm ONLY handles authorization.
+ */
+@Singleton
+@Component
+@Qualifier(AuthorizingRealmImpl.NAME)
+@Description("Local Authorizing Realm")
+public class AuthorizingRealmImpl
+    extends AuthorizingRealm
+    implements Realm, EventAware
+{
+  private static final Logger logger = LoggerFactory.getLogger(AuthorizingRealmImpl.class);
+
+  public static final String NAME = "NexusAuthorizingRealm";
+
+  private final RealmSecurityManager realmSecurityManager;
+
+  private final UserManager userManager;
+
+  private final Map<String, UserManager> userManagerMap;
+
+  private final Cache<PrincipalCollection, Collection<Permission>> principalPermissionsCache = CacheBuilder.newBuilder()
+      .expireAfterWrite(60, TimeUnit.MINUTES)
+      .softValues()
+      .build();
+
+  private final boolean principalPermissionsCacheEnabled;
+
+  @Inject
+  public AuthorizingRealmImpl(
+      final RealmSecurityManager realmSecurityManager,
+      final UserManager userManager,
+      final List<UserManager> userManagerList,
+      @Value(PRINCIPAL_PERMISSIONS_CACHE_ENABLED_NAMED_VALUE) final boolean principalPermissionsCacheEnabled)
+  {
+    this.realmSecurityManager = realmSecurityManager;
+    this.userManager = userManager;
+    this.userManagerMap = QualifierUtil.buildQualifierBeanMap(userManagerList);
+    this.principalPermissionsCacheEnabled = principalPermissionsCacheEnabled;
+    HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
+    credentialsMatcher.setHashAlgorithmName(Sha1Hash.ALGORITHM_NAME);
+    setCredentialsMatcher(credentialsMatcher);
+    setName(NAME);
+    setAuthenticationCachingEnabled(false); // we authz only, no authc done by this realm
+    setAuthorizationCachingEnabled(true);
+  }
+
+  @Override
+  public boolean supports(final AuthenticationToken token) {
+    return false;
+  }
+
+  @Override
+  protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token) {
+    return null;
+  }
+
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(final PrincipalCollection principals) {
+    if (principals == null) {
+      throw new AuthorizationException("Cannot authorize with no principals.");
+    }
+
+    String username = principals.getPrimaryPrincipal().toString();
+    Set<String> roles = new HashSet<String>();
+
+    Set<String> realmNames = new HashSet<String>(principals.getRealmNames());
+
+    // if the user belongs to this realm, we are most likely using this realm stand alone, or for testing
+    if (!realmNames.contains(this.getName())) {
+      // make sure the realm is enabled
+      Collection<Realm> configureadRealms = realmSecurityManager.getRealms();
+      boolean foundRealm = false;
+      for (Realm realm : configureadRealms) {
+        if (realmNames.contains(realm.getName())) {
+          foundRealm = true;
+          break;
+        }
+      }
+      if (!foundRealm) {
+        // user is from a realm that is NOT enabled
+        throw new AuthorizationException("User for principals: " + principals.getPrimaryPrincipal()
+            + " belongs to a disabled realm(s): " + principals.getRealmNames() + ".");
+      }
+    }
+
+    // clean up the realm names for processing (replace the Nexus*Realm with default)
+    cleanUpRealmList(realmNames);
+
+    if (RoleMappingUserManager.class.isInstance(userManager)) {
+      for (String realmName : realmNames) {
+        try {
+          for (RoleIdentifier roleIdentifier : ((RoleMappingUserManager) userManager).getUsersRoles(username,
+              realmName)) {
+            roles.add(roleIdentifier.getRoleId());
+          }
+        }
+        catch (UserNotFoundException e) {
+          logger.trace("Failed to find role mappings for user: {} realm: {}", username, realmName);
+        }
+      }
+    }
+    else if (realmNames.contains("default")) {
+      try {
+        for (RoleIdentifier roleIdentifier : userManager.getUser(username).getRoles()) {
+          roles.add(roleIdentifier.getRoleId());
+        }
+      }
+      catch (UserNotFoundException e) {
+        throw new AuthorizationException("User for principals: " + principals.getPrimaryPrincipal()
+            + " could not be found.", e);
+      }
+
+    }
+    else
+    // user not managed by this Realm
+    {
+      throw new AuthorizationException("User for principals: " + principals.getPrimaryPrincipal()
+          + " not manged by Nexus realm.");
+    }
+
+    return new SimpleAuthorizationInfo(roles);
+  }
+
+  private void cleanUpRealmList(final Set<String> realmNames) {
+    for (UserManager userManager : this.userManagerMap.values()) {
+      String authRealmName = userManager.getAuthenticationRealmName();
+      if (authRealmName != null && realmNames.contains(authRealmName)) {
+        realmNames.remove(authRealmName);
+        realmNames.add(userManager.getSource());
+      }
+    }
+
+    if (realmNames.contains(getName())) {
+      realmNames.remove(getName());
+      realmNames.add("default");
+    }
+  }
+
+  @Override
+  protected boolean isPermitted(final Permission permission, final AuthorizationInfo info) {
+    Collection<Permission> userPermissions;
+
+    if (principalPermissionsCacheEnabled) {
+      PrincipalCollection principals = SecurityUtils.getSubject().getPrincipals();
+      userPermissions = principalPermissionsCache.getIfPresent(principals);
+      if (userPermissions == null) {
+        userPermissions = this.getPermissions(info);
+        principalPermissionsCache.put(principals, userPermissions);
+      }
+    }
+    else {
+      userPermissions = this.getPermissions(info);
+    }
+
+    if (userPermissions == null || userPermissions.isEmpty()) {
+      return false;
+    }
+
+    for (Permission perm : userPermissions) {
+      if (perm.implies(permission)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final AuthorizationConfigurationChanged event) {
+    invalidatePermissionsCache();
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final SecurityContributionChangedEvent event) {
+    invalidatePermissionsCache();
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(final AuthorizationChangedDistributedEvent event) {
+    if (EventHelper.isReplicating()) {
+      invalidatePermissionsCache();
+    }
+  }
+
+  private void invalidatePermissionsCache() {
+    principalPermissionsCache.invalidateAll();
+    logger.debug("Principal permissions cache invalidated");
+  }
+}

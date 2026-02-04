@@ -1,0 +1,114 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.internal.web;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.sonatype.goodies.common.Time;
+import org.sonatype.goodies.testsupport.TestSupport;
+import org.sonatype.nexus.common.app.ApplicationVersionSupport;
+import org.sonatype.nexus.common.app.BaseUrlHolder;
+import org.sonatype.nexus.common.template.TemplateHelper;
+import org.sonatype.nexus.internal.template.TemplateHelperImpl;
+import org.sonatype.nexus.internal.webresources.DevModeResources;
+import org.sonatype.nexus.internal.webresources.WebResourceServiceImpl;
+import org.sonatype.nexus.internal.webresources.WebResourceServlet;
+import org.sonatype.nexus.mime.internal.DefaultMimeSupport;
+import org.sonatype.nexus.servlet.XFrameOptions;
+
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.velocity.app.VelocityEngine;
+import org.eclipse.jetty.ee8.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.eclipse.jetty.ee8.servlet.ErrorPageErrorHandler.GLOBAL_ERROR_PAGE;
+import static org.eclipse.jetty.http.HttpStatus.Code.NOT_FOUND;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+/**
+ * Tests for {@link ErrorPageServlet}
+ *
+ */
+public class ErrorPageServletTest
+    extends TestSupport
+{
+  Server server;
+
+  int port;
+
+  @Before
+  public void setUp() throws Exception {
+    TemplateHelper templateHelper = new TemplateHelperImpl(new ApplicationVersionSupport()
+    {
+      @Override
+      public String getEdition() {
+        return "Test";
+      }
+    }, new VelocityEngine());
+
+    XFrameOptions xFrameOptions = new XFrameOptions(true);
+
+    ServletContextHandler context = new ServletContextHandler();
+    ErrorPageService errorPageService = new ErrorPageService(templateHelper, xFrameOptions);
+    context.addServlet(new ServletHolder(new ErrorPageServlet(errorPageService)), "/error.html");
+    WebResourceServiceImpl webResources =
+        new WebResourceServiceImpl(new DevModeResources(), new DefaultMimeSupport(), List.of(), List.of());
+    context.addServlet(
+        new ServletHolder(new WebResourceServlet(webResources, xFrameOptions, new Time(10, TimeUnit.DAYS))), "/bad/*");
+
+    ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
+    errorHandler.addErrorPage(GLOBAL_ERROR_PAGE, "/error.html");
+    context.setErrorHandler(errorHandler);
+
+    BaseUrlHolder.set("http://127.0.0.1", "");
+
+    server = new Server(0);
+    server.setHandler(context);
+    server.start();
+
+    port = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    if (server != null) {
+      server.stop();
+      server = null;
+    }
+  }
+
+  @Test
+  public void errorCodeIsMaintained() throws Exception {
+    String request = "http://127.0.0.1:" + port + "/bad/403/You%20can%27t%20see%20this";
+
+    try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+      try (CloseableHttpResponse response = client.execute(new HttpGet(request))) {
+        StatusLine statusLine = response.getStatusLine();
+
+        assertThat(statusLine.getStatusCode(), is(NOT_FOUND.getCode()));
+      }
+    }
+  }
+}

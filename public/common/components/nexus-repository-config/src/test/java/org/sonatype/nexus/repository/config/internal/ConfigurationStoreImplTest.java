@@ -1,0 +1,52 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.repository.config.internal;
+
+import java.util.Collection;
+
+import org.sonatype.goodies.testsupport.Test5Support;
+import org.sonatype.nexus.datastore.api.DataSessionSupplier;
+import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationDAO;
+import org.sonatype.nexus.testdb.DataSessionConfiguration;
+import org.sonatype.nexus.testdb.DatabaseExtension;
+
+import org.hamcrest.core.Is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static java.util.Collections.emptySet;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+@ExtendWith(DatabaseExtension.class)
+class ConfigurationStoreImplTest
+    extends Test5Support
+{
+  @DataSessionConfiguration(daos = ConfigurationDAO.class)
+  private DataSessionSupplier sessionSupplier;
+
+  private ConfigurationStoreImpl underTest;
+
+  @BeforeEach
+  void setup() {
+    underTest = new ConfigurationStoreImpl(sessionSupplier);
+  }
+
+  @Test
+  void readByNamesShouldBeEmptyWhenRepositoriesIsEmpty() {
+    Collection<Configuration> configurations = underTest.readByNames(emptySet());
+
+    assertThat(configurations.isEmpty(), Is.is(true));
+  }
+}

@@ -1,0 +1,1415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2008-present Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.buildsupport</groupId>
+    <artifactId>public-parent</artifactId>
+    <version>55</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>nexus-parent</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>pom</packaging>
+
+  <version>3.89.0-09</version>
+
+  <inceptionYear>2008</inceptionYear>
+  <url>http://nexus.sonatype.org/</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>Jira</system>
+    <url>http://issues.sonatype.org/browse/NEXUS</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:git:git://github.com/sonatype/nexus-public.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus-public.git</developerConnection>
+    <url>https://github.com/sonatype/nexus-public</url>
+  </scm>
+
+  <prerequisites>
+    <!-- Mostly meaningless, though site plugin uses this; Minimum version controlled by enforcer plugin -->
+    <maven>3.9.6</maven>
+  </prerequisites>
+
+  <properties>
+    <!--
+    Define nexus versions.  The 'nexus.version' property always refers to the version of the current project.
+    These values must always be constants; 'nexus.version' will get update automatically by set-version.
+    -->
+    <nexus.version>3.89.0-09</nexus.version>
+    <nexus2.version>2.15.1-02</nexus2.version>
+
+    <spring-boot.version>3.3.11</spring-boot.version>
+    <spring.version>6.2.11</spring.version>
+
+    <!-- Default empty argLine for JaCoCo agent, will be populated by jacoco:prepare-agent -->
+    <argLine/>
+
+    <!-- Define the node and yarn versions used by the frontend-maven-plugin -->
+    <node.version>v22.19.0</node.version>
+    <yarn.version>v1.22.19</yarn.version>
+    <npm.install>install --immutable</npm.install>
+    <npm.skipTests>false</npm.skipTests>
+    <npm.build>build-all</npm.build>
+
+    <!-- logging configuration used in logback config files to control test logging -->
+    <test.log.level>INFO</test.log.level>
+    <it.test.log.level>INFO</it.test.log.level>
+
+    <!--
+    Default compile support for Java21+
+    -->
+    <maven.compiler.release>21</maven.compiler.release>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+
+    <!--
+    Sonar configuration.
+    -->
+    <sonar.branch>3.0</sonar.branch>
+
+    <!--
+    Default optimization settings for optimized "prod" aggregate sources.
+    -->
+    <extjs.omit>true</extjs.omit>
+    <extjs.omit.debug>true</extjs.omit.debug>
+    <extjs.omit.assert>true</extjs.omit.assert>
+    <maven.yuicompressor.nomunge>false</maven.yuicompressor.nomunge>
+    <maven.yuicompressor.nominify>false</maven.yuicompressor.nominify>
+    <maven.yuicompressor.disableOptimizations>false</maven.yuicompressor.disableOptimizations>
+    <maven.yuicompressor.linebreakpos>-1</maven.yuicompressor.linebreakpos>
+
+    <!-- including installers in the process significantly increases time required for staging -->
+    <staging.progressTimeout>60</staging.progressTimeout>
+
+    <test.argLine>
+      --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+      --add-opens=java.base/java.net=ALL-UNNAMED
+      --add-opens=java.base/java.util=ALL-UNNAMED
+      --add-exports=java.base/sun.security.x509=ALL-UNNAMED
+      --add-exports=java.base/sun.security.rsa=ALL-UNNAMED
+      --add-exports=java.base/sun.security.pkcs=ALL-UNNAMED
+    </test.argLine>
+
+    <test.includedGroups></test.includedGroups>
+
+    <test.excludedGroups>
+      org.sonatype.goodies.testsupport.group.Perf,
+      org.sonatype.nexus.content.testsuite.groups.PostgresTestGroup
+    </test.excludedGroups>
+
+    <clm.skip>false</clm.skip>
+
+    <!-- fabric8 container naming pattern: {imageName}-{buildTimestamp}-{index} -->
+    <docker.containerNamePattern>%n-%t-%i</docker.containerNamePattern>
+
+    <!-- max heap memory for surefire-plugin -->
+    <surefire.maxHeap>-Xmx300M</surefire.maxHeap>
+    <mockito.version>5.21.0</mockito.version>
+    <aspectjtools.version>1.9.24</aspectjtools.version>
+  </properties>
+
+  <modules>
+    <module>public</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.6.3</version>
+          <configuration>
+            <doclint>none</doclint>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <configuration>
+            <deployAtEnd>true</deployAtEnd>
+            <retryFailedDeploymentCount>2</retryFailedDeploymentCount>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <configuration>
+            <allowIncompleteProjects>true</allowIncompleteProjects>
+          </configuration>
+        </plugin>
+
+        <!--
+        Additional configuration for release; enable additional profiles.
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <releaseProfiles>release,optimize</releaseProfiles>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+
+        <!--
+        For maven-plugins which still need Plexus descriptors.
+        -->
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>1.6</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate-metadata</goal>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.gmavenplus</groupId>
+          <artifactId>gmavenplus-plugin</artifactId>
+          <version>1.5</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-ant</artifactId>
+              <version>3.0.19</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <!--
+            Workaround https://github.com/groovy/GMavenPlus/issues/56
+            -->
+            <allowSystemExits>true</allowSystemExits>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.nexus.common.maven.plugins</groupId>
+          <artifactId>extjs-maven-plugin</artifactId>
+          <version>3.89.0-09</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>aggregate-js</goal>
+              </goals>
+              <configuration>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+                <outputFile>${project.build.outputDirectory}/static/rapture/${project.artifactId}-debug.js</outputFile>
+                <omitFlags>
+                  <debug>${extjs.omit.debug}</debug>
+                  <assert>${extjs.omit.assert}</assert>
+                </omitFlags>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>1.1.0</version>
+          <configuration>
+            <jswarn>false</jswarn>
+          </configuration>
+          <executions>
+            <execution>
+              <id>plugin-js</id>
+              <goals>
+                <goal>aggregate-js</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/rapture/${project.artifactId}-prod.js</output>
+                <sourceDirectory>${project.build.outputDirectory}/static/rapture</sourceDirectory>
+                <includes>
+                  <include>${project.artifactId}-debug.js</include>
+                </includes>
+              </configuration>
+            </execution>
+            <execution>
+              <id>plugin-css</id>
+              <goals>
+                <goal>aggregate-css</goal>
+              </goals>
+              <configuration>
+                <output>${project.build.outputDirectory}/static/rapture/resources/${project.artifactId}-prod.css</output>
+                <sourceDirectory>${project.basedir}/src/main/resources/static/rapture/resources</sourceDirectory>
+                <includes>
+                  <include>${project.artifactId}-debug.css</include>
+                </includes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>1.11.3</version>
+
+          <configuration>
+            <nodeVersion>${node.version}</nodeVersion>
+            <yarnVersion>${yarn.version}</yarnVersion>
+            <workingDirectory>${project.basedir}</workingDirectory>
+            <installDirectory>${project.build.directory}</installDirectory>
+            <environmentVariables>
+              <JEST_SUITE_NAME>React-Tests</JEST_SUITE_NAME>
+              <CI>true</CI>
+            </environmentVariables>
+          </configuration>
+
+          <executions>
+            <execution>
+              <id>install node and yarn</id>
+              <goals>
+                <goal>install-node-and-yarn</goal>
+              </goals>
+              <phase>generate-resources</phase>
+            </execution>
+            <execution>
+              <id>yarn install</id>
+              <goals>
+                <goal>yarn</goal>
+              </goals>
+              <phase>generate-resources</phase>
+              <configuration>
+                <arguments>${npm.install}</arguments>
+              </configuration>
+            </execution>
+            <execution>
+              <id>yarn run build</id>
+              <goals>
+                <goal>yarn</goal>
+              </goals>
+              <phase>compile</phase>
+              <configuration>
+                <arguments>${npm.build}</arguments>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.mycila</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <configuration>
+            <encoding>UTF-8</encoding>
+            <strictCheck>true</strictCheck>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <licenseSets>
+              <!-- License Set for Public Codebase -->
+              <!-- This set applies the standard Sonatype header (header.txt) for the OSS code. -->
+              <licenseSet>
+                <header>header.txt</header>
+                <includes>
+                  <include>public/**/*.java</include>
+                  <include>public/**/*.xml</include>
+                  <include>public/**/*.js</include>
+                  <include>public/**/*.groovy</include>
+                </includes>
+                <excludes>
+                  <exclude>**/sonatype-config/**</exclude>
+                  <!--
+                  Exclude zion configuration.
+                  -->
+                  <exclude>.zion/**</exclude>
+                  <exclude>variables.properties</exclude>
+                  <!--
+                  Exclude top-level helper scripts.
+                  -->
+                  <exclude>*.sh</exclude>
+                  <exclude>*.cmd</exclude>
+                  <!--
+                  Exclude markdown documentation files
+                  -->
+                  <exclude>**/*.md</exclude>
+                  <!--
+                  Exclude maven-wrapper configuration.
+                  -->
+                  <exclude>.mvn/**</exclude>
+                  <!--
+                  Exclude IDEA run configurations.
+                  -->
+                  <exclude>.run/**</exclude>
+                  <!--
+                  Exclude optional private bits.
+                  -->
+                  <exclude>private/**</exclude>
+                  <!--
+                  Exclude assembly overlay files
+                  -->
+                  <exclude>**/src/main/resources/overlay/**</exclude>
+                  <!--
+                  Exclude (most) test resource files, many of these need specific content w/o headers.
+                  -->
+                  <exclude>**/src/test/resources/**</exclude>
+                  <exclude>**/src/test/filtered-resources/**</exclude>
+                  <exclude>**/src/test/it-resources/**</exclude>
+                  <!--
+                  Exclude XML stylesheet template so header doesn't alter expected output
+                  -->
+                  <exclude>**/nexus/internal/atlas/customizers/jetty-stylesheet.xml</exclude>
+                  <exclude>**/nexus/internal/atlas/customizers/hazelcast-stylesheet.xml</exclude>
+                  <!--
+                  Exclude rapture configuration, generated and thirdparty resources.
+                  -->
+                  <exclude>**/src/main/baseapp/**</exclude>
+                  <exclude>**/src/main/resources/static/rapture/baseapp-*.js</exclude>
+                  <exclude>**/src/main/resources/static/rapture/resources/baseapp-*.css</exclude>
+                  <exclude>**/src/main/resources-filtered/static/rapture/resources/baseapp-*.css</exclude>
+                  <exclude>**/src/main/resources/static/rapture/Ext/ux/**</exclude>
+                  <exclude>**/src/main/resources/static/rapture/Ext/patch/**</exclude>
+                  <!--
+                  Exclude npm dependencies
+                  -->
+                  <exclude>**/node_modules/**</exclude>
+                  <!--
+                  Exclude files generated by javascript builds
+                  -->
+                  <exclude>**/nexus-ui-plugin/dist/**</exclude>
+                  <!--
+                  Excludes for specific classes which have compatible, yet different licences.
+                  -->
+                  <exclude>**/nexus-extdirect/**/com/softwarementors/**</exclude>
+                  <exclude>**/nexus-ssl/**/org/sonatype/nexus/ssl/keystore/internal/geronimo/**</exclude>
+                  <exclude>**/org/sonatype/nexus/repository/apt/internal/org/apache/commons/compress/archivers/ar/ArArchiveInputStream.java</exclude>
+                  <exclude>**/JavaxProviderDefaultListableBeanFactory.java</exclude>
+
+                  <!--
+                  JS files will include the extjs specific header, see header-extjs profile below
+                  -->
+                  <exclude>**/*.js</exclude>
+                  <exclude>**/dependency-reduced-pom.xml</exclude>
+
+                  <!-- Exclude developers local scripts folder-->
+                  <exclude>myscripts/**</exclude>
+
+                  <!-- Exclude jetty modifications -->
+                  <exclude>public/common/components/thirdparty/jetty-modifications/**</exclude>
+                </excludes>
+              </licenseSet>
+
+              <!-- License Set for ExtJS JavaScript Files -->
+              <!-- This set applies the ExtJS-specific license header (header-extjs.txt) to JavaScript files. -->
+              <licenseSet>
+                <header>header-extjs.txt</header>
+                <includes>
+                  <include>**/*.js</include>
+                </includes>
+                <excludes>
+                  <exclude>private/**</exclude>
+                  <!--
+                  Exclude assembly overlay files
+                  -->
+                  <exclude>**/assemblies/**/src/main/resources/overlay/**</exclude>
+                  <exclude>**/distributions/**/src/main/resources/overlay/**</exclude>
+                  <!--
+                  Exclude (most) test resource files, many of these need specific content w/o headers.
+                  -->
+                  <exclude>**/src/test/resources/**</exclude>
+                  <exclude>**/src/test/filtered-resources/**</exclude>
+                  <exclude>**/src/test/it-resources/**</exclude>
+                  <!--
+                  Exclude rapture configuration, generated and thirdparty resources.
+                  -->
+                  <exclude>**/src/main/baseapp/**</exclude>
+                  <exclude>**/src/main/resources/static/rapture/baseapp-*.js</exclude>
+                  <exclude>**/src/main/resources/static/rapture/resources/baseapp-*.css</exclude>
+                  <exclude>**/src/main/resources-filtered/static/rapture/resources/baseapp-*.css</exclude>
+                  <exclude>**/src/main/resources/static/rapture/Ext/ux/**</exclude>
+                  <exclude>**/src/main/resources/static/rapture/Ext/patch/**</exclude>
+                  <!--
+                  Exclude npm dependencies
+                  -->
+                  <exclude>**/node_modules/**</exclude>
+                  <!--
+                  Exclude files generated by javascript builds
+                  -->
+                  <exclude>**/nexus-ui-plugin/dist/**</exclude>
+                  <exclude>**/dependency-reduced-pom.xml</exclude>
+                </excludes>
+              </licenseSet>
+
+              <!-- License Set for Private (Pro) Codebase -->
+              <!-- This set applies the private-specific license header (private/header.txt) to files part of the pro codebase. -->
+              <licenseSet>
+                <header>private/header.txt</header>
+                <includes>
+                  <include>private/**/*.java</include>
+                  <include>private/**/*.xml</include>
+                  <include>private/**/*.js</include>
+                  <include>private/**/*.groovy</include>
+                </includes>
+                <excludes>
+                  <exclude>.zion/**</exclude>
+                  <exclude>variables.properties</exclude>
+                  <!--
+                  Exclude markdown documentation files
+                  -->
+                  <exclude>**/*.md</exclude>
+                  <!--
+                  Exclude assembly overlay files
+                  -->
+                  <exclude>**/assemblies/**/src/main/resources/overlay/**</exclude>
+                  <exclude>**/distributions/**/src/main/resources/overlay/**</exclude>
+                  <!--
+                  Exclude (most) test resource files, many of these need specific content w/o headers.
+                  -->
+                  <exclude>**/src/test/resources/**</exclude>
+                  <exclude>**/src/test/filtered-resources/**</exclude>
+                  <exclude>**/src/test/it-resources/**</exclude>
+                  <!--
+                  Exclude npm dependencies
+                  -->
+                  <exclude>**/node_modules/**</exclude>
+                  <!--
+                  Exclude third-party resources.
+                  -->
+                  <exclude>**/nexus-clm-plugin/src/main/resources/artifact-details-template/jquery*</exclude>
+                  <exclude>**/nexus-proximanova-plugin/src/main/resources/static/rapture/resources/fonts/**</exclude>
+                  <!--
+                  Exclude OSS codebase overlays.
+                  -->
+                  <exclude>**/nexus-public-sources/src/main/resources/overlay/**</exclude>
+                  <!--
+                  Exclude licenses and related templates
+                  -->
+                  <exclude>**/nexus-licenses/src/main/licenses/**</exclude>
+                  <!--
+                  Exclude testsuite data resources
+                  -->
+                  <exclude>**/nexus-testsuite-data/src/main/resources/**</exclude>
+                  <!--
+                  Exclude installer resources
+                  -->
+                  <exclude>**/nexus-installer/src/main/installer/**</exclude>
+                  <exclude>**/nexus-installer/*.sh</exclude>
+                  <!--
+                  Excludes for specific classes which have compatible, yet different licenses.
+                  -->
+                  <exclude>**/nexus-ldap-plugin/**/org/sonatype/nexus/ldap/internal/connector/dao/LdapEncoder.java</exclude>
+                  <exclude>**/dependency-reduced-pom.xml</exclude>
+                  <!--
+                  Exclude files generated by swagger codegen
+                  -->
+                  <exclude>**/io/swagger/client/**</exclude>
+                </excludes>
+              </licenseSet>
+            </licenseSets>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>dev.aspectj</groupId>
+          <artifactId>aspectj-maven-plugin</artifactId>
+          <version>1.14.1</version>
+          <configuration>
+            <showWeaveInfo>true</showWeaveInfo>
+            <verbose>true</verbose>
+            <Xlint>ignore</Xlint>
+            <encoding>UTF-8</encoding>
+            <source>21</source>
+            <target>21</target>
+            <argumentFileDirectory>${project.build.directory}/aspectj</argumentFileDirectory>
+            <aspectLibraries>
+              <aspectLibrary>
+                <groupId>org.sonatype.nexus.common.components</groupId>
+                <artifactId>nexus-transaction</artifactId>
+              </aspectLibrary>
+              <aspectLibrary>
+                <groupId>org.sonatype.nexus.common.components</groupId>
+                <artifactId>nexus-common</artifactId>
+              </aspectLibrary>
+              <aspectLibrary>
+                <groupId>org.sonatype.nexus.common.components</groupId>
+                <artifactId>nexus-security</artifactId>
+              </aspectLibrary>
+              <aspectLibrary>
+                <groupId>org.sonatype.nexus.common.components</groupId>
+                <artifactId>nexus-validation</artifactId>
+              </aspectLibrary>
+            </aspectLibraries>
+          </configuration>
+          <executions>
+            <execution>
+              <id>aspectj-compile</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <configuration>
+                <argumentFileName>compile.lst</argumentFileName>
+              </configuration>
+            </execution>
+            <execution>
+              <id>aspectj-test-compile</id>
+              <goals>
+                <goal>test-compile</goal>
+              </goals>
+              <configuration>
+                <argumentFileName>test-compile.lst</argumentFileName>
+              </configuration>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>org.aspectj</groupId>
+              <artifactId>aspectjtools</artifactId>
+              <version>${aspectjtools.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <plugin>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.43.4</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>3.0.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>
+                <groupId>org.sonatype.nexus.common.assemblies</groupId>
+                <artifactId>nexus-base-overlay</artifactId>
+              </exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <!-- see developer-documentation/development/formatting.md -->
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>2.43.0</version>
+
+          <configuration>
+            <ratchetFrom>origin/main</ratchetFrom>
+
+            <formats>
+              <format>
+                <includes>
+                  <include>*.java</include>
+                </includes>
+                <excludes>
+                  <exclude>target/generated-sources/**/*.java</exclude>
+                </excludes>
+                <trimTrailingWhitespace/>
+                <endWithNewline/>
+              </format>
+            </formats>
+            <java>
+              <removeUnusedImports/>
+
+              <eclipse>
+                <file>${maven.multiModuleProjectDirectory}/sonatype-config/sonatype-eclipse.xml</file>
+              </eclipse>
+            </java>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <!-- Overridden due to parent pom defining a version which does not support java 17 -->
+          <version>3.15.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <useSystemClassLoader>false</useSystemClassLoader>
+            <forkCount>1</forkCount>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.LegacyForkNodeFactory"/>
+            <reuseForks>true</reuseForks>
+            <argLine>
+              @{argLine}
+              ${test.argLine}
+              ${surefire.maxHeap}
+              -XX:MaxDirectMemorySize=2G
+              -XX:+HeapDumpOnOutOfMemoryError
+              -XX:HeapDumpPath=${project.build.directory}/surefire-reports
+              -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+              -Xshare:off
+            </argLine>
+            <excludes>
+              <exclude>**/Abstract*</exclude>
+              <exclude>**/*$*</exclude>
+              <exclude>**/*Tests</exclude>
+            </excludes>
+            <groups>${test.includedGroups}</groups>
+            <excludedGroups>${test.excludedGroups}</excludedGroups>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <parameters>true</parameters>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.ruleoftech</groupId>
+          <artifactId>markdown-page-generator-plugin</artifactId>
+          <version>2.4.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.14</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-environment</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <fail>true</fail>
+              <rules>
+                <!--
+                Require Maven 3.9.6+ for java21 support
+                -->
+                <requireMavenVersion>
+                  <version>[3.9.6,)</version>
+                </requireMavenVersion>
+
+                <!--
+                Require Java 21+
+                -->
+                <requireJavaVersion>
+                  <version>[21,)</version>
+                </requireJavaVersion>
+
+                <!--
+                Resolving these issues after the fact is VERY tedious
+                -->
+                <banDuplicatePomDependencyVersions/>
+              </rules>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>enforce-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <fail>true</fail>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <!--
+                    Velocity 1.4 is banned, org.apache.velocity:velocity should be used instead.
+                    -->
+                    <exclude>velocity:velocity</exclude>
+                    <exclude>velocity:velocity-dep</exclude>
+
+                    <!--
+                    Conflicts with slf4j.
+                    -->
+                    <exclude>commons-logging:*</exclude>
+
+                    <!--
+                    Security hazard: osvdb-58760
+                    -->
+                    <exclude>commons-vfs:commons-vfs</exclude>
+
+                    <!--
+                    Ban all old commons-beanutils
+                    -->
+                    <exclude>commons-beanutils:commons-beanutils</exclude>
+                    <exclude>commons-beanutils:commons-beanutils-core</exclude>
+                    <exclude>commons-collections:commons-collections</exclude>
+                    <!--
+                    Security hazard: osvdb-68314
+                    -->
+                    <exclude>xmlrpc:*</exclude>
+
+                    <!--
+                    Require use of sisu plexus integration.
+                    -->
+                    <exclude>*:plexus-container-default</exclude>
+                    <exclude>*:plexus-component-api</exclude>
+
+                    <!--
+                    Ban old versions of apache shiro.
+                    -->
+                    <exclude>*:jsecurity</exclude>
+
+                    <!--
+                    Ban old aether so we can require compatible version (see includes).
+                    -->
+                    <exclude>org.sonatype.aether:*:1.8</exclude>
+
+                    <!--
+                    Ban apis which are part of Java 6.
+                    -->
+                    <!--<exclude>*:activation</exclude>-->
+                    <!--<exclude>*:stax-api</exclude>-->
+                    <!--<exclude>*:jaxb-api</exclude>-->
+                    <!--<exclude>*:xml-apis</exclude>-->
+
+                    <!--
+                    Ban junit which includes old, or improper hamcrest.
+                    -->
+                    <exclude>junit:junit:(,4.10]</exclude>
+                    <exclude>junit:junit-dep</exclude>
+
+                    <!--
+                    Ban old servlet apis.
+                    -->
+                    <exclude>javax.servlet:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api</exclude>
+                    <exclude>org.mortbay.jetty:servlet-api-2.5</exclude>
+
+                    <!--
+                    Ban uber mockito and legacy module
+                    -->
+                    <exclude>org.mockito:mockito-all</exclude>
+                    <exclude>org.mockito:mockito-inline</exclude>
+
+                    <!--
+                    Ban hamcrest so we can require compatible version (see includes).
+                    -->
+                    <exclude>org.hamcrest:*</exclude>
+
+                    <!--
+                    Ban uber hamcrest.
+                    -->
+                    <exclude>org.hamcrest:hamcrest-all:*</exclude>
+
+                    <!--
+                    Ban old plexus components.
+                    -->
+                    <exclude>org.sonatype.spice:plexus-ehcache</exclude>
+
+                    <!--
+                    Ban old litmus.
+                    -->
+                    <exclude>org.sonatype.sisu.litmus:litmus-testsupport:(,1.3]</exclude>
+
+                    <!--
+                    Ban log4j.
+                    -->
+                    <exclude>log4j:*</exclude>
+
+                    <!--
+                    CVE-2021-44228
+                    -->
+                    <exclude>org.apache.logging.log4j:log4j-core:(,2.15.0)</exclude>
+                    <exclude>ch.qos.logback:logback-classic:(,1.2.9)</exclude>
+
+                    <!--
+                    Ban old bouncycastle.
+                    -->
+                    <exclude>org.bouncycastle:*-jdk14:*</exclude>
+                    <exclude>org.bouncycastle:*-jdk15:*</exclude>
+                    <exclude>bouncycastle:*-jdk14:*</exclude>
+                    <exclude>bouncycastle:*-jdk15:*</exclude>
+
+                    <!--
+                    Ban snappy-java as there are lingering issues on OSGi when restarting.
+                    -->
+                    <exclude>org.xerial.snappy:snappy-java:*</exclude>
+
+                    <!--
+                    Ban old javax.mail
+                    -->
+                    <exclude>javax.mail:mail:*</exclude>
+
+                    <!--
+                    Ban old jaxb
+                    -->
+                    <exclude>javax.xml.bind:jaxb-api:*</exclude>
+                    <exclude>com.sun.xml.bind:jaxb-core:*</exclude>
+                    <exclude>com.sun.xml.bind:jaxb-impl:*</exclude>
+                  </excludes>
+
+                  <!--
+                  Exceptions to excludes.
+                  -->
+                  <includes>
+                    <!--
+                    Allow aether 1.8.1+
+                    -->
+                    <include>org.sonatype.aether:*:1.8.1</include>
+
+                    <!--
+                    Allow hamcrest 1.3
+                    -->
+                    <include>org.hamcrest:*:1.3</include>
+                  </includes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-identity</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+            <configuration>
+              <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+              <buildNumberPropertyName>build.revision</buildNumberPropertyName>
+              <scmBranchPropertyName>build.branch</scmBranchPropertyName>
+
+              <!-- separate from build.timestamp, which uses a less precise format defined in buildsupport parent -->
+              <timestampPropertyName>build.when</timestampPropertyName>
+              <timestampFormat>yyyy-MM-dd-HHmm-ssS</timestampFormat>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Enable CLM maven plugin -->
+      <plugin>
+        <groupId>com.sonatype.clm</groupId>
+        <artifactId>clm-maven-plugin</artifactId>
+        <configuration>
+          <skip>${clm.skip}</skip>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>index</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>pre-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- the default behavior is to run the apply goal, which will apply linting to edited files -->
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>apply</goal>
+                </goals>
+                <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>githook-checks</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.rudikershaw.gitbuildhook</groupId>
+            <artifactId>git-build-hook-maven-plugin</artifactId>
+            <version>3.5.0</version>
+            <configuration>
+              <gitConfig>
+                <core.hooksPath>private/githooks/</core.hooksPath>
+              </gitConfig>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>configure</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>githook-checks-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.rudikershaw.gitbuildhook</groupId>
+            <artifactId>git-build-hook-maven-plugin</artifactId>
+            <version>3.5.0</version>
+            <configuration>
+              <gitConfig>
+                <core.hooksPath>private/githooks/windows/</core.hooksPath>
+              </gitConfig>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>configure</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>sonatype</id>
+      <activation>
+        <property>
+          <name>!public</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- the default behavior is to run the apply goal, which will apply linting to edited files -->
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>apply</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>public</id>
+      <activation>
+        <property>
+          <name>public</name>
+        </property>
+      </activation>
+      <properties>
+        <!-- Yarn 1.x does not support immutable flag -->
+        <npm.install>install</npm.install>
+        <!-- Skip lint/format to avoid arch-specific native module issues -->
+        <npm.build>build-no-lint</npm.build>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>h2-unit-tests</id>
+      <properties>
+        <test.excludedGroups>
+          org.sonatype.nexus.content.testsuite.groups.PostgresTestGroup,
+          org.sonatype.goodies.testsupport.group.Perf
+        </test.excludedGroups>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>postgres-unit-tests</id>
+      <properties>
+        <test.excludedGroups>
+          org.sonatype.goodies.testsupport.group.Perf
+        </test.excludedGroups>
+      </properties>
+    </profile>
+
+    <!--
+    Includes building of private modules when the sources are present.
+    -->
+    <profile>
+      <id>include-private</id>
+      <activation>
+        <file>
+          <exists>private/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>private</module>
+      </modules>
+    </profile>
+
+    <!--
+    Enable verbose logging for unit tests; defaults to DEBUG.
+    -->
+    <profile>
+      <id>test.debug</id>
+      <activation>
+        <property>
+          <name>test.debug</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <test.log.level>DEBUG</test.log.level>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <test.log.level>${test.log.level}</test.log.level>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>com.ruleoftech</groupId>
+              <artifactId>markdown-page-generator-plugin</artifactId>
+              <version>2.4.2</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <!--
+    Enable animal-sniffer to verify JDK compatibility.
+    -->
+    <profile>
+      <id>animal-sniffer</id>
+      <activation>
+        <property>
+          <name>sniff</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>animal-sniffer-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+    Disable optimization for "prod" aggregate sources.
+    -->
+    <profile>
+      <id>disable-optimize</id>
+      <properties>
+        <extjs.omit>false</extjs.omit>
+        <maven.yuicompressor.nominify>true</maven.yuicompressor.nominify>
+        <maven.yuicompressor.nomunge>true</maven.yuicompressor.nomunge>
+        <maven.yuicompressor.disableOptimizations>true</maven.yuicompressor.disableOptimizations>
+        <maven.yuicompressor.linebreakpos>0</maven.yuicompressor.linebreakpos>
+      </properties>
+    </profile>
+
+    <!--
+    Execute jslint on javascript sources.
+    -->
+    <profile>
+      <id>jslint</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>yuicompressor-maven-plugin</artifactId>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/resources/static/rapture</sourceDirectory>
+              <jslintOptions>
+                <!-- ignore whitespace rules -->
+                <white>true</white>
+                <!-- do not require 'use strict' -->
+                <sloppy>true</sloppy>
+                <!-- allow to do comments -->
+                <todo>true</todo>
+                <!-- allow subscript notation -->
+                <sub>true</sub>
+              </jslintOptions>
+            </configuration>
+            <executions>
+              <execution>
+                <id>plugin-jslint</id>
+                <goals>
+                  <goal>jslint</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+    Support for loading projects in Eclipse.
+    -->
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <properties>
+        <maven.project.sourceRoots.warningsDisabled>true</maven.project.sourceRoots.warningsDisabled>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.sonatype.plugins</groupId>
+              <artifactId>yuicompressor-maven-plugin</artifactId>
+              <configuration>
+                <required>false</required>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <versionRange>[2.5.1,)</versionRange>
+                        <goals>
+                          <goal>copy</goal>
+                          <goal>unpack</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-plugin-plugin</artifactId>
+                        <versionRange>[3.2,)</versionRange>
+                        <goals>
+                          <goal>descriptor</goal>
+                          <goal>helpmojo</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <versionRange>[1.7,)</versionRange>
+                        <goals>
+                          <goal>run</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.servicemix.tooling</groupId>
+                        <artifactId>depends-maven-plugin</artifactId>
+                        <versionRange>[1.2,)</versionRange>
+                        <goals>
+                          <goal>generate-depends-file</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.sonatype.nexus.common.maven.plugins</groupId>
+                        <artifactId>extjs-maven-plugin</artifactId>
+                        <versionRange>[3.0.0-03,)</versionRange>
+                        <goals>
+                          <goal>aggregate-js</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <versionRange>[1.7.5,)</versionRange>
+                        <goals>
+                          <goal>npm</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <versionRange>[0.7,)</versionRange>
+                        <goals>
+                          <goal>install-node-and-yarn</goal>
+                          <goal>yarn</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- Make the npm test executions aware of the skipTests property -->
+      <id>skipNpmTests-skipTests</id>
+      <activation>
+        <property>
+          <name>skipTests</name>
+        </property>
+      </activation>
+      <properties>
+        <npm.skipTests>true</npm.skipTests>
+      </properties>
+    </profile>
+
+    <profile>
+      <!-- Make the npm test executions aware of the maven.test.skip property -->
+      <id>skipNpmTests-maven.test.skip</id>
+      <activation>
+        <property>
+          <name>maven.test.skip</name>
+        </property>
+      </activation>
+      <properties>
+        <npm.skipTests>true</npm.skipTests>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>ci</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <configuration>
+              <!-- when the ci profile is activated, we skip the apply goal -->
+              <!-- spotless:check is now ran during the static analysis stage when `useSpotless: true` -->
+              <applySkip>true</applySkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>buildsupport-coverage</id>
+      <properties>
+        <jacoco.skip>false</jacoco.skip>
+      </properties>
+      <build>
+        <plugins>
+          <!-- attach jacoco's report goal to the verify phase -->
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

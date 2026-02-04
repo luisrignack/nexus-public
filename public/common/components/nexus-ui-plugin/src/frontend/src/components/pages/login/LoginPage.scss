@@ -1,0 +1,190 @@
+/**
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+
+.nxrm-login-page-main {
+  > .nx-alert {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  height: calc(100% - var(--nx-global-header-height, 60px));
+
+  .login-tile {
+    width: 450px;
+    padding-bottom: 42px;
+    border: var(--nx-border-width) solid var(--nx-color-global-sidebar-2-border);
+
+    .nx-tile-header {
+      text-align: center;
+      display: block;
+
+      .nx-tile-header__title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .nx-tile-header__subtitle {
+        font-size: 16px;
+        font-weight: 400;
+      }
+    }
+    .login-content {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+
+      .initial-password-info {
+        width: 100%;
+        max-width: 336px;
+        margin:0;
+        text-align: left;
+        color: var(--nx-color-text);
+
+        &__text {
+          margin: 0 0 8px 0;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+
+        &__path {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 600;
+          word-break: break-all;
+        }
+      }
+
+      .sso-login-button {
+        width: 100%;
+        max-width: 336px;
+        min-height: 48px;
+        font-weight: 600;
+      }
+
+      .login-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--nx-color-text-subtle);
+        font-size: 14px;
+        text-transform: none;
+        width: 100%;
+        max-width: 336px;
+        margin-top: 24px;
+
+        &::before,
+        &::after {
+          content: "";
+          flex: 1;
+          height: 1px;
+          background: var(--nx-color-border);
+        }
+
+        span {
+          flex-shrink: 0;
+        }
+      }
+
+      .login-form {
+        width: 100%;
+        max-width: 336px;
+
+        .nx-fieldset {
+          width: 100%;
+        }
+
+        .nx-form-group {
+          display: flex;
+          flex-direction: column;
+          margin: 0;
+          width: 100%;
+
+          .nx-text-input,
+          .nx-password-input {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+
+            .nx-field-validation-message {
+              top: 35px;
+            }
+          }
+
+          .nx-text-input input,
+          .nx-password-input input {
+            width: 100%;
+            box-sizing: border-box;
+          }
+        }
+        .nx-form-group label {
+          font-size: 16px;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+
+        .username-field {
+          margin-bottom: 1rem;
+        }
+
+        .nx-form-group:not(.username-field) {
+          margin-bottom: 1rem;
+        }
+
+        .nx-alert {
+          margin: 1rem 0;
+        }
+
+        .login-button {
+          width: 100%;
+          margin: 0;
+          min-height: 48px;
+          font-weight: 600;
+        }
+        .server-error-container {
+          min-height: 24px;
+          display: flex;
+          align-items: flex-start;
+          margin: 0;
+        }
+
+        .server-error-message {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--nx-color-validation-invalid);
+          font-size: 14px;
+          line-height: 1.4;
+
+          svg {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        .nx-footer {
+          display: none;
+        }
+      }
+    }
+  }
+}

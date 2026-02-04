@@ -1,0 +1,35 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Maven
+target/
+*.ser
+*.ec
+
+# Intellij
+*.ipr
+*.iml
+*.iws
+.idea/
+
+# Other
+.DS_Store
+.clover
+build.log
+atlassian-ide-plugin.xml
+dependency-reduced-pom.xml
+out
+
+# Yarn / Node.js
+node_modules/
+.yarn/
+.pnp.*
+yarn.lock
+
+groovy-classes/
+
+# Zion
+.zion/
+variables.properties

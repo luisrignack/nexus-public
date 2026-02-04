@@ -1,0 +1,292 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.common.app;
+
+/**
+ * List of available feature flags
+ * You can change it's values by editing ${data-dir}/nexus.properties configuration file.
+ *
+ * @since 3.20
+ */
+public class FeatureFlags
+{
+  /* Go (hosted) repository is experimental. Available values: true, false. Default value: false */
+  public static final String FEATURE_GOLANG_HOSTED = "nexus.golang.hosted";
+
+  /* Cargo format is temporarily hidden behind the feature flag. Default value: false */
+  public static final String CARGO_FORMAT_ENABLED = "nexus.format.cargo.enabled";
+
+  /* Hugging Face format is temporarily hidden behind the feature flag. Default value: false */
+  public static final String HUGGING_FACE_FORMAT_ENABLED = "nexus.format.huggingface.enabled";
+
+  /* Composer format is temporarily hidden behind the feature flag. Default value: false */
+  public static final String COMPOSER_FORMAT_ENABLED = "nexus.format.composer.enabled";
+
+  /* Terraform Group repository type is hidden behind the feature flag. Default value: false */
+  public static final String TERRAFORM_GROUP_ENABLED = "nexus.format.terraform.group.enabled";
+
+  /* Docker GC Custom task enabled. Available values: true, false. Default value: false */
+  public static final String DOCKER_GC_CUSTOM_TASK_ENABLED = "nexus.docker.gc.custom.enabled";
+
+  /* Database externalization developers only. Available values: true, false. Default value: false */
+  public static final String DATASTORE_DEVELOPER = "nexus.datastore.developer";
+
+  public static final String DATASTORE_DEVELOPER_NAMED_VALUE = "${nexus.datastore.developer:false}";
+
+  /* Distributed event service. Available values: true, false. Default value: false */
+  public static final String DATASTORE_CLUSTERED_ENABLED = "nexus.datastore.clustered.enabled";
+
+  public static final String DATASTORE_CLUSTERED_ENABLED_NAMED_VALUE = "${nexus.datastore.clustered.enabled:false}";
+
+  /* Zero downtime upgrades while clustered. Available values: true, false. Default value: false */
+  public static final String CLUSTERED_ZERO_DOWNTIME_ENABLED = "nexus.zero.downtime.enabled";
+
+  public static final String CLUSTERED_ZERO_DOWNTIME_ENABLED_NAMED_VALUE = "${nexus.zero.downtime.enabled:false}";
+
+  public static final String CLUSTERED_ZERO_DOWNTIME_ENABLED_ENV = "NEXUS_ZERO_DOWNTIME_ENABLED";
+
+  /**
+   * Heartbeat interval in seconds for cluster node health monitoring.
+   * <p>
+   * Default: 600 seconds (10 minutes). This interval determines:
+   * <ul>
+   * <li>How frequently nodes write heartbeat data to the database</li>
+   * <li>The maximum time before a failed node's stale heartbeat is considered inactive</li>
+   * <li>The timeout for Zero Downtime Upgrade coordination (all nodes must reach consensus within this window)</li>
+   * </ul>
+   */
+  public static final String HEARTBEAT_INTERVAL_SECONDS = "nexus.heartbeat.interval";
+
+  public static final int HEARTBEAT_INTERVAL_SECONDS_DEFAULT = 600;
+
+  /* Feature flag to indicate if current db is postgresql */
+  public static final String DATASTORE_IS_POSTGRESQL = "datastore.isPostgresql";
+
+  /* JWT externalization. Available values: true, false. Default value: false */
+  public static final String JWT_ENABLED = "nexus.jwt.enabled";
+
+  /* Session flag for marking content that is only for session, and should be disabled when jwt is enabled */
+  public static final String SESSION_ENABLED = "nexus.session.enabled";
+
+  /* HTTP Replication. Available values: true, false. Default value: true */
+  public static final String REPLICATION_HTTP_ENABLED = "nexus.replication.http.enabled";
+
+  /*
+   * flag for skipping blob store with soft-quota violation (for Round Robin group policy)
+   * Available values: true, false. Default value: false
+   */
+  public static final String BLOBSTORE_SKIP_ON_SOFTQUOTA_VIOLATION = "nexus.blobstore.skipOnSoftQuotaViolation";
+
+  /*  */
+  public static final String DATASTORE_BLOBSTORE_METRICS = "nexus.datastore.blobstore.metrics.enabled";
+
+  /**
+   * The Key-Value DB storage which can be used as a distributed cache. Use it intelligently,
+   * for example it makes sense to cache IQ results in a DB rather than request IQ Server each time.
+   * At best should be replaced by Redis cache or Apache Ignite or other.
+   */
+  public static final String SQL_DISTRIBUTED_CACHE = "nexus.datastore.sql.cache.enabled";
+
+  /**
+   * Validates attribute from the node_heartbeat.node_info to determine if the deployment is valid.
+   */
+  public static final String DATASTORE_DEPLOYMENT_VALIDATOR = "nexus.datastore.deployment.validator.enabled";
+
+  public static final String CHANGE_REPO_BLOBSTORE_TASK_ENABLED = "nexus.change.repo.blobstore.task.enabled";
+
+  public static final String CHANGE_REPO_BLOBSTORE_TASK_ENABLED_NAMED_VALUE =
+      "${nexus.change.repo.blobstore.task.enabled:false}";
+
+  /**
+   * Feature flag to enable/disable RecalculateBlobStoreSizeTask
+   */
+  public static final String RECALCULATE_BLOBSTORE_SIZE_TASK_ENABLED = "nexus.recalculate.blobstore.size.task.enabled";
+
+  public static final String RECALCULATE_BLOBSTORE_SIZE_TASK_ENABLED_NAMED_VALUE =
+      "${" + RECALCULATE_BLOBSTORE_SIZE_TASK_ENABLED + ":true}";
+
+  public static final String FIREWALL_ONBOARDING_ENABLED = "nexus.firewall.onboarding.enabled";
+
+  public static final String CLEANUP_PREVIEW_ENABLED = "nexus.cleanup.preview.enabled";
+
+  public static final String CLEANUP_PREVIEW_ENABLED_NAMED_VALUE = "${nexus.cleanup.preview.enabled:true}";
+
+  public static final String CLEANUP_MAVEN_RETAIN = "nexus.cleanup.mavenRetain";
+
+  public static final String CLEANUP_DOCKER_RETAIN = "nexus.cleanup.dockerRetain";
+
+  public static final String CLEANUP_USE_SQL = "nexus.cleanup.useSQL";
+
+  public static final String FORMAT_RETAIN_PATTERN = "nexus.cleanup.{format}Retain";
+
+  public static final String DISABLE_NORMALIZE_VERSION_TASK = "nexus.cleanup.disableNormalizeVersionTask";
+
+  public static final String DISABLE_CREATING_COMPONENT_INDEXES_TASK = "nexus.component.index.task";
+
+  public static final String FIREWALL_QUARANTINE_FIX_ENABLED = "nexus.firewall.quarantineFix.enabled";
+
+  public static final String FIREWALL_QUARANTINE_FIX_ENABLED_NAMED_VALUE =
+      "${nexus.firewall.quarantineFix.enabled:false}";
+
+  public static final String REACT_PRIVILEGES = "nexus.react.privileges";
+
+  public static final String REACT_PRIVILEGES_NAMED_VALUE = "${nexus.react.privileges:true}";
+
+  public static final String REACT_PRIVILEGES_MODAL_ENABLED = "nexus.react.privileges.modal.enabled";
+
+  public static final String REACT_PRIVILEGES_MODAL_NAMED_VALUE = "${nexus.react.privileges.modal.enabled:true}";
+
+  /**
+   * Feature flag to determine if we should include the repository sizes feature
+   */
+  public static final String REPOSITORY_SIZE_ENABLED = "nexus.repository.size";
+
+  public static final String REPOSITORY_SIZE_ENABLED_NAMED_VALUE = "${nexus.repository.size:true}";
+
+  public static final String CONTENT_USAGE_ENABLED_NAMED_VALUE = "${nexus.contentUsageMetrics.enabled:true}";
+
+  public static final String REACT_ROLES_MODAL_ENABLED = "nexus.react.roles.modal.enabled";
+
+  public static final String REACT_ROLES_MODAL_NAMED_VALUE = "${nexus.react.roles.modal.enabled:true}";
+
+  public static final String BLOBSTORE_OWNERSHIP_CHECK_DISABLED_NAMED_VALUE =
+      "${nexus.blobstore.s3.ownership.check.disabled:false}";
+
+  public static final String STARTUP_TASKS_DELAY_SECONDS_VALUE = "${nexus.startup.task.delay.seconds:0}";
+
+  /**
+   * Feature flag to expose H2 export database to script task
+   */
+  public static final String H2_DATABASE_EXPORT_SCRIPT_TASK_ENABLED = "nexus.database.export.script.task.h2.enabled";
+
+  /* When false skips the orient not supported error. Available values: true, false. Default value: true */
+  public static final String ORIENT_WARNING = "nexus.orient.warning";
+
+  public static final String ORIENT_WARNING_NAMED_VALUE = "${nexus.orient.warning:true}";
+
+  /**
+   * When true (default), the Secure attribute will be set on the NXSESSIONID Cookie when delivered over https.
+   * In deployments with HTTP-only listeners, this setting will typically have no effect.
+   * Setting false for this property in HTTPS only environments is not recommended.
+   *
+   * See https://owasp.org/www-community/controls/SecureCookieAttribute
+   */
+  public static final String NXSESSIONID_SECURE_COOKIE_NAMED_VALUE = "${nexus.session.secureCookie:true}";
+
+  public static final String ASSET_AUDITOR_ATTRIBUTE_CHANGES_ENABLED_VALUE =
+      "${nexus.audit.attribute.changes.enabled:true}";
+
+  public static final String ZERO_DOWNTIME_MARKETING_MODAL_ENABLED = "zero.downtime.marketing.modal";
+
+  public static final String ZERO_DOWNTIME_MARKETING_MODAL_ENABLED_NAMED_VALUE =
+      "${zero.downtime.marketing.modal:false}";
+
+  /* For testing purposes only */
+  public static final String ZERO_DOWNTIME_BASELINE_FAIL = "nexus.zdu.baseline.fail";
+
+  /* For testing purposes only */
+  public static final String ZERO_DOWNTIME_FUTURE_MIGRATION_ENABLED = "nexus.zdu.future.enabled";
+
+  public static final String MALWARE_RISK_ENABLED = "nexus.malware.risk.enabled";
+
+  public static final String MALWARE_RISK_ENABLED_NAMED_VALUE = "${nexus.malware.risk.enabled:true}";
+
+  public static final String MALWARE_RISK_ON_DISK_NONADMIN_OVERRIDE_ENABLED =
+      "nexus.malware.risk.on.disk.nonadmin.override.enabled";
+
+  public static final String MALWARE_RISK_ON_DISK_NONADMIN_OVERRIDE_ENABLED_NAMED_VALUE =
+      "${nexus.malware.risk.on.disk.nonadmin.override.enabled:false}";
+
+  public static final String MALWARE_REMEDIATOR_TASK_CHECK_REPOSITORY_IN_KNOWN_REGISTRIES_NAMED_VALUE =
+      "${nexus.malware.remediator.task.check.repository.in.known.registries:true}";
+
+  public static final String MALWARE_REMEDIATOR_TASK_IGNORE_QUARANTINE_STATE_NAMED_VALUE =
+      "${nexus.malware.remediator.task.ignore.quarantine.state:true}";
+
+  /* properties/env vars used by secrets service */
+  public static final String SECRETS_FILE = "nexus.secrets.file";
+
+  public static final String SECRETS_FILE_ENV = "NEXUS_SECRETS_KEY_FILE";
+
+  public static final String RECONCILE_CLEANUP_DAYS_AGO_VALUE = "${nexus.reconcile.cleanup.daysAgo:7}";
+
+  public static final String SECRETS_API_ENABLED = "nexus.secrets.api.enabled";
+
+  public static final String NEXUS_SECURITY_OAUTH2_ENABLED = "nexus.security.oauth2.enabled";
+
+  public static final String NEXUS_SECURITY_FIPS_ENABLED = "nexus.security.fips.enabled";
+
+  public static final String NEXUS_SECURITY_FIPS_ENABLED_NAMED_VALUE = "${nexus.security.fips.enabled:false}";
+
+  public static final String NEXUS_SECURITY_PASSWORD_ALGORITHM_NAMED_VALUE =
+      "${nexus.security.password.algorithm:shiro1}";
+
+  public static final String NEXUS_SECURITY_PASSWORD_ITERATIONS_NAMED_VALUE =
+      "${nexus.security.password.iterations:}";
+
+  public static final String NEXUS_SECURITY_SECRETS_ALGORITHM_NAMED_VALUE =
+      "${nexus.security.secrets.algorithm:PBKDF2WithHmacSHA1}";
+
+  public static final String NEXUS_SECURITY_SECRETS_ITERATIONS_NAMED_VALUE =
+      "${nexus.security.secrets.iterations:}";
+
+  public static final String CONTAINER_IMAGES_EVAL_ENABLED = "nexus.container.images.eval.enabled";
+
+  public static final String CONTAINER_IMAGES_EVAL_ENABLED_NAMED = "${nexus.container.images.eval.enabled:-true}";
+
+  public static final String CONTAINER_IMAGES_EVAL_ENABLED_NAMED_VALUE = "${nexus.container.images.eval.enabled:true}";
+
+  public static final String CONTAINER_IMAGES_EVAL_API_ENABLED_VALUE =
+      "${nexus.container.images.eval.api.enabled:true}";
+
+  public static final String NEXUS_SECURITY_AUTH0_USER_MANAGEMENT_ENABLED =
+      "nexus.security.auth0.userManagement.enabled";
+
+  public static final String FIREWALL_CONTAINER_WORK_DIRECTORY_NAMED = "${nexus.firewall.container.workdirectory:-}";
+
+  public static final String FIREWALL_CONTAINER_WORK_DIRECTORY_VALUE = "${nexus.firewall.container.workdirectory:}";
+
+  public static final String EGRESS_METRICS_AGGREGATION_TASK_VISIBLE = "${nexus.egressmetrics.task.visible:false}";
+
+  /*
+   * PyPi metadata features (PEP 658 + 691). Enables metadata distribution and JSON API. Available values: true, false.
+   * Default value: false
+   */
+  public static final String PYPI_METADATA_ENABLED = "nexus.pypi.metadata.enabled";
+
+  public static final String PYPI_METADATA_ENABLED_NAMED_VALUE = "${nexus.pypi.metadata.enabled:false}";
+
+  /* React Tasks Experience. Available values: true, false. Default value: false */
+  public static final String REACT_TASKS_ENABLED = "nexus.react.tasks.enabled";
+
+  public static final String REACT_TASKS_ENABLED_NAMED_VALUE = "${nexus.react.tasks.enabled:false}";
+
+  public static final String NEXUS_USER_CONFIGURATION_SOURCE_ENABLED = "nexus.user.configuration.source.enabled";
+
+  /* ExtJS Capabilities Page. Available values: true, false. Default value: false */
+  public static final String EXTJS_CAPABILITIES_ENABLED = "nexus.extjs.capabilities.enabled";
+
+  public static final String EXTJS_CAPABILITIES_NAMED_VALUE = "${nexus.extjs.capabilities.enabled:false}";
+
+  /* React Capabilities Page. Available values: true, false. Default value: true */
+  public static final String REACT_CAPABILITIES_ENABLED = "nexus.react.capabilities.enabled";
+
+  public static final String REACT_CAPABILITIES_NAMED_VALUE = "${nexus.react.capabilities.enabled:true}";
+
+  // Swift Hosted repository type. Default value: false
+  public static final String SWIFT_HOSTED_ENABLED = "nexus.format.swift.hosted.enabled";
+
+  /* Enable principal permissions cache. Default value: true */
+  public static final String PRINCIPAL_PERMISSIONS_CACHE_ENABLED_NAMED_VALUE =
+      "${nexus.security.principal.permissions.cache.enabled:true}";
+}

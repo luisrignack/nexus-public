@@ -1,0 +1,78 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.script.configuration.model;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.sonatype.nexus.configuration.model.ConfigurationXO;
+import org.sonatype.nexus.script.Script;
+
+public class ScriptConfigurationListXO
+    implements ConfigurationXO
+{
+  public static final String TYPE_ID = "script_list";
+
+  private List<ScriptConfigurationXO> scriptConfigurationXOs = new ArrayList<>();
+
+  public List<ScriptConfigurationXO> getScriptConfigurationXOs() {
+    return scriptConfigurationXOs;
+  }
+
+  public void setScriptConfigurationXOs(final List<ScriptConfigurationXO> scriptConfigurationXOs) {
+    this.scriptConfigurationXOs = scriptConfigurationXOs;
+  }
+
+  public void addScriptConfigurationXO(final ScriptConfigurationXO scriptConfigurationXO) {
+    scriptConfigurationXOs.add(scriptConfigurationXO);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ScriptConfigurationListXO that = (ScriptConfigurationListXO) o;
+    return Objects.equals(getScriptConfigurationXOs(), that.getScriptConfigurationXOs());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getScriptConfigurationXOs());
+  }
+
+  @Override
+  public String getConfigurationTypeId() {
+    return TYPE_ID;
+  }
+
+  public List<Script> toConfiguration() {
+    List<Script> configurations = new ArrayList<>();
+    scriptConfigurationXOs.forEach(scriptConfigurationXO -> {
+      configurations.add(scriptConfigurationXO.toConfiguration());
+    });
+    return configurations;
+  }
+
+  public static ScriptConfigurationListXO from(final List<Script> configurations) {
+    ScriptConfigurationListXO listXO = new ScriptConfigurationListXO();
+    configurations.forEach(configuration -> {
+      listXO.addScriptConfigurationXO(ScriptConfigurationXO.from(configuration));
+    });
+    return listXO;
+  }
+}

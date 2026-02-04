@@ -1,0 +1,625 @@
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2008-present Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-common-parent</artifactId>
+    <version>3.89.0-09</version>
+  </parent>
+
+  <groupId>org.sonatype.nexus.common.components</groupId>
+  <artifactId>nexus-common-components-parent</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>api</module>
+    <module>formats</module>
+    <module>nexus-audit</module>
+    <module>nexus-audit-plugin</module>
+    <module>nexus-base</module>
+    <module>nexus-blobstore</module>
+    <module>nexus-blobstore-api</module>
+    <module>nexus-blobstore-file</module>
+    <module>nexus-blobstore-s3</module>
+    <module>nexus-blobstore-tasks</module>
+    <module>nexus-bootstrap-spring</module>
+    <module>nexus-cache</module>
+    <module>nexus-capability</module>
+    <module>nexus-cleanup</module>
+    <module>nexus-cleanup-config</module>
+    <module>nexus-common</module>
+    <module>nexus-configuration</module>
+    <module>nexus-core</module>
+    <module>nexus-coreui-plugin</module>
+    <module>nexus-crypto</module>
+    <module>nexus-datastore</module>
+    <module>nexus-datastore-api</module>
+    <module>nexus-datastore-h2</module>
+    <module>nexus-datastore-mybatis</module>
+    <module>nexus-distributed-event-service-api</module>
+    <module>nexus-email</module>
+    <module>nexus-example-content</module>
+    <module>nexus-extender-spring</module>
+    <module>nexus-formfields</module>
+    <module>nexus-httpclient</module>
+    <module>nexus-jetty-log</module>
+    <module>nexus-jmx</module>
+    <module>nexus-logging</module>
+    <module>nexus-mime</module>
+    <module>nexus-onboarding-plugin</module>
+    <module>nexus-outbound-request-context</module>
+    <module>nexus-plugin-api</module>
+    <module>nexus-quartz</module>
+    <module>nexus-rapture</module>
+    <module>nexus-repository-config</module>
+    <module>nexus-repository-content</module>
+    <module>nexus-repository-httpbridge</module>
+    <module>nexus-repository-services</module>
+    <module>nexus-repository-view</module>
+    <module>nexus-scheduling</module>
+    <module>nexus-script</module>
+    <module>nexus-script-plugin</module>
+    <module>nexus-search-sql</module>
+    <module>nexus-selector</module>
+    <module>nexus-servlet</module>
+    <module>nexus-siesta</module>
+    <module>nexus-spring</module>
+    <module>nexus-ssl</module>
+    <module>nexus-ssl-plugin</module>
+    <module>nexus-supportzip-api</module>
+    <module>nexus-task-log-cleanup</module>
+    <module>nexus-test-common</module>
+    <module>nexus-test-db</module>
+    <module>nexus-testsupport</module>
+    <module>nexus-thread</module>
+    <module>nexus-transaction</module>
+    <module>nexus-ui-plugin</module>
+    <module>nexus-upgrade</module>
+    <module>nexus-validation</module>
+    <module>nexus-version</module>
+    <module>nexus-webhooks</module>
+    <module>nexus-webresources-api</module>
+	<module>security</module>
+    <module>thirdparty</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <!-- BUILDSUPPORT -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.buildsupport</groupId>
+        <artifactId>nexus-common-buildsupport-all</artifactId>
+        <type>pom</type>
+        <version>3.89.0-09</version>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- COMPONENTS -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-audit</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-audit-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-base</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-blobstore</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-blobstore-api</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-blobstore-file</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-blobstore-s3</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-blobstore-tasks</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-bootstrap-spring</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-cache</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-capability</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-cleanup</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-cleanup-config</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-common</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-configuration</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-core</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+	  
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-coreui-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-crypto</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-datastore</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-datastore-api</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-datastore-h2</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-datastore-mybatis</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-distributed-event-service-api</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-email</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-example-content</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-extender-spring</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-formfields</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-httpclient</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-jetty-log</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-jmx</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-logging</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-mime</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-onboarding-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-outbound-request-context</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-plugin-api</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-quartz</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-rapture</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-config</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-content</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-httpbridge</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-services</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-view</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-scheduling</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-script</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-script-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-search-sql</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-selector</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-servlet</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-siesta</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-spring</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-ssl</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-ssl-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-supportzip-api</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-task-log-cleanup</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-test-common</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-test-db</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-testsupport</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-thread</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-transaction</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-ui-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-upgrade</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-validation</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-version</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-webhooks</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-webresources-api</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <!-- API -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-api-extdirect-common</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-api-rest-common</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-extdirect</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-rest</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-rest-client</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-rest-jackson2</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-swagger</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <!-- SECURITY -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-security</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-default-role-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <!-- FORMATS -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-maven</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-apt</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-raw</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+	  
+	  <!-- THIRDPARTY -->
+	  
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>jetty-ee8-nested</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>jetty-security</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>dev.aspectj</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
