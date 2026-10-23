@@ -30,6 +30,7 @@
   <modules>
     <module>nexus-repository-apt</module>
     <module>nexus-repository-maven</module>
+    <module>nexus-repository-npm</module>
     <module>nexus-repository-raw</module>
   </modules>
 
