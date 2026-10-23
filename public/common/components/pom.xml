@@ -588,6 +588,12 @@
         <artifactId>nexus-repository-npm</artifactId>
         <version>3.89.0-09</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-yum</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
 	  
 	  <!-- THIRDPARTY -->
 	  

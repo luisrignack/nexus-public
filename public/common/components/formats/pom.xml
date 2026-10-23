@@ -32,6 +32,7 @@
     <module>nexus-repository-maven</module>
     <module>nexus-repository-npm</module>
     <module>nexus-repository-raw</module>
+    <module>nexus-repository-yum</module>
   </modules>
 
 </project>
