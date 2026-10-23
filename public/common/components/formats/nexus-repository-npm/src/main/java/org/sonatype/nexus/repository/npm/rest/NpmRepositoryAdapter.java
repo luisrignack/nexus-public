@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.rest.api.SimpleApiRepositoryAdapter;
 import org.sonatype.nexus.repository.rest.api.model.AbstractApiRepository;
 import org.sonatype.nexus.repository.routing.RoutingRuleStore;
 import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.types.ProxyType;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,20 @@ public class NpmRepositoryAdapter
           getHostedStorageAttributes(repository),
           getCleanupPolicyAttributes(repository),
           getComponentAttributes(repository),
+          new NpmAttributes());
+    }
+    if (ProxyType.NAME.equals(repository.getType().toString())) {
+      return new NpmProxyApiRepository(
+          repository.getName(),
+          repository.getUrl(),
+          repository.getConfiguration().isOnline(),
+          getHostedStorageAttributes(repository),
+          getCleanupPolicyAttributes(repository),
+          getProxyAttributes(repository),
+          getNegativeCacheAttributes(repository),
+          getHttpClientAttributes(repository),
+          getRoutingRuleName(repository),
+          getReplicationAttributes(repository),
           new NpmAttributes());
     }
     throw new IllegalArgumentException("Unsupported repository type: " + repository.getType());
