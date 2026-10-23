@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.npm.internal.NpmFormat;
 import org.sonatype.nexus.repository.rest.api.SimpleApiRepositoryAdapter;
 import org.sonatype.nexus.repository.rest.api.model.AbstractApiRepository;
 import org.sonatype.nexus.repository.routing.RoutingRuleStore;
+import org.sonatype.nexus.repository.types.GroupType;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
 
@@ -59,6 +60,15 @@ public class NpmRepositoryAdapter
           getHttpClientAttributes(repository),
           getRoutingRuleName(repository),
           getReplicationAttributes(repository),
+          new NpmAttributes());
+    }
+    if (GroupType.NAME.equals(repository.getType().toString())) {
+      return new NpmGroupApiRepository(
+          repository.getName(),
+          repository.getUrl(),
+          repository.getConfiguration().isOnline(),
+          getHostedStorageAttributes(repository),
+          getGroupAttributes(repository),
           new NpmAttributes());
     }
     throw new IllegalArgumentException("Unsupported repository type: " + repository.getType());
