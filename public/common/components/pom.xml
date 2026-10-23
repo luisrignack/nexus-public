@@ -579,7 +579,13 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.common.components</groupId>
-        <artifactId>nexus-repository-raw</artifactId>
+        
+      <artifactId>nexus-repository-pypi</artifactId>
+      <version>3.89.0-09</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-raw</artifactId>
         <version>3.89.0-09</version>
       </dependency>
 

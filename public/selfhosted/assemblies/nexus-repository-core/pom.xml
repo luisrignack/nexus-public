@@ -380,6 +380,10 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-pypi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-repository-raw</artifactId>
     </dependency>
     <dependency>
