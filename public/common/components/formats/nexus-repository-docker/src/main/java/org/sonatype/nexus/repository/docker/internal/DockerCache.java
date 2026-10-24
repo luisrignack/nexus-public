@@ -19,13 +19,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.sonatype.nexus.repository.docker.internal.DockerRegistryConfig.Upstream;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -42,6 +50,8 @@ import org.springframework.stereotype.Component;
 public class DockerCache
 {
   private static final Logger log = LoggerFactory.getLogger(DockerCache.class);
+
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private final DockerRegistryConfig config;
 
@@ -298,5 +308,314 @@ public class DockerCache
 
   private static String emptyToNull(final String value) {
     return value == null || value.isEmpty() ? null : value;
+  }
+
+  /**
+   * Summary of a Docker cache garbage collection run.
+   */
+  public static final class GcResult
+  {
+    private final int deletedFiles;
+
+    private final long deletedBytes;
+
+    private final int retainedFiles;
+
+    private final long retainedBytes;
+
+    private final int protectedFiles;
+
+    private final boolean dryRun;
+
+    public GcResult(
+        final int deletedFiles,
+        final long deletedBytes,
+        final int retainedFiles,
+        final long retainedBytes,
+        final int protectedFiles,
+        final boolean dryRun)
+    {
+      this.deletedFiles = deletedFiles;
+      this.deletedBytes = deletedBytes;
+      this.retainedFiles = retainedFiles;
+      this.retainedBytes = retainedBytes;
+      this.protectedFiles = protectedFiles;
+      this.dryRun = dryRun;
+    }
+
+    public int deletedFiles() {
+      return deletedFiles;
+    }
+
+    public long deletedBytes() {
+      return deletedBytes;
+    }
+
+    public int retainedFiles() {
+      return retainedFiles;
+    }
+
+    public long retainedBytes() {
+      return retainedBytes;
+    }
+
+    public int protectedFiles() {
+      return protectedFiles;
+    }
+
+    public boolean dryRun() {
+      return dryRun;
+    }
+  }
+
+  /**
+   * Runs garbage collection on the Docker disk cache across all upstreams (or a specific upstream when
+   * {@code upstreamFilter} is non-blank).
+   *
+   * @param maxSizeBytesPerUpstream maximum total bytes per upstream (0 or negative disables size limit)
+   * @param maxAgeSeconds           maximum age in seconds for cache entries (0 or negative disables age limit)
+   * @param dryRun                  when {@code true}, calculates the report without deleting files
+   * @param upstreamFilter          optional upstream directory name; {@code null} or blank cleans all upstreams
+   */
+  public GcResult gc(
+      final long maxSizeBytesPerUpstream,
+      final long maxAgeSeconds,
+      final boolean dryRun,
+      final String upstreamFilter) throws IOException
+  {
+    Path root = config.getCacheDir();
+    if (!Files.isDirectory(root)) {
+      return new GcResult(0, 0L, 0, 0L, 0, dryRun);
+    }
+
+    int deletedFiles = 0;
+    long deletedBytes = 0L;
+    int retainedFiles = 0;
+    long retainedBytes = 0L;
+    int protectedFiles = 0;
+
+    List<Path> upstreamDirs = new ArrayList<>();
+    try (Stream<Path> children = Files.list(root)) {
+      children.filter(Files::isDirectory).forEach(dir -> {
+        if (upstreamFilter == null || upstreamFilter.isBlank()
+            || dir.getFileName().toString().equalsIgnoreCase(upstreamFilter.trim())) {
+          upstreamDirs.add(dir);
+        }
+      });
+    }
+
+    long now = System.currentTimeMillis();
+    for (Path upstreamDir : upstreamDirs) {
+      GcResult single = gcUpstream(upstreamDir, maxSizeBytesPerUpstream, maxAgeSeconds, dryRun, now);
+      deletedFiles += single.deletedFiles();
+      deletedBytes += single.deletedBytes();
+      retainedFiles += single.retainedFiles();
+      retainedBytes += single.retainedBytes();
+      protectedFiles += single.protectedFiles();
+    }
+
+    log.info(
+        "Docker cache GC (dryRun={}): deleted {} files ({} bytes), retained {} files ({} bytes), protected {} referenced entries",
+        dryRun, deletedFiles, deletedBytes, retainedFiles, retainedBytes, protectedFiles);
+    return new GcResult(deletedFiles, deletedBytes, retainedFiles, retainedBytes, protectedFiles, dryRun);
+  }
+
+  private GcResult gcUpstream(
+      final Path upstreamDir,
+      final long maxSizeBytes,
+      final long maxAgeSeconds,
+      final boolean dryRun,
+      final long now) throws IOException
+  {
+    List<CachedFile> allFiles = new ArrayList<>();
+    try (Stream<Path> walk = Files.walk(upstreamDir)) {
+      walk.filter(Files::isRegularFile)
+          .filter(p -> !p.getFileName().toString().endsWith(".meta"))
+          .filter(p -> !p.getFileName().toString().endsWith(".tmp"))
+          .forEach(p -> {
+            Entry entry = read(p);
+            if (entry != null) {
+              try {
+                long size = Files.size(p);
+                Path rel = upstreamDir.relativize(p);
+                String category = rel.getNameCount() > 0 ? rel.getName(0).toString() : "";
+                boolean byTagManifest = "manifests".equals(category)
+                    && rel.getNameCount() > 1
+                    && "by-tag".equals(rel.getName(1).toString());
+                boolean byDigestManifest = "manifests".equals(category)
+                    && rel.getNameCount() > 1
+                    && "by-digest".equals(rel.getName(1).toString());
+                boolean blob = "blobs".equals(category);
+                allFiles.add(new CachedFile(entry, size, byTagManifest, byDigestManifest, blob));
+              }
+              catch (IOException ignored) {
+                // ignore concurrently removed files
+              }
+            }
+          });
+    }
+
+    // 1. Determine active manifests (not expired by maxAgeSeconds) and collect referenced blob/manifest digests
+    Set<String> referencedSafeDigests = new HashSet<>();
+    List<CachedFile> activeManifests = new ArrayList<>();
+    for (CachedFile cf : allFiles) {
+      if (cf.byTagManifest || cf.byDigestManifest) {
+        boolean expired = maxAgeSeconds > 0 && (now - cf.entry.cachedAt()) > maxAgeSeconds * 1000L;
+        if (!expired) {
+          // If only size limit is used (maxAgeSeconds <= 0), by-tag manifests are treated as roots of live references
+          if (maxAgeSeconds > 0 || cf.byTagManifest) {
+            activeManifests.add(cf);
+          }
+        }
+      }
+    }
+
+    for (CachedFile manifest : activeManifests) {
+      collectReferencedDigests(upstreamDir, manifest.entry.file(), referencedSafeDigests, 0);
+    }
+
+    int deletedFiles = 0;
+    long deletedBytes = 0L;
+    int protectedFiles = 0;
+    List<CachedFile> survivors = new ArrayList<>();
+
+    // 2. Evict entries exceeding maxAgeSeconds unless protected by an active manifest reference
+    for (CachedFile cf : allFiles) {
+      boolean expired = maxAgeSeconds > 0 && (now - cf.entry.cachedAt()) > maxAgeSeconds * 1000L;
+      if (expired) {
+        if (isReferenced(cf, referencedSafeDigests)) {
+          protectedFiles++;
+          survivors.add(cf);
+        }
+        else {
+          deleteEntry(cf.entry.file(), dryRun);
+          deletedFiles++;
+          deletedBytes += cf.size;
+        }
+      }
+      else {
+        survivors.add(cf);
+      }
+    }
+
+    // 3. Enforce maxSizeBytes using LRU (oldest cachedAt first), evicting unreferenced entries before referenced ones
+    if (maxSizeBytes > 0) {
+      long currentBytes = survivors.stream().mapToLong(cf -> cf.size).sum();
+      if (currentBytes > maxSizeBytes) {
+        survivors.sort(Comparator.comparingLong(cf -> cf.entry.cachedAt()));
+        List<CachedFile> keptAfterLru = new ArrayList<>();
+        for (CachedFile cf : survivors) {
+          if (currentBytes > maxSizeBytes) {
+            if (isReferenced(cf, referencedSafeDigests)) {
+              protectedFiles++;
+              keptAfterLru.add(cf);
+            }
+            else {
+              deleteEntry(cf.entry.file(), dryRun);
+              deletedFiles++;
+              deletedBytes += cf.size;
+              currentBytes -= cf.size;
+            }
+          }
+          else {
+            keptAfterLru.add(cf);
+          }
+        }
+        survivors = keptAfterLru;
+      }
+    }
+
+    int retainedFiles = survivors.size();
+    long retainedBytes = survivors.stream().mapToLong(cf -> cf.size).sum();
+    return new GcResult(deletedFiles, deletedBytes, retainedFiles, retainedBytes, protectedFiles, dryRun);
+  }
+
+  private void collectReferencedDigests(
+      final Path upstreamDir,
+      final Path manifestFile,
+      final Set<String> referencedSafeDigests,
+      final int depth)
+  {
+    if (depth > 3 || !Files.isRegularFile(manifestFile)) {
+      return;
+    }
+    try (InputStream in = Files.newInputStream(manifestFile)) {
+      JsonNode root = MAPPER.readTree(in);
+      if (root == null || !root.isObject()) {
+        return;
+      }
+      JsonNode configNode = root.get("config");
+      if (configNode != null && configNode.hasNonNull("digest")) {
+        referencedSafeDigests.add(safeDigest(configNode.get("digest").asText()));
+      }
+      JsonNode layers = root.get("layers");
+      if (layers != null && layers.isArray()) {
+        for (JsonNode layer : layers) {
+          if (layer.hasNonNull("digest")) {
+            referencedSafeDigests.add(safeDigest(layer.get("digest").asText()));
+          }
+        }
+      }
+      JsonNode manifests = root.get("manifests");
+      if (manifests != null && manifests.isArray()) {
+        for (JsonNode child : manifests) {
+          if (child.hasNonNull("digest")) {
+            String safe = safeDigest(child.get("digest").asText());
+            if (referencedSafeDigests.add(safe)) {
+              Path childPath = upstreamDir.resolve("manifests").resolve("by-digest").resolve(safe);
+              collectReferencedDigests(upstreamDir, childPath, referencedSafeDigests, depth + 1);
+            }
+          }
+        }
+      }
+    }
+    catch (Exception e) {
+      log.debug("Could not parse manifest {} for GC reference scanning", manifestFile, e);
+    }
+  }
+
+  private static boolean isReferenced(final CachedFile cf, final Set<String> referencedSafeDigests) {
+    if (!cf.blob && !cf.byDigestManifest) {
+      return false;
+    }
+    String fileName = cf.entry.file().getFileName().toString();
+    if (referencedSafeDigests.contains(fileName)) {
+      return true;
+    }
+    return cf.entry.digest() != null && referencedSafeDigests.contains(safeDigest(cf.entry.digest()));
+  }
+
+  private static void deleteEntry(final Path file, final boolean dryRun) throws IOException {
+    if (!dryRun) {
+      Files.deleteIfExists(file);
+      Files.deleteIfExists(metaPath(file));
+    }
+  }
+
+  private static final class CachedFile
+  {
+    final Entry entry;
+
+    final long size;
+
+    final boolean byTagManifest;
+
+    final boolean byDigestManifest;
+
+    final boolean blob;
+
+    CachedFile(
+        final Entry entry,
+        final long size,
+        final boolean byTagManifest,
+        final boolean byDigestManifest,
+        final boolean blob)
+    {
+      this.entry = entry;
+      this.size = size;
+      this.byTagManifest = byTagManifest;
+      this.byDigestManifest = byDigestManifest;
+      this.blob = blob;
+    }
   }
 }
