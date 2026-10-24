@@ -156,7 +156,7 @@ public class DockerRegistryConfig
    * name. Returns the name to request from the upstream registry.
    */
   public String upstreamRepository(final Upstream upstream, final String repository) {
-    if (hubLibraryFallback && upstream != null && "dockerhub".equals(upstream.name())
+    if (hubLibraryFallback && upstream != null && upstream.libraryFallback()
         && repository.indexOf('/') < 0) {
       return "library/" + repository;
     }
@@ -204,7 +204,7 @@ public class DockerRegistryConfig
         continue;
       }
 
-      result.put(name, new Upstream(name, url, authorization));
+      result.put(name, new Upstream(name, url, authorization, "dockerhub".equals(name)));
     }
     return result;
   }
@@ -231,10 +231,28 @@ public class DockerRegistryConfig
 
     private final String authorization;
 
-    Upstream(final String name, final String baseUrl, final String authorization) {
+    private final boolean libraryFallback;
+
+    /**
+     * Creates an upstream using the default Docker Hub library fallback heuristic.
+     */
+    public Upstream(final String name, final String baseUrl, final String authorization) {
+      this(name, baseUrl, authorization, "dockerhub".equals(name));
+    }
+
+    /**
+     * Creates an upstream, optionally enabling the {@code library/} fallback used by Docker Hub official images.
+     */
+    public Upstream(
+        final String name,
+        final String baseUrl,
+        final String authorization,
+        final boolean libraryFallback)
+    {
       this.name = name;
       this.baseUrl = baseUrl;
       this.authorization = authorization;
+      this.libraryFallback = libraryFallback;
     }
 
     public String name() {
@@ -247,6 +265,10 @@ public class DockerRegistryConfig
 
     public String authorization() {
       return authorization;
+    }
+
+    public boolean libraryFallback() {
+      return libraryFallback;
     }
 
     @Override
