@@ -39,6 +39,9 @@ import AptDistributionConfiguration from './facets/AptDistributionConfiguration'
 import AptSigningConfiguration from './facets/AptSigningConfiguration';
 import AptFlatConfiguration from './facets/AptFlatConfiguration';
 import TerraformSigningConfiguration from './facets/TerraformSigningConfiguration';
+import DockerIndexConfiguration from './facets/DockerIndexConfiguration';
+import DockerForeignLayerConfiguration from './facets/DockerForeignLayerConfiguration';
+import DockerRepositoryRoutingConfiguration from './facets/DockerRepositoryRoutingConfiguration';
 
 import {genericDefaultValues} from './RepositoryFormDefaultValues';
 import {
@@ -237,8 +240,9 @@ const repositoryFormats = {
   },
   docker_proxy: {
     facets: [
-      RepositoryConnectorsConfiguration,
-      RegistryApiSupportConfiguration,
+      DockerRepositoryRoutingConfiguration,
+      DockerIndexConfiguration,
+      DockerForeignLayerConfiguration,
       ...genericFacets.proxy
     ],
     defaultValues: {

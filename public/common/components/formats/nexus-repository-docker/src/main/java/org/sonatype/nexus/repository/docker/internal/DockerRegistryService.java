@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.inject.Inject;
@@ -36,9 +37,11 @@ import jakarta.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.docker.internal.DockerCache.Entry;
 import org.sonatype.nexus.repository.docker.internal.DockerRegistryConfig.Resolved;
 import org.sonatype.nexus.repository.docker.internal.DockerRegistryConfig.Upstream;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.security.anonymous.AnonymousHelper;
 import org.sonatype.nexus.security.anonymous.AnonymousManager;
 import org.sonatype.nexus.security.authc.NexusBasicHttpAuthenticationFilter;
@@ -85,6 +88,8 @@ public class DockerRegistryService
 
   private final Provider<AnonymousManager> anonymousManager;
 
+  private final Provider<RepositoryManager> repositoryManager;
+
   private final HttpClient httpClient;
 
   private final Map<String, CachedToken> tokens = new ConcurrentHashMap<>();
@@ -93,11 +98,13 @@ public class DockerRegistryService
   public DockerRegistryService(
       final DockerRegistryConfig config,
       final DockerCache cache,
-      final Provider<AnonymousManager> anonymousManager)
+      final Provider<AnonymousManager> anonymousManager,
+      final Provider<RepositoryManager> repositoryManager)
   {
     this.config = config;
     this.cache = cache;
     this.anonymousManager = anonymousManager;
+    this.repositoryManager = repositoryManager;
     this.httpClient = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(Math.min(config.getTimeoutSeconds(), 30)))
         .followRedirects(HttpClient.Redirect.NORMAL)
@@ -148,7 +155,7 @@ public class DockerRegistryService
     }
 
     String route = tail.startsWith("/") ? tail.substring(1) : tail;
-    Resolved resolved = config.resolve(route);
+    Resolved resolved = resolve(route);
     if (resolved.upstream() == null || resolved.path().isEmpty()) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
@@ -197,6 +204,39 @@ public class DockerRegistryService
         response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Docker registry request failed");
       }
     }
+  }
+
+  /**
+   * Resolves the first path segment as a Docker repository name. When it matches a repository created from the UI
+   * (format {@code docker}) the request is forwarded to the upstream configured on that repository, otherwise the
+   * global upstream selector of {@link DockerRegistryConfig} is used.
+   */
+  private Resolved resolve(final String route) {
+    int slash = route.indexOf('/');
+    if (slash > 0 && slash < route.length() - 1) {
+      String repositoryName = route.substring(0, slash);
+      String rest = route.substring(slash + 1);
+      Repository repository = null;
+      try {
+        repository = repositoryManager.get().get(repositoryName);
+      }
+      catch (RuntimeException e) {
+        log.debug("Could not look up Docker repository {}", repositoryName, e);
+      }
+
+      if (repository != null && DockerFormat.NAME.equals(repository.getFormat().getValue())) {
+        Optional<DockerProxyFacet> facet = repository.optionalFacet(DockerProxyFacet.class);
+        if (facet.isPresent()) {
+          Upstream upstream = facet.get().upstream();
+          if (upstream == null) {
+            log.warn("Docker repository {} has no upstream URL; request for {} will return 404",
+                repositoryName, rest);
+          }
+          return new Resolved(upstream, rest);
+        }
+      }
+    }
+    return config.resolve(route);
   }
 
   /**
