@@ -109,6 +109,74 @@ class DockerCacheTest
     assertThat(cache.tags(upstream, "missing")).isNull();
   }
 
+  @Test
+  void gcProtectsBlobsReferencedByRecentManifestDuringAgeAndLruEviction() throws Exception {
+    String referencedBlobDigest = "sha256:" + repeat('1', 64);
+    String unreferencedBlobDigest = "sha256:" + repeat('2', 64);
+
+    Entry refBlob = cache.storeBlob(upstream, referencedBlobDigest, "application/octet-stream", "\"e1\"",
+        tempFile("referenced-layer-payload"));
+    Entry unrefBlob = cache.storeBlob(upstream, unreferencedBlobDigest, "application/octet-stream", "\"e2\"",
+        tempFile("unreferenced-layer-payload"));
+
+    // Backdate both blobs by 10 hours so they appear expired
+    backdateMeta(refBlob.file(), System.currentTimeMillis() - 10 * 3600_000L);
+    backdateMeta(unrefBlob.file(), System.currentTimeMillis() - 10 * 3600_000L);
+
+    // Store a recent manifest by tag that references refBlob
+    String manifestJson = "{\"schemaVersion\":2,\"config\":{\"digest\":\"" + referencedBlobDigest
+        + "\"},\"layers\":[{\"digest\":\"" + referencedBlobDigest + "\"}]}";
+    cache.storeManifest(upstream, "library/alpine", "latest", false,
+        "application/vnd.docker.distribution.manifest.v2+json", null, null, tempFile(manifestJson));
+
+    // Dry run first: nothing deleted on disk
+    DockerCache.GcResult dryResult = cache.gc(0L, 3600L, true, null);
+    assertThat(dryResult.dryRun()).isTrue();
+    assertThat(dryResult.deletedFiles()).isEqualTo(1);
+    assertThat(dryResult.protectedFiles()).isEqualTo(1);
+    assertThat(cache.blob(upstream, unreferencedBlobDigest)).isNotNull();
+
+    // Real GC run with maxAge = 1 hour
+    DockerCache.GcResult result = cache.gc(0L, 3600L, false, null);
+    assertThat(result.dryRun()).isFalse();
+    assertThat(result.deletedFiles()).isEqualTo(1);
+    assertThat(result.protectedFiles()).isEqualTo(1);
+    assertThat(cache.blob(upstream, unreferencedBlobDigest)).isNull();
+    assertThat(cache.blob(upstream, referencedBlobDigest)).isNotNull();
+  }
+
+  @Test
+  void gcEvictsOldestUnreferencedEntriesWhenExceedingMaxSize() throws Exception {
+    String oldDigest = "sha256:" + repeat('a', 64);
+    String newDigest = "sha256:" + repeat('b', 64);
+
+    Entry oldBlob = cache.storeBlob(upstream, oldDigest, "application/octet-stream", "\"eold\"",
+        tempFile(repeat('x', 200)));
+    backdateMeta(oldBlob.file(), System.currentTimeMillis() - 60_000L);
+
+    Entry newBlob = cache.storeBlob(upstream, newDigest, "application/octet-stream", "\"enew\"",
+        tempFile(repeat('y', 200)));
+
+    // Limit to 250 bytes: oldBlob (200B) should be evicted so only newBlob (200B) remains
+    DockerCache.GcResult result = cache.gc(250L, 0L, false, "dockerhub");
+    assertThat(result.deletedFiles()).isEqualTo(1);
+    assertThat(result.retainedFiles()).isEqualTo(1);
+    assertThat(cache.blob(upstream, oldDigest)).isNull();
+    assertThat(cache.blob(upstream, newDigest)).isNotNull();
+  }
+
+  private static void backdateMeta(final Path dataFile, final long cachedAtMillis) throws IOException {
+    Path meta = dataFile.resolveSibling(dataFile.getFileName() + ".meta");
+    java.util.Properties props = new java.util.Properties();
+    try (java.io.InputStream in = Files.newInputStream(meta)) {
+      props.load(in);
+    }
+    props.setProperty("cachedAt", Long.toString(cachedAtMillis));
+    try (java.io.OutputStream out = Files.newOutputStream(meta)) {
+      props.store(out, null);
+    }
+  }
+
   private Path tempFile(final String content) throws IOException {
     Path file = Files.createTempFile(cacheDir, "download-", ".tmp");
     Files.writeString(file, content);
