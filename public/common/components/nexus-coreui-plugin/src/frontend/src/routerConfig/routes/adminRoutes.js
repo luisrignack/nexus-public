@@ -423,6 +423,9 @@ export const adminRoutes = [
     component: LdapServersExt,
     data: {
       visibilityRequirements: {
+        // the LDAP admin screens have no backend in this build: hide them instead of
+        // rendering an Ext grid whose store is never registered (crashes on isBufferedStore)
+        bundle: 'nexus-ldap-plugin',
         permissions: [Permissions.LDAP.READ],
       },
       title: ADMIN.SECURITY.LDAP.TITLE,
