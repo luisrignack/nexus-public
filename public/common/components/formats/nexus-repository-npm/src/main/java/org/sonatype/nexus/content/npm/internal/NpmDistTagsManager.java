@@ -152,6 +152,22 @@ public class NpmDistTagsManager
     return true;
   }
 
+  /**
+   * Removes tags that point at versions which no longer exist and derives {@code latest} when it is missing.
+   * Returns the effective tags after the repair.
+   */
+  public Map<String, String> repair(final Repository repository, final String packagePath) {
+    List<FluentComponent> components = components(repository, packagePath);
+    Set<String> versions = new LinkedHashSet<>(versions(components));
+    for (FluentComponent component : components) {
+      Set<String> tags = tagsOf(component);
+      if (tags.retainAll(versions)) {
+        setTags(component, tags);
+      }
+    }
+    return get(repository, packagePath);
+  }
+
   private List<FluentComponent> components(final Repository repository, final String packagePath) {
     ContentFacet contentFacet = repository.facet(ContentFacet.class);
     String namespace = NpmCoordinatesHelper.getComponentGroup(packagePath);

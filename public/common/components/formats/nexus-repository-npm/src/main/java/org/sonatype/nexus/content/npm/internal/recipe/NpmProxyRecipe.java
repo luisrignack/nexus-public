@@ -68,6 +68,8 @@ public class NpmProxyRecipe
 
   private final NpmProxyHandler proxyHandler;
 
+  private final NpmAuditHandler auditHandler;
+
   private final RoutingRuleHandler routingRuleHandler;
 
   @Inject
@@ -80,6 +82,7 @@ public class NpmProxyRecipe
       final Provider<PurgeUnusedFacet> purgeUnusedFacet,
       final NegativeCacheHandler negativeCacheHandler,
       final NpmProxyHandler proxyHandler,
+      final NpmAuditHandler auditHandler,
       final RoutingRuleHandler routingRuleHandler)
   {
     super(type, format);
@@ -89,6 +92,7 @@ public class NpmProxyRecipe
     this.purgeUnusedFacet = checkNotNull(purgeUnusedFacet);
     this.negativeCacheHandler = checkNotNull(negativeCacheHandler);
     this.proxyHandler = checkNotNull(proxyHandler);
+    this.auditHandler = checkNotNull(auditHandler);
     this.routingRuleHandler = checkNotNull(routingRuleHandler);
   }
 
@@ -121,6 +125,7 @@ public class NpmProxyRecipe
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(lastDownloadedHandler)
+        .handler(auditHandler)
         .handler(proxyHandler)
         .create());
 

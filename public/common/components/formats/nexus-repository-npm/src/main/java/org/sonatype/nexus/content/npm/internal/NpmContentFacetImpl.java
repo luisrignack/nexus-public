@@ -80,9 +80,16 @@ public class NpmContentFacetImpl
   @Override
   public Content put(final String path, final Payload content, final String componentVersion) throws IOException {
     try (TempBlob blob = blobs().ingest(content, HASHING)) {
+      // Version manifests (name/version) belong to the same component as the tarball (name/-/name-version.tgz),
+      // otherwise publishing creates a bogus component named after the version.
+      String componentPath = NpmCoordinatesHelper.getPackagePathForManifest(path);
+      if (componentPath == null) {
+        componentPath = path;
+      }
+
       FluentComponentBuilder builder = components()
-          .name(NpmCoordinatesHelper.getComponentName(path))
-          .namespace(NpmCoordinatesHelper.getComponentGroup(path));
+          .name(NpmCoordinatesHelper.getComponentName(componentPath))
+          .namespace(NpmCoordinatesHelper.getComponentGroup(componentPath));
 
       if (componentVersion != null && !componentVersion.isEmpty()) {
         builder.version(componentVersion);
