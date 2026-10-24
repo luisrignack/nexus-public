@@ -29,9 +29,13 @@
 
   <modules>
     <module>nexus-repository-apt</module>
+    <module>nexus-repository-docker</module>
     <module>nexus-repository-maven</module>
     <module>nexus-repository-npm</module>
     <module>nexus-repository-pypi</module>
+    <module>nexus-repository-helm</module>
+    <module>nexus-repository-go</module>
+    <module>nexus-repository-rubygems</module>
     <module>nexus-repository-raw</module>
     <module>nexus-repository-yum</module>
   </modules>

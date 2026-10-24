@@ -585,7 +585,28 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-helm</artifactId>
+      <version>3.89.0-09</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-go</artifactId>
+      <version>3.89.0-09</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-rubygems</artifactId>
+      <version>3.89.0-09</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-repository-raw</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-docker</artifactId>
         <version>3.89.0-09</version>
       </dependency>
 

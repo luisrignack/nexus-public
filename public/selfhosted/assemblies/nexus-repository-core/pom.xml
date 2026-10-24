@@ -192,6 +192,11 @@
       <artifactId>nexus-datastore-mybatis</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-distributed-event-service-api</artifactId>
     </dependency>
@@ -368,6 +373,10 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-docker</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-repository-httpbridge</artifactId>
     </dependency>
     <dependency>
@@ -381,6 +390,18 @@
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-repository-pypi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-helm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-go</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-repository-rubygems</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
