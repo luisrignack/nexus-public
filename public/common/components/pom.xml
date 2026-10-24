@@ -33,6 +33,7 @@
     <module>formats</module>
     <module>nexus-audit</module>
     <module>nexus-audit-plugin</module>
+    <module>nexus-backup</module>
     <module>nexus-base</module>
     <module>nexus-blobstore</module>
     <module>nexus-blobstore-api</module>
@@ -125,6 +126,12 @@
       <dependency>
         <groupId>org.sonatype.nexus.common.components</groupId>
         <artifactId>nexus-audit-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-backup</artifactId>
         <version>3.89.0-09</version>
       </dependency>
 
