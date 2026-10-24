@@ -49,17 +49,20 @@ public class SqlSearchUpdateService
     if (GroupType.NAME.equals(repository.getType().getValue())) {
       return false;
     }
-    ContentFacet contentFacet = repository.facet(ContentFacet.class);
-    Object indexOutdated = contentFacet.attributes().get(SEARCH_INDEX_OUTDATED);
-    if (indexOutdated instanceof Boolean) {
-      return (boolean) indexOutdated;
-    }
-    return searchTableStore.repositoryNeedsReindex(repository.getName());
+    // formats that persist content outside the content store (such as the pull-through docker proxy) have
+    // nothing to index, so skip them instead of failing the periodic re-index check
+    return repository.optionalFacet(ContentFacet.class).map(contentFacet -> {
+      Object indexOutdated = contentFacet.attributes().get(SEARCH_INDEX_OUTDATED);
+      if (indexOutdated instanceof Boolean) {
+        return (boolean) indexOutdated;
+      }
+      return searchTableStore.repositoryNeedsReindex(repository.getName());
+    }).orElse(false);
   }
 
   @Override
   public void doneReindexing(final Repository repository) {
-    ContentFacet contentFacet = repository.facet(ContentFacet.class);
-    contentFacet.withoutAttribute(SEARCH_INDEX_OUTDATED);
+    repository.optionalFacet(ContentFacet.class)
+        .ifPresent(contentFacet -> contentFacet.withoutAttribute(SEARCH_INDEX_OUTDATED));
   }
 }

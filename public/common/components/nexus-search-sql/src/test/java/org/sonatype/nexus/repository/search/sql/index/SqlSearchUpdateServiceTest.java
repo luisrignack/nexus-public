@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.search.sql.index;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.sonatype.goodies.testsupport.Test5Support;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
@@ -51,7 +52,7 @@ public class SqlSearchUpdateServiceTest
   @BeforeEach
   public void setup() {
     when(repository.getType()).thenReturn(new HostedType());
-    lenient().when(repository.facet(ContentFacet.class)).thenReturn(contentFacet);
+    lenient().when(repository.optionalFacet(ContentFacet.class)).thenReturn(Optional.of(contentFacet));
     lenient().when(contentFacet.attributes()).thenReturn(attributes);
 
     underTest = new SqlSearchUpdateService(searchTableStore);
@@ -75,6 +76,13 @@ public class SqlSearchUpdateServiceTest
   public void needsReindex_indexesExistInStore() {
     when(repository.getName()).thenReturn("test-repo");
     when(searchTableStore.repositoryNeedsReindex(repository.getName())).thenReturn(false);
+
+    assertFalse(underTest.needsReindex(repository));
+  }
+
+  @Test
+  public void needsReindex_repositoryWithoutContentFacet() {
+    when(repository.optionalFacet(ContentFacet.class)).thenReturn(Optional.empty());
 
     assertFalse(underTest.needsReindex(repository));
   }
