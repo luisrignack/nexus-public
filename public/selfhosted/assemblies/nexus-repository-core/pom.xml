@@ -380,6 +380,10 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-backup</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-repository-httpbridge</artifactId>
     </dependency>
     <dependency>
