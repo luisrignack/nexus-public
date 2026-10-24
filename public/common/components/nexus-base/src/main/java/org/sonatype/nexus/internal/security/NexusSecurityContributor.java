@@ -94,6 +94,12 @@ public class NexusSecurityContributor
 
   public static final String NX_ANON_ROLE_DESCRIPTION = "Anonymous Role";
 
+  private static final String USERTOKEN_SETTINGS_DOMAIN = "usertoken-settings";
+
+  private static final String USERTOKEN_USERS_DOMAIN = "usertoken-users";
+
+  private static final String USERTOKEN_CURRENT_DOMAIN = "usertoken-current";
+
   public static final String NX_HEALTHCHECK_READ_PRIV_ID = "nx-healthcheck-read";
 
   public static final String NX_REPO_VIEW_ALL_BROWSE_PRIV_ID = "nx-repository-view-*-*-browse";
@@ -138,6 +144,21 @@ public class NexusSecurityContributor
 
     configuration.addPrivilege(
         createApplicationPrivilege(NX_APIKEY_ALL_PRIV_ID, NX_APIKEY_ALL_DESCRIPTION, APIKEY_DOMAIN, ACTION_ALL));
+
+    // user tokens: settings are managed through the admin screen, while the current-user token page is
+    // available to any user holding the "read" privilege on the usertoken-current domain
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-usertoken-settings-read", READ_DESCRIPTION_BASE + "User Token Settings",
+        USERTOKEN_SETTINGS_DOMAIN, ACTION_READ));
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-usertoken-settings-update", UPDATE_DESCRIPTION_BASE + "User Token Settings",
+        USERTOKEN_SETTINGS_DOMAIN, ACTION_UPDATE));
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-usertoken-users-delete", DELETE_DESCRIPTION_BASE + "User Tokens",
+        USERTOKEN_USERS_DOMAIN, ACTION_DELETE));
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-usertoken-current-read", READ_DESCRIPTION_BASE + "Current User Token",
+        USERTOKEN_CURRENT_DOMAIN, ACTION_READ));
 
     createCrudAndAllApplicationPrivileges(NX_PRIVILEGE_PRIV_ID_PREFIX, NX_PRIVILEGE_DOMAIN)
         .forEach(configuration::addPrivilege);

@@ -489,13 +489,6 @@ export const adminRoutes = [
     data: {
       visibilityRequirements: {
         permissions: [Permissions.USER_TOKENS_SETTINGS.READ],
-        editions: ['PRO'],
-        licenseValid: [
-          {
-            key: 'usertoken',
-            defaultValue: false,
-          },
-        ],
       },
       title: ADMIN.SECURITY.USERTOKEN.TITLE,
     },

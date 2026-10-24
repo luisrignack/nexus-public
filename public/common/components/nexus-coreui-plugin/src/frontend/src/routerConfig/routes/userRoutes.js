@@ -70,15 +70,9 @@ export const userRoutes = [
     component: UserToken,
     data: {
       visibilityRequirements: {
-        bundle: 'nexus-usertoken-plugin',
-        statesEnabled: [
-          {
-            key: 'usertoken',
-            defaultValue: { enabled: false },
-          },
-        ],
+        capability: 'usertoken',
         permissions: ['nexus:usertoken-current:read'],
-        editions: ['PRO'],
+        requiresUser: true,
       },
       title: USER.TITLE,
     },
