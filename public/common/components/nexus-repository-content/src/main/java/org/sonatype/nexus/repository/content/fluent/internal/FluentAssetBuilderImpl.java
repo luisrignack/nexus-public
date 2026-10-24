@@ -187,7 +187,13 @@ public class FluentAssetBuilderImpl
   private Asset updateAssetAttributes(final Asset asset) {
     if (attributes != null && !attributes.isEmpty()) {
       AttributeChangeSet changeSet = new AttributeChangeSet();
-      attributes.forEach((key, value) -> changeSet.attributes(AttributeOperation.OVERLAY, key, value));
+      // OVERLAY merges nested maps; scalar values (strings, numbers, etc.) must use
+      // SET instead, as overlay of a scalar over an existing scalar throws an
+      // IllegalArgumentException and breaks re-publishing assets.
+      attributes.forEach((key, value) -> changeSet.attributes(
+          value instanceof Map ? AttributeOperation.OVERLAY : AttributeOperation.SET,
+          key,
+          value));
       facet.stores().assetStore
           .updateAssetAttributes(asset, changeSet);
     }

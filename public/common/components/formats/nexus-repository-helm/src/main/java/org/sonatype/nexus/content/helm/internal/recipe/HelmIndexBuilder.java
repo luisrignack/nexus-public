@@ -26,6 +26,8 @@ import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.content.fluent.FluentAsset;
 import org.sonatype.nexus.repository.content.fluent.FluentComponent;
 import org.sonatype.nexus.repository.helm.HelmCoordinatesHelper;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Builds the Helm repository index.yaml.
@@ -122,35 +124,44 @@ public final class HelmIndexBuilder
   }
 
   private static void parseIndex(final String index, final Map<String, Map<String, ChartEntry>> entries) {
-    String[] lines = index.split("\\R");
-    String currentChart = null;
-    String currentVersion = null;
-    String currentUrl = null;
-
-    for (String line : lines) {
-      String trimmed = line.trim();
-      if (trimmed.endsWith(":") && !line.startsWith(" ") && !line.startsWith("-")) {
-        currentChart = trimmed.substring(0, trimmed.length() - 1);
-        if (!"entries".equals(currentChart) && !currentChart.isEmpty()) {
-          entries.putIfAbsent(currentChart, new LinkedHashMap<>());
+    Map<String, Object> root;
+    try {
+      // real-world registries ship large indexes (e.g. Bitnami's is ~27 MB), so the
+      // SnakeYAML default code point limit (3 MB) must be lifted
+      LoaderOptions loaderOptions = new LoaderOptions();
+      loaderOptions.setCodePointLimit(Integer.MAX_VALUE);
+      root = new Yaml(loaderOptions).load(index);
+    }
+    catch (Exception e) {
+      // unparseable index contributes nothing to the merge
+      return;
+    }
+    if (!(root instanceof Map)) {
+      return;
+    }
+    Object entriesNode = ((Map<?, ?>) root).get("entries");
+    if (!(entriesNode instanceof Map)) {
+      return;
+    }
+    for (Map.Entry<?, ?> chartEntry : ((Map<?, ?>) entriesNode).entrySet()) {
+      if (!(chartEntry.getValue() instanceof List)) {
+        continue;
+      }
+      String chart = String.valueOf(chartEntry.getKey());
+      for (Object versionNode : (List<?>) chartEntry.getValue()) {
+        if (!(versionNode instanceof Map)) {
+          continue;
         }
-        continue;
-      }
-      if (trimmed.startsWith("- name:") && currentChart != null && entries.containsKey(currentChart)) {
-        currentVersion = null;
-        currentUrl = null;
-        continue;
-      }
-      if (trimmed.startsWith("version:") && currentChart != null && entries.containsKey(currentChart)) {
-        currentVersion = trimmed.substring("version:".length()).trim().replace("\"", "").replace("'", "");
-        continue;
-      }
-      if (trimmed.startsWith("- ") && currentChart != null && entries.containsKey(currentChart) && trimmed.contains(".tgz")) {
-        currentUrl = trimmed.substring(1).trim();
-        if (currentVersion != null) {
-          entries.get(currentChart).put(currentVersion, new ChartEntry(currentChart, currentVersion, currentUrl));
+        Object version = ((Map<?, ?>) versionNode).get("version");
+        if (version == null) {
+          continue;
         }
-        continue;
+        String v = String.valueOf(version);
+        String url = "";
+        if (((Map<?, ?>) versionNode).get("urls") instanceof List<?> urls && !urls.isEmpty()) {
+          url = String.valueOf(urls.get(0));
+        }
+        entries.computeIfAbsent(chart, k -> new LinkedHashMap<>()).putIfAbsent(v, new ChartEntry(chart, v, url));
       }
     }
   }
