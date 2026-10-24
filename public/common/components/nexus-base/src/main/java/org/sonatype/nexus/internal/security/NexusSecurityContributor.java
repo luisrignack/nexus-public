@@ -100,6 +100,8 @@ public class NexusSecurityContributor
 
   private static final String USERTOKEN_CURRENT_DOMAIN = "usertoken-current";
 
+  private static final String OIDC_SETTINGS_DOMAIN = "oidc-settings";
+
   public static final String NX_HEALTHCHECK_READ_PRIV_ID = "nx-healthcheck-read";
 
   public static final String NX_REPO_VIEW_ALL_BROWSE_PRIV_ID = "nx-repository-view-*-*-browse";
@@ -159,6 +161,14 @@ public class NexusSecurityContributor
     configuration.addPrivilege(createApplicationPrivilege(
         "nx-usertoken-current-read", READ_DESCRIPTION_BASE + "Current User Token",
         USERTOKEN_CURRENT_DOMAIN, ACTION_READ));
+
+    // OAuth2/OIDC single sign-on: settings are managed through the admin screen
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-oidc-settings-read", READ_DESCRIPTION_BASE + "OAuth2/OIDC Settings",
+        OIDC_SETTINGS_DOMAIN, ACTION_READ));
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-oidc-settings-update", UPDATE_DESCRIPTION_BASE + "OAuth2/OIDC Settings",
+        OIDC_SETTINGS_DOMAIN, ACTION_UPDATE));
 
     createCrudAndAllApplicationPrivileges(NX_PRIVILEGE_PRIV_ID_PREFIX, NX_PRIVILEGE_DOMAIN)
         .forEach(configuration::addPrivilege);

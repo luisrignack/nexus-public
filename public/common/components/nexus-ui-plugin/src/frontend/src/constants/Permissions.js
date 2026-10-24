@@ -60,6 +60,7 @@ export default {
   LDAP: generatePermissions('ldap'),
   USER_TOKENS_SETTINGS: generatePermissions('usertoken-settings', [READ, UPDATE]),
   USER_TOKENS_USERS: generatePermissions('usertoken-users', [DELETE]),
+  OIDC_SETTINGS: generatePermissions('oidc-settings', [READ, UPDATE]),
   TAGS: generatePermissions('tags', [READ]),
   COMPONENT: generatePermissions('component', [CREATE]),
   SEARCH: generatePermissions('search', [READ]),

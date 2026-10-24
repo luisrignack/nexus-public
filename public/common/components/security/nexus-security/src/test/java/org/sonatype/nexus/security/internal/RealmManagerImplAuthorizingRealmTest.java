@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.AbstractSecurityTest.BaseSecurityConfiguration;
+import org.sonatype.nexus.security.authc.oidc.OidcRealm;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.realm.SecurityRealm;
 
@@ -58,9 +59,10 @@ class RealmManagerImplAuthorizingRealmTest
   @Test
   void testGetAvailableRealms() {
     assertThat(underTest.getAvailableRealms().stream().map(SecurityRealm::getId).collect(toList()),
-        is(asList(AuthenticatingRealmImpl.NAME, "MockRealmA", "MockRealmB", "MockRealmC")));
+        is(asList(AuthenticatingRealmImpl.NAME, "MockRealmA", "MockRealmB", "MockRealmC", OidcRealm.REALM_NAME)));
     assertThat(underTest.getAvailableRealms(true).stream().map(SecurityRealm::getId).collect(toList()),
-        is(asList(AuthenticatingRealmImpl.NAME, AuthorizingRealmImpl.NAME, "MockRealmA", "MockRealmB", "MockRealmC")));
+        is(asList(AuthenticatingRealmImpl.NAME, AuthorizingRealmImpl.NAME, "MockRealmA", "MockRealmB", "MockRealmC",
+            OidcRealm.REALM_NAME)));
   }
 
   @Test

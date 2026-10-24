@@ -533,15 +533,7 @@ export const adminRoutes = [
     component: OAuth2Configuration,
     data: {
       visibilityRequirements: {
-        bundle: 'nexus-oauth2-plugin',
-        permissions: ['nexus:*'],
-        editions: ['PRO'],
-        statesEnabled: [
-          {
-            key: 'oauth2Available',
-            defaultValue: false,
-          },
-        ],
+        permissions: [Permissions.OIDC_SETTINGS.READ],
       },
       title: ADMIN.SECURITY.OAUTH2.TITLE,
     },

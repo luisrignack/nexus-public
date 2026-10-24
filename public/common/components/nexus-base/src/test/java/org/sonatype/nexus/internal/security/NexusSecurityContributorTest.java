@@ -58,7 +58,8 @@ public class NexusSecurityContributorTest
             "nx-privileges-all", "nx-privileges-create", "nx-privileges-read", "nx-privileges-update",
             "nx-privileges-delete",
             "nx-usertoken-settings-read", "nx-usertoken-settings-update", "nx-usertoken-users-delete",
-            "nx-usertoken-current-read"));
+            "nx-usertoken-current-read",
+            "nx-oidc-settings-read", "nx-oidc-settings-update"));
   }
 
   @Test
@@ -82,6 +83,7 @@ public class NexusSecurityContributorTest
             "nx-privileges-all", "nx-privileges-create", "nx-privileges-read", "nx-privileges-update",
             "nx-privileges-delete",
             "nx-usertoken-settings-read", "nx-usertoken-settings-update", "nx-usertoken-users-delete",
-            "nx-usertoken-current-read"));
+            "nx-usertoken-current-read",
+            "nx-oidc-settings-read", "nx-oidc-settings-update"));
   }
 }
