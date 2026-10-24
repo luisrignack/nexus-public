@@ -25,3 +25,4 @@ out
 # Zion
 .zion/
 variables.properties
+admin-creds.txt
