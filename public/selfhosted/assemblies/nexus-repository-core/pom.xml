@@ -377,6 +377,10 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-sbom</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-repository-httpbridge</artifactId>
     </dependency>
     <dependency>

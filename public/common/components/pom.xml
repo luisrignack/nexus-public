@@ -75,6 +75,7 @@
     <module>nexus-repository-view</module>
     <module>nexus-scheduling</module>
     <module>nexus-script</module>
+    <module>nexus-sbom</module>
     <module>nexus-script-plugin</module>
     <module>nexus-search-sql</module>
     <module>nexus-selector</module>
@@ -382,6 +383,12 @@
       <dependency>
         <groupId>org.sonatype.nexus.common.components</groupId>
         <artifactId>nexus-script-plugin</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-sbom</artifactId>
         <version>3.89.0-09</version>
       </dependency>
 
