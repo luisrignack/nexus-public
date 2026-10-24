@@ -58,7 +58,30 @@ public class NpmProxyFacet
     if (isTarball(path)) {
       return path;
     }
+    if (path.equals("-/v1/search")) {
+      String query = queryString(context);
+      if (!query.isEmpty()) {
+        return path + '?' + query;
+      }
+    }
     return encodeMetadataPath(path);
+  }
+
+  /**
+   * npm search uses query parameters ({@code text}, {@code size}, {@code from}) that must reach the upstream
+   * registry when this repository proxies {@code /-/v1/search}.
+   */
+  private static String queryString(final Context context) {
+    StringBuilder query = new StringBuilder();
+    for (java.util.Map.Entry<String, String> entry : context.getRequest().getParameters().entries()) {
+      if (query.length() > 0) {
+        query.append('&');
+      }
+      query.append(java.net.URLEncoder.encode(entry.getKey(), java.nio.charset.StandardCharsets.UTF_8))
+          .append('=')
+          .append(java.net.URLEncoder.encode(entry.getValue(), java.nio.charset.StandardCharsets.UTF_8));
+    }
+    return query.toString();
   }
 
   @Override

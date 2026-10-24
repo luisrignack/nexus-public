@@ -43,12 +43,16 @@ public class NpmHostedRecipe
 {
   public static final String NAME = "npm-hosted";
 
+  private final NpmAuditHandler auditHandler;
+
   @Inject
   public NpmHostedRecipe(
       @Qualifier(HostedType.NAME) final Type type,
-      @Qualifier(NpmFormat.NAME) final Format format)
+      @Qualifier(NpmFormat.NAME) final Format format,
+      final NpmAuditHandler auditHandler)
   {
     super(type, format);
+    this.auditHandler = auditHandler;
   }
 
   @Override
@@ -74,6 +78,7 @@ public class NpmHostedRecipe
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(lastDownloadedHandler)
+        .handler(auditHandler)
         .handler(contentHandler)
         .create());
 

@@ -49,16 +49,20 @@ public class NpmGroupRecipe
 
   private final NpmGroupHandler groupHandler;
 
+  private final NpmAuditHandler auditHandler;
+
   @Inject
   public NpmGroupRecipe(
       @Qualifier(GroupType.NAME) final Type type,
       @Qualifier(NpmFormat.NAME) final Format format,
       @Qualifier("default") final Provider<GroupFacet> groupFacet,
-      final NpmGroupHandler groupHandler)
+      final NpmGroupHandler groupHandler,
+      final NpmAuditHandler auditHandler)
   {
     super(type, format);
     this.groupFacet = Preconditions.checkNotNull(groupFacet);
     this.groupHandler = Preconditions.checkNotNull(groupHandler);
+    this.auditHandler = Preconditions.checkNotNull(auditHandler);
   }
 
   @Override
@@ -80,6 +84,7 @@ public class NpmGroupRecipe
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(contentHeadersHandler)
+        .handler(auditHandler)
         .handler(groupHandler)
         .create());
 

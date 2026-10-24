@@ -29,12 +29,15 @@ import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.npm.internal.NpmCoordinatesHelper;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.Parameters;
+import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.ByteStreams;
 import org.springframework.stereotype.Component;
@@ -67,6 +70,9 @@ public class NpmGroupHandler
   {
     String path = NpmCoordinatesHelper.stripLeadingSlash(NpmCoordinatesHelper.decode(contentPath(context)));
 
+    if (path.equals("-/v1/search")) {
+      return mergedSearch(context, dispatched);
+    }
     if (isPackument(path)) {
       return mergedPackument(context, dispatched);
     }
@@ -76,6 +82,81 @@ public class NpmGroupHandler
 
     GroupFacet groupFacet = context.getRepository().facet(GroupFacet.class);
     return getFirst(context, groupFacet.members(), dispatched);
+  }
+
+  /**
+   * Dispatches the search to every member and merges the resulting {@code objects}, keeping member priority order
+   * and de-duplicating by package name. Every member is asked for the maximum page size and the merged result is
+   * paginated afterwards, so {@code from}/{@code size} stay consistent across members.
+   */
+  private Response mergedSearch(
+      final Context context,
+      final DispatchedRepositories dispatched) throws Exception
+  {
+    GroupFacet groupFacet = context.getRepository().facet(GroupFacet.class);
+
+    Parameters parameters = new Parameters();
+    for (java.util.Map.Entry<String, String> entry : context.getRequest().getParameters().entries()) {
+      if (!"from".equals(entry.getKey()) && !"size".equals(entry.getKey())) {
+        parameters.set(entry.getKey(), entry.getValue());
+      }
+    }
+    parameters.set("size", "250");
+    parameters.set("from", "0");
+
+    Request request = new Request.Builder()
+        .copy(context.getRequest())
+        .parameters(parameters)
+        .build();
+
+    Map<String, JsonNode> objects = new java.util.LinkedHashMap<>();
+    for (Map.Entry<Repository, Response> entry : getAll(request, context, groupFacet.members(), dispatched)
+        .entrySet()) {
+      JsonNode document = readDocument(entry.getValue());
+      JsonNode memberObjects = document != null ? document.path("objects") : null;
+      if (memberObjects == null || !memberObjects.isArray()) {
+        continue;
+      }
+      for (JsonNode object : memberObjects) {
+        JsonNode pkg = object.path("package");
+        String name = pkg.path("name").asText();
+        if (!name.isEmpty()) {
+          objects.putIfAbsent(name, object);
+        }
+      }
+    }
+
+    int from = parseInt(context.getRequest().getParameters().get("from"), 0);
+    int size = parseInt(context.getRequest().getParameters().get("size"), 20);
+    size = size <= 0 ? 20 : Math.min(size, 250);
+
+    ArrayNode merged = MAPPER.createArrayNode();
+    int index = 0;
+    int end = Math.min(from + size, objects.size());
+    for (JsonNode object : objects.values()) {
+      if (index++ >= from && index <= end) {
+        merged.add(object);
+      }
+    }
+
+    ObjectNode response = MAPPER.createObjectNode();
+    response.set("objects", merged);
+    response.put("total", objects.size());
+    response.put("time", java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME.format(
+        java.time.ZonedDateTime.now(java.time.ZoneOffset.UTC)));
+    return jsonResponse(MAPPER.writeValueAsBytes(response));
+  }
+
+  private static int parseInt(final String value, final int defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    try {
+      return Integer.parseInt(value);
+    }
+    catch (NumberFormatException e) {
+      return defaultValue;
+    }
   }
 
   private Response mergedPackument(

@@ -75,16 +75,20 @@ public class NpmContentHandler
 
   private final NpmDistTagsManager distTagsManager;
 
+  private final NpmSearchHandler searchHandler;
+
   private final SecurityHelper securityHelper;
 
   @Inject
   public NpmContentHandler(
       final NpmPackumentBuilder packumentBuilder,
       final NpmDistTagsManager distTagsManager,
+      final NpmSearchHandler searchHandler,
       final SecurityHelper securityHelper)
   {
     this.packumentBuilder = packumentBuilder;
     this.distTagsManager = distTagsManager;
+    this.searchHandler = searchHandler;
     this.securityHelper = securityHelper;
   }
 
@@ -212,6 +216,7 @@ public class NpmContentHandler
         manifest.put("version", version);
         storage.put(assetPath(packagePath + "/" + version),
             new BytesPayload(MAPPER.writeValueAsBytes(manifest), APPLICATION_JSON), version);
+        NpmComponentAttributes.apply(repository, packagePath, version, manifest);
         publishedVersions.add(version);
       }
     }
@@ -292,6 +297,10 @@ public class NpmContentHandler
       return jsonResponse("{}".getBytes());
     }
 
+    if (path.equals("-/v1/search") && (GET.equals(method) || HEAD.equals(method))) {
+      return search(context);
+    }
+
     if (!path.startsWith(PACKAGE_PREFIX)) {
       return HttpResponses.notFound(path);
     }
@@ -338,6 +347,27 @@ public class NpmContentHandler
     }
 
     return HttpResponses.methodNotAllowed(method, GET, HEAD, PUT, DELETE);
+  }
+
+  private Response search(final Context context) throws Exception {
+    org.sonatype.nexus.repository.view.Parameters parameters = context.getRequest().getParameters();
+    String text = parameters.get("text");
+    int size = parseInt(parameters.get("size"), 20);
+    int from = parseInt(parameters.get("from"), 0);
+    ObjectNode result = searchHandler.search(context.getRepository(), text, size, from);
+    return jsonResponse(MAPPER.writeValueAsBytes(result));
+  }
+
+  private static int parseInt(final String value, final int defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    try {
+      return Integer.parseInt(value);
+    }
+    catch (NumberFormatException e) {
+      return defaultValue;
+    }
   }
 
   private static String parseTagVersion(final byte[] body) {
