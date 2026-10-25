@@ -280,6 +280,13 @@ Ext.define('NX.coreui.app.PluginStrings', {
     SearchYum_Text: 'Yum',
     SearchYum_Description: 'Search for components in Yum repositories',
 
+    // Browse -> Search -> Ansible
+    SearchAnsible_Text: 'Ansible',
+    SearchAnsible_Description: 'Search for components in Ansible repositories',
+    SearchAnsible_Group: 'Ansible Repositories',
+    SearchAnsible_Name_FieldLabel: 'Name',
+    SearchAnsible_Version_FieldLabel: 'Version',
+
     // Browse -> Search -> Apt
     SearchApt_Text: 'Apt',
     SearchApt_Description: 'Search for components in Apt repositories',

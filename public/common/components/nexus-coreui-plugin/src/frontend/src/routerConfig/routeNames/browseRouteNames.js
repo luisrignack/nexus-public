@@ -45,6 +45,7 @@ export default {
     GENERIC: 'browse.search.generic',
     CUSTOM: 'browse.search.custom',
     APT: 'browse.search.apt',
+    ANSIBLE: 'browse.search.ansible',
     CARGO: 'browse.search.cargo',
     COCOAPODS: 'browse.search.cocoapods',
     COMPOSER: 'browse.search.composer',

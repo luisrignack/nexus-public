@@ -138,6 +138,12 @@ Ext.define('NX.coreui.app.PluginConfig', {
       }
     },
     {
+      id: 'NX.coreui.controller.SearchAnsible',
+      active: function () {
+        return NX.app.Application.bundleActive('nexus-repository-ansible');
+      }
+    },
+    {
       id: 'NX.coreui.controller.SearchApt',
       active: function () {
         return NX.app.Application.bundleActive('nexus-repository-apt');

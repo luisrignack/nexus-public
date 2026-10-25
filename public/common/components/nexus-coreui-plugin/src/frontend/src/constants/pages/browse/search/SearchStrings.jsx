@@ -35,6 +35,13 @@ export default {
         icon: faSearch
       }
     },
+    ANSIBLE: {
+      MENU: {
+        text: 'Ansible',
+        description: 'Search for components in Ansible repositories',
+        icon: faSearch
+      }
+    },
     CARGO: {
       MENU: {
         text: 'Cargo',

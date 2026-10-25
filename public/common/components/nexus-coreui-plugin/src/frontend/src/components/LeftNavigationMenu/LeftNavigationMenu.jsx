@@ -67,6 +67,13 @@ export default function LeftNavigationMenu() {
           params={{ keyword: null }}
         />
         <LeftNavigationMenuCollapsibleChildItem
+          name={BROWSE.SEARCH.ANSIBLE}
+          text={UIStrings.SEARCH.ANSIBLE.MENU.text}
+          icon={UIStrings.SEARCH.ANSIBLE.MENU.icon}
+          data-analytics-id="nxrm-global-navbar-search-ansible"
+          params={{ keyword: null }}
+        />
+        <LeftNavigationMenuCollapsibleChildItem
           name={BROWSE.SEARCH.APT}
           text={UIStrings.SEARCH.APT.MENU.text}
           icon={UIStrings.SEARCH.APT.MENU.icon}

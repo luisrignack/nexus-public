@@ -25,6 +25,7 @@ const Welcome = lazyLoad(() => import('../../components/pages/user/Welcome/Welco
 const BrowseReactExt = lazyLoad(() => import('../../components/pages/browse/Browse/BrowseExt'));
 const MalwareRemediation = lazyLoad(() => import('../../components/pages/maliciousrisk/MalwareRemediation'));
 const SearchGenericExt = lazyLoad(() => import('../../components/pages/browse/Search/SearchGenericExt'));
+const SearchAnsibleExt = lazyLoad(() => import('../../components/pages/browse/Search/SearchAnsibleExt'));
 const SearchAptExt = lazyLoad(() => import('../../components/pages/browse/Search/SearchAptExt'));
 const SearchCargoExt = lazyLoad(() => import('../../components/pages/browse/Search/SearchCargoExt'));
 const SearchCocoapodsExt = lazyLoad(() => import('../../components/pages/browse/Search/SearchCocoapodsExt'));
@@ -127,6 +128,25 @@ export const browseRoutes = [
         permissions: ['nexus:search:read'],
       },
       title: BROWSE.SEARCH.TITLE,
+    },
+  },
+  {
+    name: BROWSE.SEARCH.ANSIBLE,
+    url: '/ansible/:keyword',
+    component: SearchAnsibleExt,
+    data: {
+      visibilityRequirements: {
+        permissions: ['nexus:search:read'],
+        browseableFormat: 'ansible',
+      },
+      title: BROWSE.SEARCH.TITLE,
+    },
+    params: {
+      keyword: {
+        value: null,
+        raw: true,
+        dynamic: true,
+      },
     },
   },
   {

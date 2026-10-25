@@ -1,0 +1,137 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype Nexus" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.content.nuget.internal.recipe;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Priority;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
+import org.sonatype.nexus.common.upgrade.AvailabilityVersion;
+import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.Type;
+import org.sonatype.nexus.repository.cache.NegativeCacheFacet;
+import org.sonatype.nexus.repository.cache.NegativeCacheHandler;
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
+import org.sonatype.nexus.repository.proxy.ProxyHandler;
+import org.sonatype.nexus.repository.purge.PurgeUnusedFacet;
+import org.sonatype.nexus.repository.nuget.internal.NugetFormat;
+import org.sonatype.nexus.repository.routing.RoutingRuleHandler;
+import org.sonatype.nexus.repository.types.ProxyType;
+import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
+import org.sonatype.nexus.repository.view.Route;
+import org.sonatype.nexus.repository.view.Router;
+import org.sonatype.nexus.repository.view.ViewFacet;
+import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.http.HttpHandlers.notFound;
+
+/**
+ * NuGet proxy repository recipe.
+ */
+@AvailabilityVersion(from = "1.0")
+@Component
+@Qualifier(NugetProxyRecipe.NAME)
+@Priority(Integer.MAX_VALUE)
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@Singleton
+public class NugetProxyRecipe
+    extends NugetRecipeSupport
+{
+  public static final String NAME = "nuget-proxy";
+
+  private final Provider<HttpClientFacet> httpClientFacet;
+
+  private final Provider<NegativeCacheFacet> negativeCacheFacet;
+
+  private final Provider<NugetProxyFacet> proxyFacet;
+
+  private final Provider<PurgeUnusedFacet> purgeUnusedFacet;
+
+  private final NegativeCacheHandler negativeCacheHandler;
+
+  private final ProxyHandler proxyHandler;
+
+  private final RoutingRuleHandler routingRuleHandler;
+
+  @Inject
+  public NugetProxyRecipe(
+      @Qualifier(ProxyType.NAME) final Type type,
+      @Qualifier(NugetFormat.NAME) final Format format,
+      final Provider<HttpClientFacet> httpClientFacet,
+      final Provider<NegativeCacheFacet> negativeCacheFacet,
+      final Provider<NugetProxyFacet> proxyFacet,
+      final Provider<PurgeUnusedFacet> purgeUnusedFacet,
+      final NegativeCacheHandler negativeCacheHandler,
+      final ProxyHandler proxyHandler,
+      final RoutingRuleHandler routingRuleHandler)
+  {
+    super(type, format);
+    this.httpClientFacet = checkNotNull(httpClientFacet);
+    this.negativeCacheFacet = checkNotNull(negativeCacheFacet);
+    this.proxyFacet = checkNotNull(proxyFacet);
+    this.purgeUnusedFacet = checkNotNull(purgeUnusedFacet);
+    this.negativeCacheHandler = checkNotNull(negativeCacheHandler);
+    this.proxyHandler = checkNotNull(proxyHandler);
+    this.routingRuleHandler = checkNotNull(routingRuleHandler);
+  }
+
+  @Override
+  public void apply(@Nonnull final Repository repository) throws Exception {
+    repository.attach(securityFacet.get());
+    repository.attach(configure(viewFacet.get()));
+    repository.attach(httpClientFacet.get());
+    repository.attach(negativeCacheFacet.get());
+    repository.attach(proxyFacet.get());
+    repository.attach(contentFacet.get());
+    repository.attach(maintenanceFacet.get());
+    repository.attach(searchFacet.get());
+    repository.attach(browseFacet.get());
+    repository.attach(purgeUnusedFacet.get());
+  }
+
+  private ViewFacet configure(final ConfigurableViewFacet facet) {
+    Router.Builder builder = new Router.Builder();
+
+    builder.route(new Route.Builder()
+        .matcher(PATH_MATCHER)
+        .handler(timingHandler)
+        .handler(securityHandler)
+        .handler(routingRuleHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(negativeCacheHandler)
+        .handler(conditionalRequestHandler)
+        .handler(partialFetchHandler)
+        .handler(contentHeadersHandler)
+        .handler(lastDownloadedHandler)
+        .handler(proxyHandler)
+        .create());
+
+    // publishing is not supported on proxy repositories
+    builder.defaultHandlers(notFound());
+
+    facet.configure(builder.create());
+
+    return facet;
+  }
+}

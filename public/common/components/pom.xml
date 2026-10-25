@@ -636,6 +636,54 @@
         <version>3.89.0-09</version>
       </dependency>
 	  
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-ansible</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-nuget</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-cargo</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-conan</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-cocoapods</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-p2</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-swift</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-gitlfs</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
 	  <!-- THIRDPARTY -->
 	  
       <dependency>
