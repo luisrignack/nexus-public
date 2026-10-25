@@ -49,7 +49,7 @@ const Tasks = lazyLoad(() => import('../../components/pages/admin/Tasks/Tasks'))
 const Capabilities = lazyLoad(() => import('../../components/pages/admin/Capabilities/Capabilities'));
 const BlobStoresList = lazyLoad(() => import('../../components/pages/admin/BlobStores/BlobStoresList'));
 const BlobStoresForm = lazyLoad(() => import('../../components/pages/admin/BlobStores/BlobStoresForm'));
-const LdapServersExt = lazyLoad(() => import('../../components/pages/admin/LdapServers/LdapServersExt'));
+const LdapServers = lazyLoad(() => import('../../components/pages/admin/LdapServers/LdapServers'));
 const AdminRepositoriesDirectoryPage = lazyLoad(() => import('../../components/pages/AdminRepositories/AdminRepositoriesDirectoryPage'));
 const AdminSecurityDirectoryPage = lazyLoad(() => import('../../components/pages/AdminSecurity/AdminSecurityDirectoryPage'));
 const AdminSystemDirectoryPage = lazyLoad(() => import('../../components/pages/AdminSystem/AdminSystemDirectoryPage'));
@@ -420,12 +420,9 @@ export const adminRoutes = [
   {
     name: ADMIN.SECURITY.LDAP.ROOT,
     url: '/ldap:itemId',
-    component: LdapServersExt,
+    component: LdapServers,
     data: {
       visibilityRequirements: {
-        // the LDAP admin screens have no backend in this build: hide them instead of
-        // rendering an Ext grid whose store is never registered (crashes on isBufferedStore)
-        bundle: 'nexus-ldap-plugin',
         permissions: [Permissions.LDAP.READ],
       },
       title: ADMIN.SECURITY.LDAP.TITLE,

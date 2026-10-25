@@ -48,6 +48,11 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.common.components</groupId>
+      <artifactId>nexus-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.common.components</groupId>
       <artifactId>nexus-repository-services</artifactId>
     </dependency>
 
