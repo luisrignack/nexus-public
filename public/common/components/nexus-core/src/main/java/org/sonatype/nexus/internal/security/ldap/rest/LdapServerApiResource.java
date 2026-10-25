@@ -81,15 +81,26 @@ public class LdapServerApiResource
   @RequiresPermissions("nexus:ldap:read")
   public List<LdapServerXO> list() {
     return configurationStore.list().stream()
-        .map(this::toXO)
+        .map(LdapServerXoMapper::toXO)
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Reads a single server. The React admin UI addresses servers by their (unique) name, so the
+   * path segment accepts either the name or the backing capability id.
+   */
+  @GET
+  @Path("/{name}")
+  @RequiresPermissions("nexus:ldap:read")
+  public LdapServerXO read(@PathParam("name") final String name) {
+    return LdapServerXoMapper.toXO(findByKey(name));
   }
 
   @POST
   @RequiresAuthentication
   @RequiresPermissions("nexus:ldap:create")
   public LdapServerXO create(@NotNull @Valid final LdapServerXO xo) {
-    LdapConfiguration configuration = toConfiguration(xo);
+    LdapConfiguration configuration = LdapServerXoMapper.toConfiguration(xo);
     LdapConfiguration created = configurationStore.create(configuration);
     try {
       realmManager.enableRealm(LdapRealm.REALM_NAME);
@@ -97,7 +108,7 @@ public class LdapServerApiResource
     catch (Exception e) {
       // ignore
     }
-    return toXO(created);
+    return LdapServerXoMapper.toXO(created);
   }
 
   @PUT
@@ -105,8 +116,8 @@ public class LdapServerApiResource
   @RequiresAuthentication
   @RequiresPermissions("nexus:ldap:update")
   public LdapServerXO update(@PathParam("id") final String id, @NotNull @Valid final LdapServerXO xo) {
-    LdapConfiguration existing = findById(id);
-    LdapConfiguration configuration = toConfiguration(xo);
+    LdapConfiguration existing = findExisting(id, xo);
+    LdapConfiguration configuration = LdapServerXoMapper.toConfiguration(xo);
     if (configuration instanceof LdapConfigurationData data) {
       data.setId(existing.getId());
     }
@@ -131,7 +142,7 @@ public class LdapServerApiResource
     catch (Exception e) {
       // ignore
     }
-    return toXO(findById(id));
+    return LdapServerXoMapper.toXO(byId(existing.getId()));
   }
 
   @DELETE
@@ -139,7 +150,7 @@ public class LdapServerApiResource
   @RequiresAuthentication
   @RequiresPermissions("nexus:ldap:delete")
   public Response delete(@PathParam("id") final String id) {
-    configurationStore.delete(id);
+    configurationStore.delete(findByKey(id).getId());
     return Response.noContent().build();
   }
 
@@ -147,11 +158,14 @@ public class LdapServerApiResource
   @Path("/change-order")
   @RequiresAuthentication
   @RequiresPermissions("nexus:ldap:update")
-  public Response changeOrder(final List<String> ids) {
-    if (ids == null) {
+  public Response changeOrder(final List<String> keys) {
+    if (keys == null) {
       throw new WebApplicationException("Missing order", Response.Status.BAD_REQUEST);
     }
-    configurationStore.changeOrder(ids);
+    // the admin UI orders the list by server name, the store orders it by capability id
+    configurationStore.changeOrder(keys.stream()
+        .map(this::resolveId)
+        .collect(Collectors.toList()));
     return Response.noContent().build();
   }
 
@@ -161,7 +175,7 @@ public class LdapServerApiResource
   @RequiresPermissions("nexus:ldap:read")
   public Response verifyConnection(@NotNull @Valid final LdapServerXO xo) {
     try {
-      ldapDirectory.verifyConnection(toConfiguration(xo));
+      ldapDirectory.verifyConnection(LdapServerXoMapper.toConfiguration(xo));
       return Response.ok().build();
     }
     catch (Exception e) {
@@ -179,7 +193,8 @@ public class LdapServerApiResource
       if (xo.getAuthUsername() == null || xo.getAuthPassword() == null) {
         throw new IllegalArgumentException("Username and password are required");
       }
-      ldapDirectory.authenticate(toConfiguration(xo), xo.getAuthUsername(), xo.getAuthPassword().toCharArray());
+      ldapDirectory.authenticate(
+          LdapServerXoMapper.toConfiguration(xo), xo.getAuthUsername(), xo.getAuthPassword().toCharArray());
       return Response.ok().build();
     }
     catch (Exception e) {
@@ -195,9 +210,8 @@ public class LdapServerApiResource
   public List<LdapUserXO> verifyUserMapping(@NotNull @Valid final LdapServerXO xo) {
     try {
       List<LdapUserXO> users = new ArrayList<>();
-      for (LdapUserInfo userInfo : ldapDirectory.verifyUserMapping(toConfiguration(xo))) {
-        users.add(new LdapUserXO(userInfo.getUsername(), userInfo.getRealName(), userInfo.getEmailAddress(),
-            userInfo.getGroups()));
+      for (LdapUserInfo userInfo : ldapDirectory.verifyUserMapping(LdapServerXoMapper.toConfiguration(xo))) {
+        users.add(LdapServerXoMapper.toUserXO(userInfo));
       }
       return users;
     }
@@ -207,84 +221,46 @@ public class LdapServerApiResource
     }
   }
 
-  private LdapConfiguration findById(final String id) {
+  /**
+   * Resolves a server by name or, when no server matches, by its capability id. The admin UI
+   * addresses servers by name everywhere (list links, detail route, delete and reorder).
+   */
+  private LdapConfiguration findByKey(final String key) {
+    if (key == null || key.isEmpty()) {
+      throw new WebApplicationException("LDAP server not found", Response.Status.NOT_FOUND);
+    }
+    return configurationStore.list().stream()
+        .filter(c -> key.equals(c.getName()) || key.equals(c.getId()))
+        .findFirst()
+        .orElseThrow(() -> new WebApplicationException("LDAP server not found", Response.Status.NOT_FOUND));
+  }
+
+  /**
+   * Resolves the server to update. The admin UI puts to the name currently in the form, which is
+   * the new name when the server is being renamed, so an unknown path falls back to the id carried
+   * in the request body.
+   */
+  private LdapConfiguration findExisting(final String key, final LdapServerXO xo) {
+    try {
+      return findByKey(key);
+    }
+    catch (WebApplicationException notFound) {
+      return findByKey(xo.getId());
+    }
+  }
+
+  private LdapConfiguration byId(final String id) {
     return configurationStore.list().stream()
         .filter(c -> id.equals(c.getId()))
         .findFirst()
         .orElseThrow(() -> new WebApplicationException("LDAP server not found", Response.Status.NOT_FOUND));
   }
 
-  private LdapConfiguration toConfiguration(final LdapServerXO xo) {
-    LdapConfigurationData data = new LdapConfigurationData();
-    data.setId(xo.getId());
-    data.setOrder(xo.getOrder());
-    data.setName(xo.getName());
-    data.setProtocol(xo.getProtocol() != null ? xo.getProtocol() : "LDAP");
-    data.setUseTrustStore(xo.getUseTrustStore() != null && xo.getUseTrustStore());
-    data.setHost(xo.getHost());
-    data.setPort(xo.getPort() != null ? xo.getPort() : 389);
-    data.setSearchBase(xo.getSearchBase());
-    data.setAuthScheme(xo.getAuthScheme() != null ? xo.getAuthScheme() : "NONE");
-    data.setAuthRealm(xo.getAuthRealm());
-    data.setAuthUsername(xo.getAuthUsername());
-    data.setAuthPassword(xo.getAuthPassword());
-    data.setConnectionTimeoutSeconds(xo.getConnectionTimeoutSeconds() != null ? xo.getConnectionTimeoutSeconds() : 30);
-    data.setConnectionRetryDelaySeconds(xo.getConnectionRetryDelaySeconds() != null ? xo.getConnectionRetryDelaySeconds() : 30);
-    data.setMaxIncidentsCount(xo.getMaxIncidentsCount() != null ? xo.getMaxIncidentsCount() : 30);
-    data.setUserBaseDn(xo.getUserBaseDn());
-    data.setUserSubtree(xo.getUserSubtree() == null || xo.getUserSubtree());
-    data.setUserObjectClass(xo.getUserObjectClass());
-    data.setUserLdapFilter(xo.getUserLdapFilter());
-    data.setUserIdAttribute(xo.getUserIdAttribute());
-    data.setUserRealNameAttribute(xo.getUserRealNameAttribute());
-    data.setUserEmailAddressAttribute(xo.getUserEmailAddressAttribute());
-    data.setUserPasswordAttribute(xo.getUserPasswordAttribute());
-    data.setLdapGroupsAsRoles(xo.getLdapGroupsAsRoles() != null && xo.getLdapGroupsAsRoles());
-    data.setGroupType(xo.getGroupType() != null ? xo.getGroupType() : "DYNAMIC");
-    data.setGroupBaseDn(xo.getGroupBaseDn());
-    data.setGroupSubtree(xo.getGroupSubtree() == null || xo.getGroupSubtree());
-    data.setGroupObjectClass(xo.getGroupObjectClass());
-    data.setGroupIdAttribute(xo.getGroupIdAttribute());
-    data.setGroupMemberAttribute(xo.getGroupMemberAttribute());
-    data.setGroupMemberFormat(xo.getGroupMemberFormat());
-    data.setUserMemberOfAttribute(xo.getUserMemberOfAttribute());
-    return data;
-  }
-
-  private LdapServerXO toXO(final LdapConfiguration configuration) {
-    LdapServerXO xo = new LdapServerXO();
-    xo.setId(configuration.getId());
-    xo.setOrder(configuration.getOrder());
-    xo.setName(configuration.getName());
-    xo.setProtocol(configuration.getProtocol());
-    xo.setUseTrustStore(configuration.isUseTrustStore());
-    xo.setHost(configuration.getHost());
-    xo.setPort(configuration.getPort());
-    xo.setSearchBase(configuration.getSearchBase());
-    xo.setAuthScheme(configuration.getAuthScheme());
-    xo.setAuthRealm(configuration.getAuthRealm());
-    xo.setAuthUsername(configuration.getAuthUsername());
-    xo.setAuthPassword(org.sonatype.nexus.internal.security.ldap.LdapConfigurationStoreImpl.PASSWORD_PLACEHOLDER);
-    xo.setConnectionTimeoutSeconds(configuration.getConnectionTimeoutSeconds());
-    xo.setConnectionRetryDelaySeconds(configuration.getConnectionRetryDelaySeconds());
-    xo.setMaxIncidentsCount(configuration.getMaxIncidentsCount());
-    xo.setUserBaseDn(configuration.getUserBaseDn());
-    xo.setUserSubtree(configuration.isUserSubtree());
-    xo.setUserObjectClass(configuration.getUserObjectClass());
-    xo.setUserLdapFilter(configuration.getUserLdapFilter());
-    xo.setUserIdAttribute(configuration.getUserIdAttribute());
-    xo.setUserRealNameAttribute(configuration.getUserRealNameAttribute());
-    xo.setUserEmailAddressAttribute(configuration.getUserEmailAddressAttribute());
-    xo.setUserPasswordAttribute(configuration.getUserPasswordAttribute());
-    xo.setLdapGroupsAsRoles(configuration.isLdapGroupsAsRoles());
-    xo.setGroupType(configuration.getGroupType());
-    xo.setGroupBaseDn(configuration.getGroupBaseDn());
-    xo.setGroupSubtree(configuration.isGroupSubtree());
-    xo.setGroupObjectClass(configuration.getGroupObjectClass());
-    xo.setGroupIdAttribute(configuration.getGroupIdAttribute());
-    xo.setGroupMemberAttribute(configuration.getGroupMemberAttribute());
-    xo.setGroupMemberFormat(configuration.getGroupMemberFormat());
-    xo.setUserMemberOfAttribute(configuration.getUserMemberOfAttribute());
-    return xo;
+  private String resolveId(final String key) {
+    return configurationStore.list().stream()
+        .filter(c -> key.equals(c.getName()) || key.equals(c.getId()))
+        .map(LdapConfiguration::getId)
+        .findFirst()
+        .orElse(key);
   }
 }
