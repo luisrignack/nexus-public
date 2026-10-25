@@ -33,6 +33,6 @@ public class DatastoreHighAvailabilitySupportChecker
   protected List<String> getEnabledFormats() {
     return List.of("docker", "oci", "maven2", "npm", "r", "raw", "pypi", "conan", "conda", "gitlfs",
         "cocoapods", "go", "p2", "nuget", "rubygems", "helm", "apt", "yum", "cargo", "composer",
-        "huggingface", "terraform", "swift", "pub", "ansiblegalaxy", "alpine", "openvsx");
+        "huggingface", "terraform", "swift", "pub", "ansible", "ansiblegalaxy", "alpine", "openvsx");
   }
 }
