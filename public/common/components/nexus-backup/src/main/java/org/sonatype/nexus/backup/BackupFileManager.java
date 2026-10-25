@@ -25,8 +25,11 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
+import jakarta.inject.Singleton;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.stereotype.Component;
 
 /**
  * Filesystem support for the consistent backup task: recursive verified copy of trees and
@@ -38,6 +41,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * hash over all {@code <hash>  <relative path>} lines (sorted) is also returned for a quick
  * integrity check of the complete backup.</p>
  */
+@Component
+@Singleton
 public class BackupFileManager
 {
   public static final String MANIFEST_FILE = "backup-manifest.json";

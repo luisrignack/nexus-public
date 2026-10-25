@@ -102,6 +102,8 @@ public class NexusSecurityContributor
 
   private static final String OIDC_SETTINGS_DOMAIN = "oidc-settings";
 
+  private static final String LDAP_DOMAIN = "ldap";
+
   public static final String NX_HEALTHCHECK_READ_PRIV_ID = "nx-healthcheck-read";
 
   public static final String NX_REPO_VIEW_ALL_BROWSE_PRIV_ID = "nx-repository-view-*-*-browse";
@@ -169,6 +171,9 @@ public class NexusSecurityContributor
     configuration.addPrivilege(createApplicationPrivilege(
         "nx-oidc-settings-update", UPDATE_DESCRIPTION_BASE + "OAuth2/OIDC Settings",
         OIDC_SETTINGS_DOMAIN, ACTION_UPDATE));
+
+    // LDAP server configuration
+    createCrudAndAllApplicationPrivileges("nx-ldap", LDAP_DOMAIN).forEach(configuration::addPrivilege);
 
     createCrudAndAllApplicationPrivileges(NX_PRIVILEGE_PRIV_ID_PREFIX, NX_PRIVILEGE_DOMAIN)
         .forEach(configuration::addPrivilege);
