@@ -36,6 +36,7 @@ public class DatastoreHighAvailabilitySupportChecker
   @Override
   protected List<String> getEnabledFormats() {
     return ImmutableList.<String>builder()
+        .add("ansible")
         .add("docker")
         .add("maven2")
         .add("npm")
