@@ -38,6 +38,14 @@
     <module>nexus-repository-rubygems</module>
     <module>nexus-repository-raw</module>
     <module>nexus-repository-yum</module>
+    <module>nexus-repository-ansible</module>
+    <module>nexus-repository-nuget</module>
+    <module>nexus-repository-cargo</module>
+    <module>nexus-repository-conan</module>
+    <module>nexus-repository-cocoapods</module>
+    <module>nexus-repository-p2</module>
+    <module>nexus-repository-swift</module>
+    <module>nexus-repository-gitlfs</module>
   </modules>
 
 </project>
