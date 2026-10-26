@@ -39,6 +39,7 @@
     <module>nexus-repository-raw</module>
     <module>nexus-repository-yum</module>
     <module>nexus-repository-ansible</module>
+    <module>nexus-repository-alpine</module>
     <module>nexus-repository-nuget</module>
     <module>nexus-repository-cargo</module>
     <module>nexus-repository-conan</module>
