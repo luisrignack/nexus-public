@@ -644,6 +644,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-alpine</artifactId>
+        <version>3.89.0-09</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
         <artifactId>nexus-repository-nuget</artifactId>
         <version>3.89.0-09</version>
       </dependency>
