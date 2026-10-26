@@ -76,7 +76,9 @@ public class PyPiProxyFacet
 
     Optional<String> upstream = PyPiCoordinatesHelper.upstreamTokenFromPackagePath(path);
     if (upstream.isPresent()) {
-      return PyPiCoordinatesHelper.decodeUpstreamUrl(upstream.get()).orElse(path);
+      String upstreamUrl = PyPiCoordinatesHelper.decodeUpstreamUrl(upstream.get()).orElse(path);
+      return PyPiCoordinatesHelper.withRequestedSidecar(
+          upstreamUrl, PyPiCoordinatesHelper.fileName(path));
     }
 
     String remote = PyPiCoordinatesHelper.stripTrailingSlash(getRemoteUrl().toString());

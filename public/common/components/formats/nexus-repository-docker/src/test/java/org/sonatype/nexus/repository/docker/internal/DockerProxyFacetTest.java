@@ -38,6 +38,9 @@ class DockerProxyFacetTest
     assertThat(DockerProxyFacetImpl.isDockerHub("docker.io")).isTrue();
     assertThat(DockerProxyFacetImpl.isDockerHub("https://ghcr.io")).isFalse();
     assertThat(DockerProxyFacetImpl.isDockerHub("https://quay.io")).isFalse();
+    assertThat(DockerProxyFacetImpl.isDockerHub("https://ghcr.m.daocloud.io")).isFalse();
+    assertThat(DockerProxyFacetImpl.isDockerHub("https://quay.m.daocloud.io")).isFalse();
+    assertThat(DockerProxyFacetImpl.isDockerHub("https://gcr.m.daocloud.io")).isFalse();
     assertThat(DockerProxyFacetImpl.isDockerHub(null)).isFalse();
   }
 }

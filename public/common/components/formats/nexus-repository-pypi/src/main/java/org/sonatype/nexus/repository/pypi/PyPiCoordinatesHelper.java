@@ -126,6 +126,21 @@ public final class PyPiCoordinatesHelper
   }
 
   /**
+   * Appends the requested sidecar suffix ({@code .metadata}, {@code .asc}) to the decoded upstream file URL.
+   * Returns the upstream URL unchanged when the requested name does not extend the upstream file name.
+   */
+  public static String withRequestedSidecar(final String upstreamUrl, final String requestedFileName) {
+    if (upstreamUrl == null || requestedFileName == null || requestedFileName.isEmpty()) {
+      return upstreamUrl;
+    }
+    String upstreamFileName = fileName(upstreamUrl);
+    if (upstreamFileName.isEmpty() || !requestedFileName.startsWith(upstreamFileName)) {
+      return upstreamUrl;
+    }
+    return upstreamUrl + requestedFileName.substring(upstreamFileName.length());
+  }
+
+  /**
    * Base64url (unpadded) encoding of an upstream URL.
    */
   public static String encodeUpstreamUrl(final String url) {

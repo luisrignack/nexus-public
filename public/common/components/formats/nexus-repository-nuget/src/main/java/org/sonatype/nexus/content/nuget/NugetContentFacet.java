@@ -14,6 +14,7 @@ package org.sonatype.nexus.content.nuget;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
@@ -52,6 +53,16 @@ public interface NugetContentFacet
    * Stores a generated or proxied document, without attaching it to a component.
    */
   Content put(String path, Payload content) throws IOException;
+
+  /**
+   * Stores a generated or proxied document with additional asset attributes.
+   */
+  Content put(String path, Payload content, Map<String, Object> attributes) throws IOException;
+
+  /**
+   * Attributes of a stored asset, used to remember upstream service endpoints across restarts.
+   */
+  Optional<Map<String, Object>> assetAttributes(String path) throws IOException;
 
   /**
    * Publishes a raw {@code .nupkg}: the {@code .nuspec} manifest is extracted from the archive, its id and

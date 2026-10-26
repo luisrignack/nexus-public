@@ -240,6 +240,14 @@ public final class ConanCoordinates
   }
 
   /**
+   * Converts any path to the absolute form required by {@code assets().path(...)}.
+   */
+  public static String assetPath(final String rawPath) {
+    String normalized = normalize(rawPath);
+    return normalized.isEmpty() ? "/" : "/" + normalized;
+  }
+
+  /**
    * Splits a storage path into its segments, ignoring empty ones.
    */
   public static List<String> segments(final String path) {

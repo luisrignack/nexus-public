@@ -77,6 +77,14 @@ public class CargoCoordinatesHelperTest
   }
 
   @Test
+  public void storagePathAddsLeadingSlash() {
+    assertEquals("/index/se/rd/serde", CargoCoordinatesHelper.storagePath("index/se/rd/serde"));
+    assertEquals("/index/se/rd/serde", CargoCoordinatesHelper.storagePath("/index/se/rd/serde"));
+    assertEquals("/", CargoCoordinatesHelper.storagePath(null));
+    assertEquals("/", CargoCoordinatesHelper.storagePath(""));
+  }
+
+  @Test
   public void parseDownloadPath() {
     Optional<CrateCoordinates> download =
         CargoCoordinatesHelper.parseDownload("api/v1/crates/serde/1.0.0/download");

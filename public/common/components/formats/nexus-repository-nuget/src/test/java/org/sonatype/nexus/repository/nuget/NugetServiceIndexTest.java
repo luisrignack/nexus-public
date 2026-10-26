@@ -48,6 +48,33 @@ public class NugetServiceIndexTest
   }
 
   @Test
+  public void readsResourceUrlsFromServiceIndex() {
+    String json = "{\"version\":\"3.0.0\",\"resources\":["
+        + "{\"@id\":\"https://api.nuget.org/v3-flatcontainer/\",\"@type\":\"PackageBaseAddress/3.0.0\"},"
+        + "{\"@id\":\"https://api.nuget.org/v3/registration5-gz-semver2/\",\"@type\":\"RegistrationsBaseUrl/3.6.0\"}]}";
+
+    assertEquals("https://api.nuget.org/v3-flatcontainer/",
+        NugetServiceIndex.resourceUrl(json, "PackageBaseAddress/3."));
+    assertEquals("https://api.nuget.org/v3/registration5-gz-semver2/",
+        NugetServiceIndex.resourceUrl(json, "RegistrationsBaseUrl/"));
+    assertEquals(null, NugetServiceIndex.resourceUrl(json, "SearchQueryService/"));
+  }
+
+  @Test
+  public void keepsTheRegistrationVariantOfTheRequestedPath() {
+    assertEquals(
+        "https://api.nuget.org/v3/registration5-gz-semver2/six/index.json",
+        NugetServiceIndex.registrationUrl(
+            "https://api.nuget.org/v3/registration5-semver1/",
+            "registration5-gz-semver2/six/index.json"));
+    assertEquals(
+        "https://api.nuget.org/v3/registration5-semver1/six/index.json",
+        NugetServiceIndex.registrationUrl(
+            "https://api.nuget.org/v3/registration5-gz-semver2/",
+            "registration5-semver1/six/index.json"));
+  }
+
+  @Test
   public void rewritesUpstreamUrlsToLocalRepository() throws Exception {
     String json = "{\"version\":\"3.0.0\",\"resources\":["
         + "{\"@id\":\"https://api.nuget.org/v3/index.json\",\"@type\":\"Index\"},"

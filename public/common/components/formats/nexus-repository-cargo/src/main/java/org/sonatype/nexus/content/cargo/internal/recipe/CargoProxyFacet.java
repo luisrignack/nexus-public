@@ -92,7 +92,9 @@ public class CargoProxyFacet
     }
 
     if (CargoCoordinatesHelper.parseDownload(path).isPresent()) {
-      return new Content(content, new CargoPayload(content.getPayload(), "application/gzip"));
+      // store the crate with the gzip content type instead of wrapping the returned content: the upstream payload
+      // is closed once it has been ingested, so a wrapper around it cannot be streamed to the client afterwards
+      return content().put(path, new CargoPayload(content.getPayload(), "application/gzip"));
     }
 
     return content().put(path, content);
@@ -109,10 +111,10 @@ public class CargoProxyFacet
       url = remote + "/" + path.substring(INDEX_DIR.length() + 1);
     }
     else if (API_ROOT.equals(path) || path.startsWith(API_ROOT + "/")) {
-      Optional<String> api = content().remoteApiBase();
-      url = api.isPresent()
-          ? CargoCoordinatesHelper.stripTrailingSlash(api.get()) + path.substring(API_ROOT.length())
-          : remote + "/" + path;
+      String discovered = CargoCoordinatesHelper.parseDownload(path).isPresent()
+          ? downloadUrl(path)
+          : apiUrl(path);
+      url = discovered != null ? discovered : remote + "/" + path;
     }
     else {
       url = remote + "/" + path;
@@ -120,6 +122,35 @@ public class CargoProxyFacet
 
     String query = CargoCoordinatesHelper.queryString(context.getRequest().getParameters());
     return query.isEmpty() ? url : url + "?" + query;
+  }
+
+  /**
+   * Upstream URL of a crate download. Cargo appends {@code /{crate}/{version}/download} to the {@code dl} base
+   * announced by {@code config.json}, so the {@code api/v1/crates} prefix is replaced by that base.
+   */
+  private String downloadUrl(final String path) {
+    Optional<String> dl = content().remoteDlBase();
+    if (dl.isEmpty() || dl.get().contains("{")) {
+      return null;
+    }
+    return CargoCoordinatesHelper.stripTrailingSlash(dl.get())
+        + path.substring(CargoCoordinatesHelper.API_CRATES_PATH.length());
+  }
+
+  /**
+   * Upstream URL of a crates.io API request. The {@code api} base is a root: cargo builds
+   * {@code <api>/api/v1/crates/...} from it, but some registries advertise the full crates path already.
+   */
+  private String apiUrl(final String path) {
+    Optional<String> api = content().remoteApiBase();
+    if (api.isEmpty()) {
+      return null;
+    }
+    String base = CargoCoordinatesHelper.stripTrailingSlash(api.get());
+    if (base.endsWith("/" + CargoCoordinatesHelper.API_CRATES_PATH)) {
+      return base + path.substring(CargoCoordinatesHelper.API_CRATES_PATH.length());
+    }
+    return base + "/" + path;
   }
 
   @Override

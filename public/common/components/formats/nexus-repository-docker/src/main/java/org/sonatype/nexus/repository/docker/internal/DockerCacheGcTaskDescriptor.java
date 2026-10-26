@@ -62,7 +62,7 @@ public class DockerCacheGcTaskDescriptor
         new StringTextFormField(
             UPSTREAM_FIELD_ID,
             "Upstream filter",
-            "Optional upstream name (e.g. dockerhub, ghcr, quay, or repository name); leave blank for all upstreams",
+            "Optional upstream name (e.g. ghcr, quay, gcr, or repository name); leave blank for all upstreams",
             FormField.OPTIONAL),
         new CheckboxFormField(
             DRY_RUN_FIELD_ID,

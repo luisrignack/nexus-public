@@ -80,10 +80,25 @@ class DockerRegistryConfigTest
   void fallsBackToDefaultUpstreamForUnknownPrefix() {
     DockerRegistryConfig config = config(UPSTREAMS, "dockerhub");
 
-    Resolved resolved = config.resolve("library/nginx/manifests/latest");
+    Resolved resolved = config.resolve("owner/image/manifests/latest");
 
     assertThat(resolved.upstream().name()).isEqualTo("dockerhub");
-    assertThat(resolved.path()).isEqualTo("library/nginx/manifests/latest");
+    assertThat(resolved.path()).isEqualTo("owner/image/manifests/latest");
+  }
+
+  @Test
+  void unconfiguredRegistriesAreRejectedInsteadOfUsingTheDefaultUpstream() {
+    DockerRegistryConfig config = config(
+        "ghcr=https://ghcr.m.daocloud.io,quay=https://quay.m.daocloud.io",
+        "ghcr");
+
+    assertThat(config.resolve("library/nginx/manifests/latest").upstream()).isNull();
+    assertThat(config.resolve("dockerhub/library/nginx/manifests/latest").upstream()).isNull();
+    assertThat(config.resolve("docker.io/library/nginx/manifests/latest").upstream()).isNull();
+    // a known registry that is not configured is rejected instead of being sent to the default upstream
+    assertThat(config.resolve("gcr/google-containers/busybox/manifests/1.27").upstream()).isNull();
+    // regular ghcr images still resolve to the default upstream
+    assertThat(config.resolve("astral-sh/uv/manifests/0.5.0").upstream().name()).isEqualTo("ghcr");
   }
 
   @Test

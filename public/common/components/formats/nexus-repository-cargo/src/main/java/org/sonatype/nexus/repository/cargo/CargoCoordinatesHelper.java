@@ -76,6 +76,14 @@ public final class CargoCoordinatesHelper
     return decoded;
   }
 
+  /**
+   * Converts any path to the absolute form required by {@code assets().path(...)}.
+   */
+  public static String storagePath(@Nullable final String path) {
+    String normalized = normalize(path);
+    return normalized.startsWith("/") ? normalized : "/" + normalized;
+  }
+
   @Nullable
   public static String decode(@Nullable final String path) {
     if (path == null) {

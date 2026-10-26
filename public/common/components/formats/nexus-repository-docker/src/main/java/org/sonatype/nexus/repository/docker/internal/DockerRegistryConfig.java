@@ -39,12 +39,15 @@ import static java.util.Base64.getEncoder;
  * first path segment of the registry API, so with the default configuration the following pulls are possible:</p>
  *
  * <pre>
- * docker pull localhost:8081/library/nginx
- * docker pull localhost:8081/dockerhub/library/nginx
- * docker pull localhost:8081/gcr/google-containers/pause
  * docker pull localhost:8081/ghcr/owner/image
  * docker pull localhost:8081/quay/prometheus/node-exporter
  * </pre>
+ *
+ * <p>Docker Hub is deliberately not part of the defaults: it is not reachable in the target environments and
+ * every request would fail after a long timeout. A {@code dockerhub} upstream may still be configured explicitly,
+ * but no request is sent to Docker Hub unless it is. Only mirrors whose manifests and blobs were verified to work
+ * are enabled by default ({@code ghcr} and {@code quay}); {@code gcr} is not included because its mirror serves
+ * manifests but rejects blob downloads.</p>
  */
 @Component
 @Singleton
@@ -53,8 +56,6 @@ public class DockerRegistryConfig
   private static final Logger log = LoggerFactory.getLogger(DockerRegistryConfig.class);
 
   public static final String DEFAULT_UPSTREAMS =
-      "dockerhub=https://docker.m.daocloud.io," +
-      "gcr=https://gcr.m.daocloud.io," +
       "ghcr=https://ghcr.m.daocloud.io," +
       "quay=https://quay.m.daocloud.io";
 
@@ -78,7 +79,7 @@ public class DockerRegistryConfig
   public DockerRegistryConfig(
       @Value("${nexus.docker.enabled:true}") final boolean enabled,
       @Value("${nexus.docker.upstreams:" + DEFAULT_UPSTREAMS + "}") final String upstreams,
-      @Value("${nexus.docker.defaultUpstream:dockerhub}") final String defaultUpstream,
+      @Value("${nexus.docker.defaultUpstream:ghcr}") final String defaultUpstream,
       @Value("${nexus.docker.cacheDir:}") final String cacheDir,
       @Value("${nexus.docker.manifestTtlSeconds:300}") final long manifestTtlSeconds,
       @Value("${nexus.docker.tagsTtlSeconds:300}") final long tagsTtlSeconds,
@@ -136,7 +137,8 @@ public class DockerRegistryConfig
   /**
    * Splits a request path into the upstream registry and the registry relative path. The first path segment selects
    * the upstream when it matches a configured name; otherwise the default upstream is used and the whole path is
-   * passed through.
+   * passed through, unless the segment names a known registry that is not configured: those requests are rejected
+   * rather than forwarded to the wrong registry.
    */
   public Resolved resolve(final String route) {
     Upstream fallback = upstreams.get(defaultUpstream);
@@ -144,11 +146,32 @@ public class DockerRegistryConfig
     String first = slash < 0 ? route : route.substring(0, slash);
     String rest = slash < 0 ? "" : route.substring(slash + 1);
 
-    Upstream named = upstreams.get(first.toLowerCase(Locale.ROOT));
+    String normalized = first.toLowerCase(Locale.ROOT);
+    Upstream named = upstreams.get(normalized);
     if (named != null && !rest.isEmpty()) {
       return new Resolved(named, rest);
     }
+    if (named == null && isKnownRegistry(normalized)) {
+      // a known registry that is not configured must not be silently sent to whichever upstream is the default
+      return new Resolved(null, "");
+    }
     return new Resolved(fallback, route);
+  }
+
+  /**
+   * First path segments that name a well-known registry. When such a name has no configured upstream the request is
+   * rejected instead of being forwarded to the default upstream (which would query the wrong registry).
+   */
+  private static boolean isKnownRegistry(final String firstSegment) {
+    return "dockerhub".equals(firstSegment)
+        || "docker".equals(firstSegment)
+        || "docker.io".equals(firstSegment)
+        || "index.docker.io".equals(firstSegment)
+        || "registry-1.docker.io".equals(firstSegment)
+        || "library".equals(firstSegment)
+        || "ghcr".equals(firstSegment)
+        || "quay".equals(firstSegment)
+        || "gcr".equals(firstSegment);
   }
 
   /**

@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -75,12 +76,37 @@ public class NugetProxyFacet
     public Integer queryCacheItemMaxAge = 3600;
   }
 
+  private static final String PACKAGE_BASE_ADDRESS_ATTRIBUTE = "nuget.packageBaseAddress";
+
+  private static final String REGISTRATION_BASE_ATTRIBUTE = "nuget.registrationBaseAddress";
+
+  private static final String SEARCH_ENDPOINT_ATTRIBUTE = "nuget.searchEndpoint";
+
+  private static final String PACKAGE_BASE_ADDRESS_TYPE = "PackageBaseAddress/3.";
+
+  private static final String REGISTRATION_BASE_TYPE = "RegistrationsBaseUrl/";
+
   private Config nugetConfig = new Config();
 
   /**
    * Upstream search service discovered while rewriting a service index, {@code null} until then.
    */
   private volatile String searchEndpoint;
+
+  /**
+   * Upstream flat-container base discovered in the service index, {@code null} until then.
+   */
+  private volatile String packageBaseAddress;
+
+  /**
+   * Upstream registration base discovered in the service index, {@code null} until then.
+   */
+  private volatile String registrationBaseAddress;
+
+  /**
+   * Whether the endpoints persisted on the cached service index have already been loaded.
+   */
+  private volatile boolean resourcesLoaded;
 
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
@@ -116,12 +142,32 @@ public class NugetProxyFacet
 
     if (isJsonPath(assetPath(context))) {
       byte[] rewritten = rewrite(context, content);
-      if (rewritten != null) {
-        return content().put(path, new Content(content, new BytesPayload(rewritten, APPLICATION_JSON)));
-      }
+      Content transformed = rewritten != null
+          ? new Content(content, new BytesPayload(rewritten, APPLICATION_JSON))
+          : content;
+      Map<String, Object> attributes = serviceIndexAttributes(context);
+      return attributes.isEmpty()
+          ? content().put(path, transformed)
+          : content().put(path, transformed, attributes);
     }
 
     return content().put(path, content);
+  }
+
+  private Map<String, Object> serviceIndexAttributes(final Context context) {
+    Map<String, Object> attributes = new HashMap<>();
+    if (isServiceIndex(assetPath(context))) {
+      if (searchEndpoint != null) {
+        attributes.put(SEARCH_ENDPOINT_ATTRIBUTE, searchEndpoint);
+      }
+      if (packageBaseAddress != null) {
+        attributes.put(PACKAGE_BASE_ADDRESS_ATTRIBUTE, packageBaseAddress);
+      }
+      if (registrationBaseAddress != null) {
+        attributes.put(REGISTRATION_BASE_ATTRIBUTE, registrationBaseAddress);
+      }
+    }
+    return attributes;
   }
   @Override
   protected Content fetch(final Context context, @Nullable final Content stale) throws IOException {
@@ -140,6 +186,8 @@ public class NugetProxyFacet
     String path = NugetCoordinatesHelper.stripLeadingSlash(assetPath(context));
     Parameters parameters = context.getRequest().getParameters();
 
+    loadDiscoveredResources();
+
     String remote;
     if (NugetCoordinatesHelper.QUERY.equals(path) && searchEndpoint != null) {
       // the upstream search service may live on another host and path than the configured remote url
@@ -147,9 +195,75 @@ public class NugetProxyFacet
       return appendQuery(remote, parameters);
     }
 
+    if (path.startsWith(NugetCoordinatesHelper.FLAT_CONTAINER + "/")) {
+      String base = flatContainerBase();
+      if (base != null) {
+        String suffix = path.substring(NugetCoordinatesHelper.FLAT_CONTAINER.length() + 1);
+        return appendQuery(NugetCoordinatesHelper.ensureTrailingSlash(base) + suffix, parameters);
+      }
+    }
+
+    if (path.startsWith("registration") && registrationBaseAddress != null) {
+      int slash = path.indexOf('/');
+      if (slash > 0) {
+        return appendQuery(NugetServiceIndex.registrationUrl(registrationBaseAddress, path), parameters);
+      }
+    }
+
     remote = remoteBase();
     String url = remote + "/" + path;
     return appendQuery(url, parameters);
+  }
+
+  /**
+   * Upstream flat-container base: the {@code PackageBaseAddress/3.0.0} resource of the service index when it has
+   * been seen, otherwise a best-effort value derived from the configured service index URL.
+   */
+  @Nullable
+  private String flatContainerBase() {
+    if (packageBaseAddress != null) {
+      return packageBaseAddress;
+    }
+    String remote = NugetCoordinatesHelper.stripTrailingSlash(getRemoteUrl().toString());
+    String v3Index = "/v3/" + NugetCoordinatesHelper.INDEX_JSON;
+    if (remote.endsWith(v3Index)) {
+      return remote.substring(0, remote.length() - v3Index.length()) + "/v3-flatcontainer/";
+    }
+    String index = "/" + NugetCoordinatesHelper.INDEX_JSON;
+    if (remote.endsWith(index)) {
+      return remote.substring(0, remote.length() - index.length()) + "/v3-flatcontainer/";
+    }
+    return null;
+  }
+
+  /**
+   * Reloads the upstream endpoints persisted as attributes of the cached service index, so a restart does not lose
+   * them before the index is fetched again.
+   */
+  private void loadDiscoveredResources() {
+    if (resourcesLoaded) {
+      return;
+    }
+    resourcesLoaded = true;
+    try {
+      content().assetAttributes("/" + NugetCoordinatesHelper.INDEX_JSON).ifPresent(attributes -> {
+        Object search = attributes.get(SEARCH_ENDPOINT_ATTRIBUTE);
+        if (search != null) {
+          searchEndpoint = String.valueOf(search);
+        }
+        Object packageBase = attributes.get(PACKAGE_BASE_ADDRESS_ATTRIBUTE);
+        if (packageBase != null) {
+          packageBaseAddress = String.valueOf(packageBase);
+        }
+        Object registrationBase = attributes.get(REGISTRATION_BASE_ATTRIBUTE);
+        if (registrationBase != null) {
+          registrationBaseAddress = String.valueOf(registrationBase);
+        }
+      });
+    }
+    catch (IOException e) {
+      // fall back to the configured remote URL
+    }
   }
 
   /**
@@ -233,6 +347,17 @@ public class NugetProxyFacet
     String searchService = NugetServiceIndex.searchServiceUrl(json);
     if (searchService != null) {
       searchEndpoint = searchService;
+    }
+
+    // remember the upstream flat-container and registration bases; the local service index advertises
+    // relative paths such as /v3-flatcontainer/..., but the upstream base is not necessarily <remoteBase>/...
+    String packageBase = NugetServiceIndex.resourceUrl(json, PACKAGE_BASE_ADDRESS_TYPE);
+    if (packageBase != null) {
+      packageBaseAddress = packageBase;
+    }
+    String registrationBase = NugetServiceIndex.resourceUrl(json, REGISTRATION_BASE_TYPE);
+    if (registrationBase != null) {
+      registrationBaseAddress = registrationBase;
     }
 
     String rewritten = NugetServiceIndex.rewriteUrls(json, remoteBase(), localBase);
