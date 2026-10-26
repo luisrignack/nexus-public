@@ -169,11 +169,12 @@ public class CargoIndexBuilderTest
     JsonNode config = MAPPER.readTree(
         CargoIndexBuilder.configJson("http://localhost:8081/repository/cargo-hosted"));
     assertEquals("http://localhost:8081/repository/cargo-hosted/api/v1/crates", config.path("dl").asText());
-    assertEquals("http://localhost:8081/repository/cargo-hosted/api", config.path("api").asText());
+    assertEquals("http://localhost:8081/repository/cargo-hosted", config.path("api").asText());
 
     JsonNode withSlash = MAPPER.readTree(
         CargoIndexBuilder.configJson("http://localhost:8081/repository/cargo-hosted/"));
     assertEquals("http://localhost:8081/repository/cargo-hosted/api/v1/crates", withSlash.path("dl").asText());
+    assertEquals("http://localhost:8081/repository/cargo-hosted", withSlash.path("api").asText());
   }
 
   @Test
@@ -185,7 +186,7 @@ public class CargoIndexBuilderTest
         CargoIndexBuilder.rewriteConfig(upstream, "http://localhost:8081/repository/cargo-proxy"));
 
     assertEquals("http://localhost:8081/repository/cargo-proxy/api/v1/crates", rewritten.path("dl").asText());
-    assertEquals("http://localhost:8081/repository/cargo-proxy/api", rewritten.path("api").asText());
+    assertEquals("http://localhost:8081/repository/cargo-proxy", rewritten.path("api").asText());
     assertFalse(rewritten.path("auth-required").asBoolean(true));
 
     // an unparsable upstream document falls back to a freshly generated configuration

@@ -138,7 +138,7 @@ public class ConanContentHandler
     String query = context.getRequest().getParameters().get("q");
     Set<String> references = new TreeSet<>();
     for (final FluentAsset asset : storage(context).assetsWithPrefix(ConanCoordinates.STORAGE_ROOT + "/")) {
-      String reference = referenceOf(asset.path());
+      String reference = referenceOf(relativePath(asset));
       if (reference == null) {
         continue;
       }
@@ -160,7 +160,7 @@ public class ConanContentHandler
     String prefix = apiPath.contentPrefix();
     Map<String, OffsetDateTime> revisions = new LinkedHashMap<>();
     for (final FluentAsset asset : storage(context).assetsWithPrefix(prefix)) {
-      String revision = firstSegment(asset.path(), prefix);
+      String revision = firstSegment(relativePath(asset), prefix);
       if (revision.isEmpty()) {
         continue;
       }
@@ -189,7 +189,7 @@ public class ConanContentHandler
 
     Map<String, Map<String, Object>> files = new LinkedHashMap<>();
     for (final FluentAsset asset : storage.assetsWithPrefix(prefix)) {
-      String relative = asset.path().substring(prefix.length());
+      String relative = relativePath(asset).substring(prefix.length());
       if (relative.isEmpty()) {
         continue;
       }
@@ -254,7 +254,7 @@ public class ConanContentHandler
     String repositoryUrl = context.getRepository().getUrl();
     Map<String, Map<String, Object>> files = new LinkedHashMap<>();
     for (final FluentAsset asset : storage.assetsWithPrefix(prefix)) {
-      String relative = asset.path().substring(prefix.length());
+      String relative = relativePath(asset).substring(prefix.length());
       if (relative.isEmpty()) {
         continue;
       }
@@ -302,7 +302,7 @@ public class ConanContentHandler
     String latest = null;
     OffsetDateTime latestTime = null;
     for (final FluentAsset asset : storage.assetsWithPrefix(prefix)) {
-      String candidate = firstSegment(asset.path(), prefix);
+      String candidate = firstSegment(relativePath(asset), prefix);
       if (candidate.isEmpty()) {
         continue;
       }
@@ -313,6 +313,10 @@ public class ConanContentHandler
       }
     }
     return latest;
+  }
+
+  private static String relativePath(final FluentAsset asset) {
+    return ConanCoordinates.normalize(asset.path());
   }
 
   private static String firstSegment(final String path, final String prefix) {

@@ -39,8 +39,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p>The upstream registry is taken from {@code dockerProxy.indexUrl} when present, and falls back to the generic
  * {@code proxy.remoteUrl} otherwise. When the index type is {@code HUB} (or the URL points at Docker Hub) the
- * configured global {@code dockerhub} mirror is used so Docker Hub official images keep working in networks where
- * {@code docker.io} is not directly reachable.</p>
+ * explicitly configured global {@code dockerhub} mirror is used. Docker Hub is not configured by default: if no
+ * {@code dockerhub} upstream exists the repository returns 404 instead of attempting to reach Docker Hub.</p>
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -107,12 +107,12 @@ public class DockerProxyFacetImpl
     boolean hub = HUB.equalsIgnoreCase(indexType) || isDockerHub(baseUrl);
     if (hub) {
       Upstream mirror = registryConfig.getUpstreams().get("dockerhub");
-      if (mirror != null) {
-        baseUrl = mirror.baseUrl();
+      if (mirror == null) {
+        log.warn("Docker repository {} points at Docker Hub, but no 'dockerhub' upstream is configured; "
+            + "requests will return 404 instead of attempting Docker Hub", getRepository().getName());
+        return null;
       }
-      else if (baseUrl == null || isDockerHub(baseUrl)) {
-        baseUrl = "https://registry-1.docker.io";
-      }
+      baseUrl = mirror.baseUrl();
     }
 
     if (baseUrl == null) {
@@ -201,7 +201,7 @@ public class DockerProxyFacetImpl
       String normalized = host.toLowerCase(Locale.ROOT);
       return "docker.io".equals(normalized) || "index.docker.io".equals(normalized)
           || "registry-1.docker.io".equals(normalized) || normalized.contains("dockerhub")
-          || normalized.contains("daocloud.io");
+          || "docker.m.daocloud.io".equals(normalized);
     }
     catch (IllegalArgumentException e) {
       return false;

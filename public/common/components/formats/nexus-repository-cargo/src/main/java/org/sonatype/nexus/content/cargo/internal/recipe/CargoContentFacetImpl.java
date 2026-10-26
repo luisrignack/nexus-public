@@ -70,7 +70,7 @@ public class CargoContentFacetImpl
 
   @Override
   public Optional<Content> get(final String path) throws IOException {
-    return assets().path(path).find().map(FluentAsset::download);
+    return assets().path(CargoCoordinatesHelper.storagePath(path)).find().map(FluentAsset::download);
   }
 
   @Override
@@ -83,7 +83,7 @@ public class CargoContentFacetImpl
       throws IOException
   {
     try (TempBlob blob = blobs().ingest(content, HASHING)) {
-      FluentAssetBuilder builder = assets().path(path)
+      FluentAssetBuilder builder = assets().path(CargoCoordinatesHelper.storagePath(path))
           .attributes(FILE_NAME_ATTRIBUTE, fileName(path));
       if (attributes != null) {
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
@@ -107,7 +107,7 @@ public class CargoContentFacetImpl
           .namespace("")
           .version(version);
 
-      return assets().path(path)
+      return assets().path(CargoCoordinatesHelper.storagePath(path))
           .attributes(FILE_NAME_ATTRIBUTE, fileName(path))
           .component(component.getOrCreate())
           .blob(blob)
@@ -119,9 +119,10 @@ public class CargoContentFacetImpl
 
   @Override
   public boolean delete(final String path) throws IOException {
-    return assets().path(path)
+    String storagePath = CargoCoordinatesHelper.storagePath(path);
+    return assets().path(storagePath)
         .find()
-        .map(asset -> repository().facet(ContentMaintenanceFacet.class).deleteAsset(asset).contains(path))
+        .map(asset -> repository().facet(ContentMaintenanceFacet.class).deleteAsset(asset).contains(storagePath))
         .orElse(false);
   }
 
@@ -160,7 +161,7 @@ public class CargoContentFacetImpl
     do {
       page = assets().browse(PAGE_SIZE, continuationToken);
       for (FluentAsset asset : page) {
-        String path = asset.path();
+        String path = CargoCoordinatesHelper.normalize(asset.path());
         if (!path.startsWith(CargoCoordinatesHelper.INDEX_DIR + "/")
             || CargoCoordinatesHelper.isConfigPath(path)) {
           continue;
@@ -184,7 +185,7 @@ public class CargoContentFacetImpl
   }
 
   private Optional<String> remoteAttribute(final String key) {
-    return assets().path(CargoCoordinatesHelper.CONFIG_PATH)
+    return assets().path(CargoCoordinatesHelper.storagePath(CargoCoordinatesHelper.CONFIG_PATH))
         .find()
         .map(FluentAsset::attributes)
         .map(attributes -> attributes.get(key))

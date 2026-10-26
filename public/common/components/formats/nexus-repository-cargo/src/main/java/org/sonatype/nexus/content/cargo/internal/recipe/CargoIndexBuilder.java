@@ -391,7 +391,8 @@ public final class CargoIndexBuilder
     String base = ensureTrailingSlash(repositoryBaseUrl);
     ObjectNode config = MAPPER.createObjectNode();
     config.put("dl", base + "api/v1/crates");
-    config.put("api", base + "api");
+    // cargo builds <api>/api/v1/crates/... from this value, so it must be the repository root
+    config.put("api", stripTrailingSlash(base));
     return config.toString();
   }
 
@@ -414,7 +415,7 @@ public final class CargoIndexBuilder
       return configJson(repositoryBaseUrl);
     }
     config.put("dl", base + "api/v1/crates");
-    config.put("api", base + "api");
+    config.put("api", stripTrailingSlash(base));
     return config.toString();
   }
 
@@ -424,6 +425,14 @@ public final class CargoIndexBuilder
       return base;
     }
     return base + "/";
+  }
+
+  private static String stripTrailingSlash(final String url) {
+    String base = url == null ? "" : url.trim();
+    while (base.length() > 1 && base.endsWith("/")) {
+      base = base.substring(0, base.length() - 1);
+    }
+    return base;
   }
 
   /**

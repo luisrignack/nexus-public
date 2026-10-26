@@ -199,6 +199,14 @@ public class ConanApiPathTest
   }
 
   @Test
+  public void coordinates_assetPathAddsLeadingSlash() {
+    assertThat(ConanCoordinates.assetPath("conans/zlib/1.2.13/_/_"), is("/conans/zlib/1.2.13/_/_"));
+    assertThat(ConanCoordinates.assetPath("/conans/zlib/1.2.13/_/_"), is("/conans/zlib/1.2.13/_/_"));
+    assertThat(ConanCoordinates.assetPath("/"), is("/"));
+    assertThat(ConanCoordinates.assetPath(null), is("/"));
+  }
+
+  @Test
   public void coordinates_decodeKeepsPlusInVersions() {
     assertThat(ConanCoordinates.decode("1.0+build2"), is("1.0+build2"));
     assertThat(ConanCoordinates.normalize("/v2/conans/a/1.0+build/_/_/revisions"),

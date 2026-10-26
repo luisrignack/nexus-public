@@ -185,6 +185,63 @@ public final class NugetServiceIndex
   }
 
   /**
+   * The URL of the first service index resource whose {@code @type} starts with {@code typePrefix}, or
+   * {@code null} when the document has no such resource.
+   */
+  @Nullable
+  public static String resourceUrl(final String json, final String typePrefix) {
+    if (json == null || json.isEmpty()) {
+      return null;
+    }
+    JsonNode root;
+    try {
+      root = MAPPER.readTree(json);
+    }
+    catch (IOException e) {
+      return null;
+    }
+    if (root == null || !root.isObject()) {
+      return null;
+    }
+    JsonNode resources = root.get("resources");
+    if (resources == null || !resources.isArray()) {
+      return null;
+    }
+    for (JsonNode resource : resources) {
+      JsonNode type = resource.get("@type");
+      JsonNode id = resource.get("@id");
+      if (type != null && id != null && type.isTextual() && id.isTextual()
+          && type.asText().startsWith(typePrefix)) {
+        return id.asText();
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Upstream URL of a registration request. The local service index keeps the upstream registration variant in the
+   * path ({@code registration5-gz-semver2}, {@code registration5-semver1}, ...), so the variant is resolved against
+   * the parent of the discovered registration base instead of always using the first variant.
+   */
+  public static String registrationUrl(final String registrationBase, final String localPath) {
+    String base = stripTrailingSlash(registrationBase);
+    int slash = base.lastIndexOf('/');
+    String last = slash < 0 ? base : base.substring(slash + 1);
+    if (slash > 0 && last.startsWith("registration")) {
+      return base.substring(0, slash) + "/" + localPath;
+    }
+    return base + "/" + localPath;
+  }
+
+  private static String stripTrailingSlash(final String value) {
+    String result = value == null ? "" : value;
+    while (result.length() > 1 && result.endsWith("/")) {
+      result = result.substring(0, result.length() - 1);
+    }
+    return result;
+  }
+
+  /**
    * The upstream {@code SearchQueryService} URL of a service index, or {@code null} when it has none.
    */
   @Nullable

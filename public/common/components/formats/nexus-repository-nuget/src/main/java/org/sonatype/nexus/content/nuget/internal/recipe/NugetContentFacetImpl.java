@@ -32,6 +32,7 @@ import org.sonatype.nexus.content.nuget.NugetContentFacet;
 import org.sonatype.nexus.content.nuget.NugetPublishResult;
 import org.sonatype.nexus.repository.content.facet.ContentFacetSupport;
 import org.sonatype.nexus.repository.content.fluent.FluentAsset;
+import org.sonatype.nexus.repository.content.fluent.FluentAssetBuilder;
 import org.sonatype.nexus.repository.content.fluent.FluentComponent;
 import org.sonatype.nexus.repository.content.fluent.FluentComponentBuilder;
 import org.sonatype.nexus.repository.content.maintenance.ContentMaintenanceFacet;
@@ -81,16 +82,36 @@ public class NugetContentFacetImpl
 
   @Override
   public Content put(final String path, final Payload content) throws IOException {
+    return put(path, content, null);
+  }
+
+  @Override
+  public Content put(
+      final String path,
+      final Payload content,
+      final Map<String, Object> attributes) throws IOException
+  {
     String contentType = content.getContentType() != null ? content.getContentType() : DEFAULT_CONTENT_TYPE;
     try (InputStream input = content.openInputStream();
          TempBlob blob = blobs().ingest(input, contentType, HASHING)) {
-      return assets().path(path)
-          .attributes(FILE_NAME_ATTRIBUTE, fileName(path))
-          .blob(blob)
+      FluentAssetBuilder builder = assets().path(path)
+          .attributes(FILE_NAME_ATTRIBUTE, fileName(path));
+      if (attributes != null) {
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+          builder = builder.attributes(entry.getKey(), entry.getValue());
+        }
+      }
+      return builder.blob(blob)
           .save()
           .markAsCached(content)
           .download();
     }
+  }
+
+  @Override
+  public Optional<Map<String, Object>> assetAttributes(final String path) throws IOException {
+    return assets().path(path).find()
+        .map(asset -> asset.attributes().backing());
   }
 
   @Override

@@ -84,14 +84,14 @@ public class ConanContentFacetImpl
 
   @Override
   public Optional<Content> get(final String path) throws IOException {
-    return assets().path(path).find().map(FluentAsset::download);
+    return assets().path(ConanCoordinates.assetPath(path)).find().map(FluentAsset::download);
   }
 
   @Override
   public Content put(final String path, final Payload content) throws IOException {
     try (TempBlob blob = blobs().ingest(content, HASHING)) {
       FluentAssetBuilder builder = assets()
-          .path(path)
+          .path(ConanCoordinates.assetPath(path))
           .attributes(ConanFormat.NAME, storedAttributes(path))
           .blob(blob);
 
@@ -137,9 +137,10 @@ public class ConanContentFacetImpl
 
   @Override
   public Iterable<FluentAsset> assetsWithPrefix(final String prefix) {
+    String storagePrefix = ConanCoordinates.assetPath(prefix);
     Map<String, Object> params = ImmutableMap.of(
         "repositoryParam", contentRepositoryId(),
-        "pathParam", prefix + "%");
+        "pathParam", storagePrefix + "%");
 
     FluentQuery<FluentAsset> query = assets().byFilter(
         "path LIKE #{" + AssetDAO.FILTER_PARAMS + ".pathParam}",
@@ -148,7 +149,8 @@ public class ConanContentFacetImpl
     // the LIKE pattern treats "_" (the Conan user/channel placeholder) as a single character wildcard, so the
     // results are checked again against the exact prefix
     return ImmutableList.copyOf(
-        com.google.common.collect.Iterables.filter(iterableOf(query::browse), asset -> asset.path().startsWith(prefix)));
+        com.google.common.collect.Iterables.filter(iterableOf(query::browse),
+            asset -> asset.path().startsWith(storagePrefix)));
   }
 
   @Override
@@ -215,7 +217,7 @@ public class ConanContentFacetImpl
         assetAttributes.put(PACKAGE_REVISION_ATTRIBUTE, packageRevision);
       }
 
-      return assets().path(path)
+      return assets().path(ConanCoordinates.assetPath(path))
           .component(component)
           .attributes(ConanFormat.NAME, assetAttributes)
           .blob(blob)
