@@ -60,6 +60,8 @@ public class AnsibleGroupHandler
     String groupUrl = context.getRepository().getUrl();
 
     switch (request.getKind()) {
+      case API_DISCOVERY:
+        return ok(new BytesPayload(AnsibleIndexBuilder.apiDiscovery(), APPLICATION_JSON));
       case ROOT:
       case INDEX_ALL:
         return merge(context, dispatched, groupUrl,

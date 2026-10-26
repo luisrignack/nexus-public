@@ -37,6 +37,8 @@ import java.util.regex.Pattern;
  */
 public final class AnsibleCoordinatesHelper
 {
+  public static final String API = "/api";
+
   public static final String API_V3 = "/api/v3";
 
   public static final String API_V2 = "/api/v2";
@@ -71,6 +73,32 @@ public final class AnsibleCoordinatesHelper
   private static final Pattern DOWNLOAD =
       Pattern.compile("^/api/v3/collections/([^/]+)/([^/]+)/([^/]+)/download/?$");
 
+  /**
+   * Tarball location used by the public Galaxy server, which is not the same path this repository
+   * publishes for its own downloads.
+   */
+  private static final Pattern V3_ARTIFACT =
+      Pattern.compile("^/api/v3/plugin/ansible/content/published/collections/artifacts/([^/]+)$");
+
+  /** Galaxy v3 alias paths used by current ansible-galaxy clients. */
+  private static final Pattern V3_COLLECTIONS_ALL =
+      Pattern.compile("^/api/v3/collections/?$");
+
+  private static final Pattern V3_COLLECTIONS_NAMESPACE =
+      Pattern.compile("^/api/v3/collections/([^/]+)/?$");
+
+  private static final Pattern V3_COLLECTION =
+      Pattern.compile("^/api/v3/collections/([^/]+)/([^/]+)/?$");
+
+  private static final Pattern V3_VERSIONS =
+      Pattern.compile("^/api/v3/collections/([^/]+)/([^/]+)/versions/?$");
+
+  private static final Pattern V3_VERSION =
+      Pattern.compile("^/api/v3/collections/([^/]+)/([^/]+)/versions/([^/]+)/?$");
+
+  private static final Pattern API_DISCOVERY =
+      Pattern.compile("^/api/?$");
+
   private static final Pattern V2_COLLECTION =
       Pattern.compile("^/api/v2/collections/([^/]+)/([^/]+)/?$");
 
@@ -87,6 +115,8 @@ public final class AnsibleCoordinatesHelper
   {
     /** Repository root or API root. */
     ROOT,
+    /** Galaxy API discovery document ({@code /api/}). */
+    API_DISCOVERY,
     /** Paged list of every collection. */
     INDEX_ALL,
     /** List of the collections of one namespace. */
@@ -177,7 +207,20 @@ public final class AnsibleCoordinatesHelper
      * downloads and plain assets are excluded: their bytes must never be rewritten as text.
      */
     public boolean isDocument() {
-      return kind != Kind.ASSET && kind != Kind.DOWNLOAD;
+      // whitelist: only the documents this format knows how to rewrite are treated as JSON.
+      // anything else (downloads, stored assets, unknown Galaxy paths) keeps its original bytes
+      switch (kind) {
+        case ROOT:
+        case API_DISCOVERY:
+        case INDEX_ALL:
+        case INDEX_NAMESPACE:
+        case INDEX_COLLECTION:
+        case INDEX_VERSIONS:
+        case INDEX_VERSION:
+          return true;
+        default:
+          return false;
+      }
     }
   }
 
@@ -194,6 +237,9 @@ public final class AnsibleCoordinatesHelper
     }
     if (API_V2.equals(path) || (API_V2 + "/").equals(path)) {
       return GalaxyRequest.of(Kind.ROOT, path);
+    }
+    if (API_DISCOVERY.matcher(path).matches()) {
+      return GalaxyRequest.of(Kind.API_DISCOVERY, path);
     }
 
     Matcher matcher;
@@ -215,6 +261,26 @@ public final class AnsibleCoordinatesHelper
     if ((matcher = DOWNLOAD.matcher(path)).matches()) {
       return GalaxyRequest.of(Kind.DOWNLOAD, group(matcher, 1), group(matcher, 2), group(matcher, 3), path);
     }
+    // public Galaxy serves tarballs from .../collections/artifacts/<file>.tar.gz
+    if (V3_ARTIFACT.matcher(path).matches()) {
+      return GalaxyRequest.of(Kind.DOWNLOAD, path);
+    }
+    // aliases used by ansible-galaxy when it discovers the API through /api/
+    if ((matcher = V3_VERSION.matcher(path)).matches()) {
+      return GalaxyRequest.of(Kind.INDEX_VERSION, group(matcher, 1), group(matcher, 2), group(matcher, 3), path);
+    }
+    if ((matcher = V3_VERSIONS.matcher(path)).matches()) {
+      return GalaxyRequest.of(Kind.INDEX_VERSIONS, group(matcher, 1), group(matcher, 2), path);
+    }
+    if ((matcher = V3_COLLECTION.matcher(path)).matches()) {
+      return GalaxyRequest.of(Kind.INDEX_COLLECTION, group(matcher, 1), group(matcher, 2), path);
+    }
+    if ((matcher = V3_COLLECTIONS_NAMESPACE.matcher(path)).matches()) {
+      return GalaxyRequest.of(Kind.INDEX_NAMESPACE, group(matcher, 1), path);
+    }
+    if (V3_COLLECTIONS_ALL.matcher(path).matches()) {
+      return GalaxyRequest.of(Kind.INDEX_ALL, path);
+    }
     if ((matcher = V2_VERSION.matcher(path)).matches()) {
       return GalaxyRequest.of(Kind.INDEX_VERSION, group(matcher, 1), group(matcher, 2), group(matcher, 3), path);
     }
@@ -224,11 +290,11 @@ public final class AnsibleCoordinatesHelper
     if ((matcher = V2_COLLECTION.matcher(path)).matches()) {
       return GalaxyRequest.of(Kind.INDEX_COLLECTION, group(matcher, 1), group(matcher, 2), path);
     }
-    if (path.startsWith(API_V2) || path.startsWith(API_V3)) {
-      return GalaxyRequest.of(Kind.UNKNOWN, path);
-    }
     if (path.startsWith(CONTENT_DIR + "/") || path.endsWith(".tar.gz")) {
       return GalaxyRequest.of(Kind.ASSET, path);
+    }
+    if (path.startsWith(API_V2) || path.startsWith(API_V3)) {
+      return GalaxyRequest.of(Kind.UNKNOWN, path);
     }
     return GalaxyRequest.of(Kind.ASSET, path);
   }

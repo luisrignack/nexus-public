@@ -57,7 +57,7 @@ public class AnsibleGroupRecipe
 
   private final AnsibleGroupHandler groupHandler;
 
-  private final AnsibleRedirectHandler redirectHandler;
+  private final AnsibleRootHandler rootHandler;
 
   @Inject
   public AnsibleGroupRecipe(
@@ -65,12 +65,12 @@ public class AnsibleGroupRecipe
       @Qualifier(AnsibleFormat.NAME) final Format format,
       @Qualifier("default") final Provider<GroupFacet> groupFacet,
       final AnsibleGroupHandler groupHandler,
-      final AnsibleRedirectHandler redirectHandler)
+      final AnsibleRootHandler rootHandler)
   {
     super(type, format);
     this.groupFacet = checkNotNull(groupFacet);
     this.groupHandler = checkNotNull(groupHandler);
-    this.redirectHandler = checkNotNull(redirectHandler);
+    this.rootHandler = checkNotNull(rootHandler);
   }
 
   @Override
@@ -88,7 +88,7 @@ public class AnsibleGroupRecipe
     builder.route(new Route.Builder()
         .matcher(and(or(new ActionMatcher(GET), new ActionMatcher(HEAD)), new TokenMatcher("/")))
         .handler(timingHandler)
-        .handler(redirectHandler)
+        .handler(rootHandler)
         .create());
 
     builder.route(new Route.Builder()

@@ -77,7 +77,7 @@ public class AnsibleProxyRecipe
 
   private final RoutingRuleHandler routingRuleHandler;
 
-  private final AnsibleRedirectHandler redirectHandler;
+  private final AnsibleRootHandler rootHandler;
 
   @Inject
   public AnsibleProxyRecipe(
@@ -90,7 +90,7 @@ public class AnsibleProxyRecipe
       final NegativeCacheHandler negativeCacheHandler,
       final ProxyHandler proxyHandler,
       final RoutingRuleHandler routingRuleHandler,
-      final AnsibleRedirectHandler redirectHandler)
+      final AnsibleRootHandler rootHandler)
   {
     super(type, format);
     this.httpClientFacet = checkNotNull(httpClientFacet);
@@ -100,7 +100,7 @@ public class AnsibleProxyRecipe
     this.negativeCacheHandler = checkNotNull(negativeCacheHandler);
     this.proxyHandler = checkNotNull(proxyHandler);
     this.routingRuleHandler = checkNotNull(routingRuleHandler);
-    this.redirectHandler = checkNotNull(redirectHandler);
+    this.rootHandler = checkNotNull(rootHandler);
   }
 
   @Override
@@ -123,7 +123,7 @@ public class AnsibleProxyRecipe
     builder.route(new Route.Builder()
         .matcher(and(or(new ActionMatcher(GET), new ActionMatcher(HEAD)), new TokenMatcher("/")))
         .handler(timingHandler)
-        .handler(redirectHandler)
+        .handler(rootHandler)
         .create());
 
     builder.route(new Route.Builder()

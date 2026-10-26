@@ -51,16 +51,16 @@ public class AnsibleHostedRecipe
 {
   public static final String NAME = "ansible-hosted";
 
-  private final AnsibleRedirectHandler redirectHandler;
+  private final AnsibleRootHandler rootHandler;
 
   @Inject
   public AnsibleHostedRecipe(
       @Qualifier(HostedType.NAME) final Type type,
       @Qualifier(AnsibleFormat.NAME) final Format format,
-      final AnsibleRedirectHandler redirectHandler)
+      final AnsibleRootHandler rootHandler)
   {
     super(type, format);
-    this.redirectHandler = checkNotNull(redirectHandler);
+    this.rootHandler = checkNotNull(rootHandler);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class AnsibleHostedRecipe
     builder.route(new Route.Builder()
         .matcher(and(or(new ActionMatcher(GET), new ActionMatcher(HEAD)), new TokenMatcher("/")))
         .handler(timingHandler)
-        .handler(redirectHandler)
+        .handler(rootHandler)
         .create());
 
     builder.route(new Route.Builder()

@@ -88,6 +88,8 @@ public class AnsibleContentHandler
     switch (request.getKind()) {
       case ROOT:
         return ok(new BytesPayload(AnsibleIndexBuilder.root(baseUrl), APPLICATION_JSON));
+      case API_DISCOVERY:
+        return ok(new BytesPayload(AnsibleIndexBuilder.apiDiscovery(), APPLICATION_JSON));
       case INDEX_ALL:
         return ok(new BytesPayload(AnsibleIndexBuilder.collectionList(storage, baseUrl), APPLICATION_JSON));
       case INDEX_NAMESPACE:
@@ -104,6 +106,11 @@ public class AnsibleContentHandler
         return document(AnsibleIndexBuilder.version(
             storage, request.getNamespace(), request.getName(), request.getVersion(), baseUrl), path);
       case DOWNLOAD:
+        // only the repository's own download path carries coordinates; upstream Galaxy artifact
+        // paths are proxied, never served by a hosted repository
+        if (request.getNamespace() == null) {
+          return notFound(path);
+        }
         return download(storage, request);
       default:
         break;
