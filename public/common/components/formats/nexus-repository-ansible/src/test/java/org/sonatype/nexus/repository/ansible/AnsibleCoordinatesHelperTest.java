@@ -31,6 +31,8 @@ class AnsibleCoordinatesHelperTest
     assertThat(AnsibleCoordinatesHelper.parse("/api/v3/").getKind(), is(Kind.ROOT));
     assertThat(AnsibleCoordinatesHelper.parse("api/v3").getKind(), is(Kind.ROOT));
     assertThat(AnsibleCoordinatesHelper.parse("/api/v2").getKind(), is(Kind.ROOT));
+    assertThat(AnsibleCoordinatesHelper.parse("/api/").getKind(), is(Kind.API_DISCOVERY));
+    assertThat(AnsibleCoordinatesHelper.parse("/api").getKind(), is(Kind.API_DISCOVERY));
   }
 
   @Test
@@ -79,6 +81,43 @@ class AnsibleCoordinatesHelperTest
         "/api/v3/collections/community/general/1.0.0/download").isDocument(), is(false));
     assertThat(AnsibleCoordinatesHelper.parse(
         "/collections/community/general/1.0.0/community.general-1.0.0.tar.gz").isDocument(), is(false));
+    // public Galaxy serves tarballs from .../collections/artifacts/
+    assertThat(AnsibleCoordinatesHelper.parse(
+        "/api/v3/plugin/ansible/content/published/collections/artifacts/community-general-13.5.0.tar.gz")
+        .isDocument(), is(false));
+    // unknown Galaxy paths must not be decoded as text either
+    assertThat(AnsibleCoordinatesHelper.parse("/api/v3/nonsense").isDocument(), is(false));
+  }
+
+  @Test
+  void publicGalaxyArtifactsAreDownloads() {
+    GalaxyRequest artifact = AnsibleCoordinatesHelper.parse(
+        "/api/v3/plugin/ansible/content/published/collections/artifacts/community-general-13.5.0.tar.gz");
+    assertThat(artifact.getKind(), is(Kind.DOWNLOAD));
+    assertThat(artifact.isDocument(), is(false));
+  }
+
+  @Test
+  void galaxyV3AliasesUsedByAnsibleGalaxyAreRecognized() {
+    assertThat(AnsibleCoordinatesHelper.parse("/api/v3/collections/").getKind(), is(Kind.INDEX_ALL));
+
+    GalaxyRequest namespace = AnsibleCoordinatesHelper.parse("/api/v3/collections/community/");
+    assertThat(namespace.getKind(), is(Kind.INDEX_NAMESPACE));
+    assertThat(namespace.getNamespace(), is("community"));
+
+    GalaxyRequest collection = AnsibleCoordinatesHelper.parse("/api/v3/collections/community/general/");
+    assertThat(collection.getKind(), is(Kind.INDEX_COLLECTION));
+    assertThat(collection.getNamespace(), is("community"));
+    assertThat(collection.getName(), is("general"));
+
+    GalaxyRequest versions = AnsibleCoordinatesHelper.parse(
+        "/api/v3/collections/community/general/versions/");
+    assertThat(versions.getKind(), is(Kind.INDEX_VERSIONS));
+
+    GalaxyRequest version = AnsibleCoordinatesHelper.parse(
+        "/api/v3/collections/community/general/versions/1.0.0/");
+    assertThat(version.getKind(), is(Kind.INDEX_VERSION));
+    assertThat(version.getVersion(), is("1.0.0"));
   }
 
   @Test

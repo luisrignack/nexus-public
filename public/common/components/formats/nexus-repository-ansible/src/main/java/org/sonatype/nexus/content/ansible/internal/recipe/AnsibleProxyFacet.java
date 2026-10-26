@@ -14,7 +14,9 @@ package org.sonatype.nexus.content.ansible.internal.recipe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -24,6 +26,7 @@ import org.sonatype.nexus.repository.cache.CacheController;
 import org.sonatype.nexus.repository.content.facet.ContentProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.view.Parameters;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 
@@ -39,9 +42,9 @@ import static org.sonatype.nexus.repository.view.ContentTypes.APPLICATION_JSON;
 /**
  * Proxy facet for Ansible Galaxy repositories.
  *
- * <p>Bodies are cached as usual; JSON documents (API root, collection lists, versions, downloads)
- * are rewritten on the way in so every absolute URL points at this repository rather than at the
- * upstream Galaxy.</p>
+ * <p>Bodies are cached as usual; JSON documents (API discovery, collection lists, versions) are
+ * rewritten on the way in so both absolute and root-relative URLs point at this repository rather
+ * than at the upstream Galaxy. Tarballs and unknown paths keep their original bytes.</p>
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -50,6 +53,11 @@ public class AnsibleProxyFacet
 {
   @Override
   protected Content getCachedContent(final Context context) throws IOException {
+    // Galaxy paginates with query parameters (limit/offset); every variant is a different
+    // document, so query-bearing requests must not be answered from the path-keyed cache.
+    if (hasQuery(context)) {
+      return null;
+    }
     return content().get(assetPath(context)).orElse(null);
   }
 
@@ -57,23 +65,44 @@ public class AnsibleProxyFacet
   protected Content store(final Context context, final Content content) throws IOException {
     String path = assetPath(context);
     String remote = getRemoteUrl().toString();
+    boolean cacheable = !hasQuery(context);
 
     if (isJson(path)) {
       byte[] body = rewrite(read(content), remote, getRepository().getUrl())
-          .getBytes(java.nio.charset.StandardCharsets.UTF_8);
-      return content().put(path, new Content(content, new BytesPayload(body, APPLICATION_JSON)));
+          .getBytes(StandardCharsets.UTF_8);
+      Content rewritten = new Content(content, new BytesPayload(body, APPLICATION_JSON));
+      return cacheable ? content().put(path, rewritten) : rewritten;
     }
-    return content().put(path, content);
+    return cacheable ? content().put(path, content) : content;
   }
 
   @Override
   protected String getUrl(@Nonnull final Context context) {
     String path = AnsibleCoordinatesHelper.stripLeadingSlash(assetPath(context));
     String remote = AnsibleCoordinatesHelper.stripTrailingSlash(getRemoteUrl().toString());
-    if (path.isEmpty()) {
-      return remote + "/api/v3/";
+    String url = path.isEmpty() ? remote + "/api/v3/" : remote + "/" + path;
+    return appendQuery(url, context.getRequest().getParameters());
+  }
+
+  private static boolean hasQuery(final Context context) {
+    Parameters parameters = context.getRequest().getParameters();
+    return parameters != null && !parameters.isEmpty();
+  }
+
+  private static String appendQuery(final String url, final Parameters parameters) {
+    if (parameters == null || parameters.isEmpty()) {
+      return url;
     }
-    return remote + "/" + path;
+    StringBuilder query = new StringBuilder();
+    for (Map.Entry<String, String> entry : parameters.entries()) {
+      if (query.length() > 0) {
+        query.append('&');
+      }
+      query.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8))
+          .append('=')
+          .append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+    }
+    return url + (url.contains("?") ? "&" : "?") + query;
   }
 
   @Override
@@ -109,7 +138,7 @@ public class AnsibleProxyFacet
     return AnsibleCoordinatesHelper.parse(path).isDocument();
   }
 
-  private static String rewrite(final String body, final String remote, final String local) {
+  static String rewrite(final String body, final String remote, final String local) {
     if (body == null || body.isEmpty()) {
       return body;
     }
@@ -119,7 +148,14 @@ public class AnsibleProxyFacet
       return body;
     }
     // rewrite both plain and JSON-escaped variants of the upstream base URL
-    return body.replace(from, to).replace(from.replace("/", "\\/"), to.replace("/", "\\/"));
+    String rewritten = body.replace(from, to).replace(from.replace("/", "\\/"), to.replace("/", "\\/"));
+    // the public Galaxy API also answers with root-relative paths (/api/...). They must be
+    // anchored at this repository, otherwise clients resolve them against the Nexus host root.
+    String api = AnsibleCoordinatesHelper.API + "/";
+    rewritten = rewritten.replace("\"" + api, "\"" + to + api);
+    String escapedApi = api.replace("/", "\\/");
+    String escapedTo = to.replace("/", "\\/");
+    return rewritten.replace("\"" + escapedApi, "\"" + escapedTo + escapedApi);
   }
 
   private static String read(final Content content) throws IOException {

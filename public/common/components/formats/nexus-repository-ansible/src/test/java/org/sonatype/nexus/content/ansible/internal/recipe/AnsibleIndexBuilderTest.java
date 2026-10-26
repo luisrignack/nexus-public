@@ -108,6 +108,14 @@ class AnsibleIndexBuilderTest
 
     assertThat(root, containsString("http://localhost:8081/repository/g/api/v3/plugin/ansible/content/published"));
     assertThat(root, containsString("\"galaxy_api_version\":\"v3\""));
+    assertThat(root, containsString("\"available_versions\":{\"v3\":\"v3/\"}"));
+  }
+
+  @Test
+  void apiDiscoveryDocumentListsV3AndV1() {
+    String discovery = new String(AnsibleIndexBuilder.apiDiscovery(), StandardCharsets.UTF_8);
+
+    assertThat(discovery, containsString("\"available_versions\":{\"v3\":\"v3/\",\"v1\":\"v1/\"}"));
   }
 
   @Test

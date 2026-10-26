@@ -64,10 +64,22 @@ public final class AnsibleIndexBuilder
     ObjectNode node = MAPPER.createObjectNode();
     node.put("server_version", "3.89.0");
     node.put("galaxy_api_version", "v3");
-    node.put("available_versions", "v3");
-    ArrayNode versions = node.putArray("available_versions");
-    versions.add("v3");
+    node.putObject("available_versions").put("v3", "v3/");
     node.put("collection_index", join(baseUrl, AnsibleCoordinatesHelper.V3_INDEX) + "/");
+    return toBytes(node);
+  }
+
+  /**
+   * Galaxy API discovery document served at {@code /api/}.
+   *
+   * <p>{@code ansible-galaxy} probes the repository root first; when that is not JSON it appends
+   * {@code /api/} and expects this document to decide which API versions are available.</p>
+   */
+  public static byte[] apiDiscovery() {
+    ObjectNode node = MAPPER.createObjectNode();
+    ObjectNode versions = node.putObject("available_versions");
+    versions.put("v3", "v3/");
+    versions.put("v1", "v1/");
     return toBytes(node);
   }
 
