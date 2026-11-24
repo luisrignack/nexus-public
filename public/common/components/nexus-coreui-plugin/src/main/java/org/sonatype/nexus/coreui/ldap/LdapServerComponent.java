@@ -74,6 +74,85 @@ public class LdapServerComponent
   }
 
   /**
+   * Lists the configured servers for the classic store.
+   */
+  @DirectMethod
+  @Timed
+  @ExceptionMetered
+  @RequiresPermissions("nexus:ldap:read")
+  public Response<?> read() {
+    List<LdapServerXO> servers = new ArrayList<>();
+    for (LdapConfiguration configuration : configurationStore.list()) {
+      servers.add(LdapServerXoMapper.toXO(configuration));
+    }
+    return Responses.success(servers);
+  }
+
+  @DirectMethod
+  @Timed
+  @ExceptionMetered
+  @RequiresAuthentication
+  @RequiresPermissions("nexus:ldap:create")
+  public Response<?> create(final LdapServerXO xo) {
+    LdapConfiguration created = configurationStore.create(LdapServerXoMapper.toConfiguration(xo));
+    return Responses.success(LdapServerXoMapper.toXO(created));
+  }
+
+  @DirectMethod
+  @Timed
+  @ExceptionMetered
+  @RequiresAuthentication
+  @RequiresPermissions("nexus:ldap:update")
+  public Response<?> update(final LdapServerXO xo) {
+    LdapConfiguration stored = stored(xo)
+        .orElseThrow(() -> new IllegalArgumentException("LDAP server not found"));
+    LdapConfiguration configuration = LdapServerXoMapper.toConfiguration(xo);
+    if (configuration instanceof org.sonatype.nexus.internal.security.ldap.LdapConfigurationData data) {
+      data.setId(stored.getId());
+      data.setOrder(stored.getOrder());
+    }
+    else {
+      configuration.setId(stored.getId());
+      configuration.setOrder(stored.getOrder());
+    }
+    configurationStore.update(configuration);
+    LdapConfiguration updated = configurationStore.list().stream()
+        .filter(c -> stored.getId().equals(c.getId()))
+        .findFirst().orElse(configuration);
+    return Responses.success(LdapServerXoMapper.toXO(updated));
+  }
+
+  @DirectMethod
+  @Timed
+  @ExceptionMetered
+  @RequiresAuthentication
+  @RequiresPermissions("nexus:ldap:delete")
+  public Response<?> remove(final String id) {
+    configurationStore.delete(id);
+    return Responses.success();
+  }
+
+  @DirectMethod
+  @Timed
+  @ExceptionMetered
+  @RequiresAuthentication
+  @RequiresPermissions("nexus:ldap:update")
+  public Response<?> changeOrder(final List<String> keys) {
+    if (keys == null) {
+      return Responses.error("Missing order");
+    }
+    List<String> ids = new ArrayList<>();
+    for (String key : keys) {
+      configurationStore.list().stream()
+          .filter(c -> key.equals(c.getName()) || key.equals(c.getId()))
+          .findFirst()
+          .ifPresent(c -> ids.add(c.getId()));
+    }
+    configurationStore.changeOrder(ids);
+    return Responses.success();
+  }
+
+  /**
    * The schema templates offered when creating a server.
    */
   @DirectMethod
