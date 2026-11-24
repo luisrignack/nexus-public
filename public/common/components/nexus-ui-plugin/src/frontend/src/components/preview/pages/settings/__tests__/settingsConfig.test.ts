@@ -107,7 +107,8 @@ describe('settingsConfig permission gating (NEXUS-54048)', () => {
     it('gates saml on the saml bundle + Pro family editions', () => {
       const card = cardById('saml');
       expect(card?.visibilityRequirements?.bundle).toBe('nexus-saml-plugin');
-      expect(card?.visibilityRequirements?.editions).toEqual(PRO_FAMILY_EDITIONS);
+      // El fork implementa SAML propio, así que no está limitado a ediciones Pro.
+      expect(card?.visibilityRequirements?.editions).toBeUndefined();
     });
 
     it('gates oauth2 on the oauth2 bundle + Pro family editions + oauth2Available state', () => {
