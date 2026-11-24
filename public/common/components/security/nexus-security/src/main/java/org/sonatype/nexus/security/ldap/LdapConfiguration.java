@@ -71,6 +71,18 @@ public interface LdapConfiguration
 
   int getMaxIncidentsCount();
 
+  /** Number of extra attempts when opening an LDAP connection (0 means no retry). */
+  int getConnectionRetries();
+
+  /** Maximum number of entries returned by a search (0 means unlimited). */
+  int getSizeLimit();
+
+  /** Per-search time limit in seconds (0 means no explicit JNDI time limit). */
+  int getTimeLimitSeconds();
+
+  /** One of EXACT, SUBANY, SUBINIT or SUBFINAL. */
+  String getSearchBehavior();
+
   // --- user mapping ---
 
   String getUserBaseDn();
@@ -85,6 +97,12 @@ public interface LdapConfiguration
   String getUserIdAttribute();
 
   String getUserRealNameAttribute();
+
+  @Nullable
+  String getUserLastNameAttribute();
+
+  @Nullable
+  String getUserCompanyAttribute();
 
   String getUserEmailAddressAttribute();
 
@@ -122,4 +140,20 @@ public interface LdapConfiguration
    */
   @Nullable
   String getUserMemberOfAttribute();
+
+  /** Group attribute holding dynamic member rules (for example {@code memberURL}). */
+  @Nullable
+  String getGroupDynamicMemberAttribute();
+
+  /** Additional AND filter term applied to group searches. */
+  @Nullable
+  String getGroupLdapFilter();
+
+  /** Role id always granted to successfully authenticated LDAP users. */
+  @Nullable
+  String getDefaultMembersGroup();
+
+  /** Group attribute used as a human-readable label. */
+  @Nullable
+  String getGroupLabelAttribute();
 }

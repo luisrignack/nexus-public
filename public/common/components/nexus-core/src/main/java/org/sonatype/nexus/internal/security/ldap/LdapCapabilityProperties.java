@@ -47,6 +47,14 @@ public final class LdapCapabilityProperties
 
   public static final String MAX_INCIDENTS_COUNT = "maxIncidentsCount";
 
+  public static final String CONNECTION_RETRIES = "connectionRetries";
+
+  public static final String SIZE_LIMIT = "sizeLimit";
+
+  public static final String TIME_LIMIT_SECONDS = "timeLimitSeconds";
+
+  public static final String SEARCH_BEHAVIOR = "searchBehavior";
+
   public static final String USER_BASE_DN = "userBaseDn";
 
   public static final String USER_SUBTREE = "userSubtree";
@@ -58,6 +66,10 @@ public final class LdapCapabilityProperties
   public static final String USER_ID_ATTRIBUTE = "userIdAttribute";
 
   public static final String USER_REAL_NAME_ATTRIBUTE = "userRealNameAttribute";
+
+  public static final String USER_LAST_NAME_ATTRIBUTE = "userLastNameAttribute";
+
+  public static final String USER_COMPANY_ATTRIBUTE = "userCompanyAttribute";
 
   public static final String USER_EMAIL_ADDRESS_ATTRIBUTE = "userEmailAddressAttribute";
 
@@ -80,6 +92,14 @@ public final class LdapCapabilityProperties
   public static final String GROUP_MEMBER_FORMAT = "groupMemberFormat";
 
   public static final String USER_MEMBER_OF_ATTRIBUTE = "userMemberOfAttribute";
+
+  public static final String GROUP_DYNAMIC_MEMBER_ATTRIBUTE = "groupDynamicMemberAttribute";
+
+  public static final String GROUP_LDAP_FILTER = "groupLdapFilter";
+
+  public static final String DEFAULT_MEMBERS_GROUP = "defaultMembersGroup";
+
+  public static final String GROUP_LABEL_ATTRIBUTE = "groupLabelAttribute";
 
   public static final String ORDER = "order";
 

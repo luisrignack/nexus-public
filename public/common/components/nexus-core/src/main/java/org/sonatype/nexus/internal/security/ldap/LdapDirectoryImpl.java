@@ -117,6 +117,8 @@ public class LdapDirectoryImpl
     return new UserInfo(
         ldapEscape(String.valueOf(user.attributes.get(configuration.getUserIdAttribute()))),
         firstAttribute(user.attributes, configuration.getUserRealNameAttribute()),
+        firstAttribute(user.attributes, configuration.getUserLastNameAttribute()),
+        firstAttribute(user.attributes, configuration.getUserCompanyAttribute()),
         firstAttribute(user.attributes, configuration.getUserEmailAddressAttribute()),
         groupIds);
   }
@@ -130,11 +132,14 @@ public class LdapDirectoryImpl
       if (service == null) {
         throw new IllegalStateException("Failed to bind to the LDAP server");
       }
-      for (UserEntry user : searchUsers(configuration, service, "*", configuration.getMaxIncidentsCount())) {
+      for (UserEntry user : searchUsers(configuration, service, "*", configuration.getSizeLimit() > 0
+            ? configuration.getSizeLimit() : configuration.getMaxIncidentsCount())) {
         Set<String> groupIds = resolveGroups(configuration, service, user);
         users.add(new UserInfo(
             ldapEscape(String.valueOf(user.attributes.get(configuration.getUserIdAttribute()))),
             firstAttribute(user.attributes, configuration.getUserRealNameAttribute()),
+            firstAttribute(user.attributes, configuration.getUserLastNameAttribute()),
+            firstAttribute(user.attributes, configuration.getUserCompanyAttribute()),
             firstAttribute(user.attributes, configuration.getUserEmailAddressAttribute()),
             groupIds));
       }
@@ -211,17 +216,7 @@ public class LdapDirectoryImpl
     if ("ldaps".equalsIgnoreCase(configuration.getProtocol())) {
       if (configuration.isUseTrustStore()) {
         try {
-          javax.net.ssl.SSLSocketFactory socketFactory = null;
-          try {
-            java.lang.reflect.Method m = trustStore.getClass().getMethod("getSslSocketFactory");
-            socketFactory = (javax.net.ssl.SSLSocketFactory) m.invoke(trustStore);
-          }
-          catch (Exception ex) {
-            // try other methods
-          }
-          if (socketFactory != null) {
-            env.put("java.naming.ldap.factory.socket", socketFactory);
-          }
+          env.put("java.naming.ldap.factory.socket", trustStore.getSSLContext().getSocketFactory());
         }
         catch (Exception e) {
           log.warn("Unable to obtain the Nexus trust store for LDAPS; falling back to the JVM default", e);
@@ -229,7 +224,31 @@ public class LdapDirectoryImpl
       }
     }
 
-    return new javax.naming.directory.InitialDirContext(env);
+    NamingException lastFailure = null;
+    int retries = Math.max(0, configuration.getConnectionRetries());
+    for (int attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return new javax.naming.directory.InitialDirContext(env);
+      }
+      catch (NamingException e) {
+        lastFailure = e;
+        if (attempt < retries) {
+          long delay = Math.max(0, configuration.getConnectionRetryDelaySeconds()) * 1000L;
+          if (delay > 0) {
+            try {
+              Thread.sleep(delay);
+            }
+            catch (InterruptedException interrupted) {
+              Thread.currentThread().interrupt();
+              throw e;
+            }
+          }
+          log.debug("LDAP connection attempt {} failed for {}: {}", attempt + 1,
+              configuration.getHost(), rootMessage(e));
+        }
+      }
+    }
+    throw lastFailure;
   }
 
   /**
@@ -302,6 +321,9 @@ public class LdapDirectoryImpl
     controls.setSearchScope(configuration.isUserSubtree() ? SearchControls.SUBTREE_SCOPE : SearchControls.ONELEVEL_SCOPE);
     controls.setReturningAttributes(returningAttributes(configuration));
     controls.setCountLimit(limit);
+    if (configuration.getTimeLimitSeconds() > 0) {
+      controls.setTimeLimit(configuration.getTimeLimitSeconds() * 1000);
+    }
 
     NamingEnumeration<SearchResult> results = service.search(base, filter, controls);
     java.util.List<UserEntry> entries = new java.util.ArrayList<>();
@@ -324,8 +346,15 @@ public class LdapDirectoryImpl
    */
   private static String userSearchFilter(final LdapConfiguration configuration, final String username) {
     String escaped = rfc4515Escape(username);
+    String behavior = configuration.getSearchBehavior() == null ? "EXACT" : configuration.getSearchBehavior();
+    String pattern = switch (behavior.toUpperCase(java.util.Locale.ROOT)) {
+      case "SUBANY" -> "*" + escaped + "*";
+      case "SUBINIT" -> escaped + "*";
+      case "SUBFINAL" -> "*" + escaped;
+      default -> escaped;
+    };
     StringBuilder filter = new StringBuilder("(&(objectClass=").append(configuration.getUserObjectClass())
-        .append(")(").append(configuration.getUserIdAttribute()).append('=').append(escaped).append(')');
+        .append(")(").append(configuration.getUserIdAttribute()).append('=').append(pattern).append(')');
     String custom = configuration.getUserLdapFilter();
     if (custom != null && !custom.isBlank()) {
       custom = custom.trim();
@@ -357,6 +386,8 @@ public class LdapDirectoryImpl
     java.util.Set<String> attributes = new java.util.LinkedHashSet<>();
     attributes.add(configuration.getUserIdAttribute());
     addIfNotBlank(attributes, configuration.getUserRealNameAttribute());
+    addIfNotBlank(attributes, configuration.getUserLastNameAttribute());
+    addIfNotBlank(attributes, configuration.getUserCompanyAttribute());
     addIfNotBlank(attributes, configuration.getUserEmailAddressAttribute());
     addIfNotBlank(attributes, configuration.getUserPasswordAttribute());
     if ("DYNAMIC".equalsIgnoreCase(configuration.getGroupType())) {
@@ -474,18 +505,25 @@ public class LdapDirectoryImpl
       return Collections.emptySet();
     }
     if ("DYNAMIC".equalsIgnoreCase(configuration.getGroupType())) {
-      return resolveDynamicGroups(configuration, user);
+      return resolveDynamicGroups(configuration, service, user);
     }
     return resolveStaticGroups(configuration, service, user);
   }
 
-  private Set<String> resolveDynamicGroups(final LdapConfiguration configuration, final UserEntry user)
-      throws NamingException
+  private Set<String> resolveDynamicGroups(
+      final LdapConfiguration configuration,
+      final DirContext service,
+      final UserEntry user) throws NamingException
   {
     Set<String> groupIds = new java.util.LinkedHashSet<>();
-    String memberOfAttribute = configuration.getUserMemberOfAttribute();
     String groupIdAttribute = configuration.getGroupIdAttribute() != null
         ? configuration.getGroupIdAttribute() : "cn";
+    String dynamicAttribute = configuration.getGroupDynamicMemberAttribute();
+    if (dynamicAttribute != null && !dynamicAttribute.isBlank()) {
+      groupIds.addAll(resolveMemberUrlGroups(configuration, service, user, dynamicAttribute, groupIdAttribute));
+      return groupIds;
+    }
+    String memberOfAttribute = configuration.getUserMemberOfAttribute();
     if (memberOfAttribute == null || memberOfAttribute.isBlank()) {
       return groupIds;
     }
@@ -519,6 +557,94 @@ public class LdapDirectoryImpl
     return groupIds;
   }
 
+  /**
+   * Resolves groups whose membership rule is stored in an attribute such as {@code memberURL}.
+   * The rule filter is read from the group entry and combined with an exact username condition so a
+   * malformed or overly broad rule cannot grant membership to other users.
+   */
+  private Set<String> resolveMemberUrlGroups(
+      final LdapConfiguration configuration,
+      final DirContext service,
+      final UserEntry user,
+      final String dynamicAttribute,
+      final String groupIdAttribute)
+  {
+    Set<String> groupIds = new java.util.LinkedHashSet<>();
+    String groupBase = relativeDn(configuration, configuration.getGroupBaseDn());
+    if (groupBase == null || groupBase.isEmpty()) {
+      return groupIds;
+    }
+    String objectClass = configuration.getGroupObjectClass();
+    StringBuilder searchFilter = new StringBuilder("(&");
+    if (objectClass != null && !objectClass.isBlank()) {
+      searchFilter.append("(objectClass=").append(objectClass).append(')');
+    }
+    searchFilter.append('(').append(dynamicAttribute).append("=*))");
+
+    SearchControls controls = new SearchControls();
+    controls.setSearchScope(configuration.isGroupSubtree() ? SearchControls.SUBTREE_SCOPE : SearchControls.ONELEVEL_SCOPE);
+    controls.setReturningAttributes(new String[]{groupIdAttribute, dynamicAttribute});
+    if (configuration.getTimeLimitSeconds() > 0) {
+      controls.setTimeLimit(configuration.getTimeLimitSeconds() * 1000);
+    }
+
+    String username = String.valueOf(user.attributes.get(configuration.getUserIdAttribute()));
+    String userBase = relativeDn(configuration, configuration.getUserBaseDn());
+    try {
+      NamingEnumeration<SearchResult> groups = service.search(groupBase, searchFilter.toString(), controls);
+      try {
+        while (groups.hasMore()) {
+          SearchResult group = groups.next();
+          String name = firstAttribute(group.getAttributes(), groupIdAttribute);
+          if (name == null) {
+            name = firstRdnValue(group.getNameInNamespace());
+          }
+          Attribute rules = group.getAttributes().get(dynamicAttribute);
+          if (rules == null || name == null) {
+            continue;
+          }
+          NamingEnumeration<?> values = rules.getAll();
+          try {
+            while (values.hasMore()) {
+              String rule = String.valueOf(values.next());
+              int open = rule.lastIndexOf('(');
+              int close = rule.lastIndexOf(')');
+              if (open < 0 || close <= open) {
+                continue;
+              }
+              String filter = "(&" + rule.substring(open, close + 1) + "("
+                  + configuration.getUserIdAttribute() + "=" + rfc4515Escape(username) + "))";
+              SearchControls check = new SearchControls();
+              check.setSearchScope(SearchControls.SUBTREE_SCOPE);
+              check.setCountLimit(2);
+              check.setReturningAttributes(new String[0]);
+              NamingEnumeration<SearchResult> matches = service.search(userBase, filter, check);
+              try {
+                if (matches.hasMore()) {
+                  groupIds.add(name);
+                  break;
+                }
+              }
+              finally {
+                matches.close();
+              }
+            }
+          }
+          finally {
+            values.close();
+          }
+        }
+      }
+      finally {
+        groups.close();
+      }
+    }
+    catch (NamingException e) {
+      log.trace("Unable to resolve dynamic LDAP groups via {}", dynamicAttribute, e);
+    }
+    return groupIds;
+  }
+
   private Set<String> resolveStaticGroups(
       final LdapConfiguration configuration,
       final DirContext service,
@@ -533,13 +659,25 @@ public class LdapDirectoryImpl
         ? configuration.getGroupIdAttribute() : "cn";
 
     StringBuilder filter = new StringBuilder("(&(objectClass=").append(configuration.getGroupObjectClass())
-        .append(")(").append(configuration.getGroupMemberAttribute()).append('=').append(
-        memberValue.replace("\\", "\\5c").replace("(", "\\28").replace(")", "\\29")).append("))");
+        .append(")(").append(configuration.getGroupMemberAttribute()).append('=')
+        .append(rfc4515Escape(memberValue)).append(')');
+    String custom = configuration.getGroupLdapFilter();
+    if (custom != null && !custom.isBlank()) {
+      custom = custom.trim();
+      if (!custom.startsWith("(")) {
+        custom = "(" + custom + ")";
+      }
+      filter.append(custom);
+    }
+    filter.append(')');
 
     SearchControls controls = new SearchControls();
     controls.setSearchScope(configuration.isGroupSubtree() ? SearchControls.SUBTREE_SCOPE : SearchControls.ONELEVEL_SCOPE);
     controls.setReturningAttributes(new String[]{groupIdAttribute});
-    controls.setCountLimit(0);
+    controls.setCountLimit(configuration.getSizeLimit() > 0 ? configuration.getSizeLimit() : 0);
+    if (configuration.getTimeLimitSeconds() > 0) {
+      controls.setTimeLimit(configuration.getTimeLimitSeconds() * 1000);
+    }
 
     NamingEnumeration<SearchResult> results = service.search(groupBase, filter.toString(), controls);
     try {
@@ -662,6 +800,10 @@ public class LdapDirectoryImpl
 
     private final String realName;
 
+    private final String lastName;
+
+    private final String company;
+
     private final String emailAddress;
 
     private final Set<String> groups;
@@ -669,11 +811,15 @@ public class LdapDirectoryImpl
     UserInfo(
         final String username,
         final String realName,
+        final String lastName,
+        final String company,
         final String emailAddress,
         final Set<String> groups)
     {
       this.username = username;
       this.realName = realName;
+      this.lastName = lastName;
+      this.company = company;
       this.emailAddress = emailAddress;
       this.groups = Collections.unmodifiableSet(groups != null ? groups : Collections.emptySet());
     }
@@ -686,6 +832,16 @@ public class LdapDirectoryImpl
     @Override
     public String getRealName() {
       return realName;
+    }
+
+    @Override
+    public String getLastName() {
+      return lastName;
+    }
+
+    @Override
+    public String getCompany() {
+      return company;
     }
 
     @Override

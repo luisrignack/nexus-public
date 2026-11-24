@@ -46,6 +46,10 @@ export interface LdapServerConnection {
   connectionTimeout?: number;
   connectionRetryDelay?: number;
   maxIncidentsCount?: number;
+  connectionRetries?: number;
+  sizeLimit?: number;
+  timeLimitSeconds?: number;
+  searchBehavior?: string;
 }
 
 /**
@@ -59,6 +63,8 @@ export interface LdapServer extends LdapServerConnection {
   userLdapFilter?: string;
   userIdAttribute: string;
   userRealNameAttribute: string;
+  userLastNameAttribute?: string;
+  userCompanyAttribute?: string;
   userEmailAddressAttribute: string;
   userPasswordAttribute?: string;
 
@@ -72,6 +78,10 @@ export interface LdapServer extends LdapServerConnection {
   groupMemberAttribute?: string;
   groupMemberFormat?: string;
   userMemberOfAttribute?: string;
+  groupDynamicMemberAttribute?: string;
+  groupLdapFilter?: string;
+  defaultMembersGroup?: string;
+  groupLabelAttribute?: string;
 }
 
 /**
@@ -96,6 +106,10 @@ export interface LdapSchemaTemplate {
   groupMemberAttribute?: string;
   groupMemberFormat?: string;
   userMemberOfAttribute?: string;
+  groupDynamicMemberAttribute?: string;
+  groupLdapFilter?: string;
+  defaultMembersGroup?: string;
+  groupLabelAttribute?: string;
 }
 
 /**
@@ -137,6 +151,10 @@ export interface LdapFormErrors {
   connectionTimeout?: string;
   connectionRetryDelay?: string;
   maxIncidentsCount?: string;
+  connectionRetries?: string;
+  sizeLimit?: string;
+  timeLimitSeconds?: string;
+  searchBehavior?: string;
   userObjectClass?: string;
   userIdAttribute?: string;
   userRealNameAttribute?: string;
@@ -147,6 +165,10 @@ export interface LdapFormErrors {
   groupMemberAttribute?: string;
   groupMemberFormat?: string;
   userMemberOfAttribute?: string;
+  groupDynamicMemberAttribute?: string;
+  groupLdapFilter?: string;
+  defaultMembersGroup?: string;
+  groupLabelAttribute?: string;
 }
 
 /**
@@ -205,12 +227,18 @@ export const DEFAULT_LDAP_SERVER: LdapFormData = {
   connectionTimeout: 30,
   connectionRetryDelay: 300,
   maxIncidentsCount: 3,
+  connectionRetries: 1,
+  sizeLimit: 0,
+  timeLimitSeconds: 0,
+  searchBehavior: 'EXACT',
   userBaseDn: '',
   userSubtree: false,
   userObjectClass: 'inetOrgPerson',
   userLdapFilter: '',
   userIdAttribute: 'uid',
   userRealNameAttribute: 'cn',
+  userLastNameAttribute: 'sn',
+  userCompanyAttribute: 'ou',
   userEmailAddressAttribute: 'mail',
   userPasswordAttribute: '',
   ldapGroupsAsRoles: true,

@@ -51,12 +51,18 @@ public final class LdapServerXoMapper
     data.setConnectionRetryDelaySeconds(
         xo.getConnectionRetryDelaySeconds() != null ? xo.getConnectionRetryDelaySeconds() : 30);
     data.setMaxIncidentsCount(xo.getMaxIncidentsCount() != null ? xo.getMaxIncidentsCount() : 30);
+    data.setConnectionRetries(xo.getConnectionRetries() != null ? xo.getConnectionRetries() : 1);
+    data.setSizeLimit(xo.getSizeLimit() != null ? xo.getSizeLimit() : 0);
+    data.setTimeLimitSeconds(xo.getTimeLimitSeconds() != null ? xo.getTimeLimitSeconds() : 0);
+    data.setSearchBehavior(xo.getSearchBehavior() != null ? xo.getSearchBehavior() : "EXACT");
     data.setUserBaseDn(xo.getUserBaseDn());
     data.setUserSubtree(xo.getUserSubtree() == null || xo.getUserSubtree());
     data.setUserObjectClass(xo.getUserObjectClass());
     data.setUserLdapFilter(xo.getUserLdapFilter());
     data.setUserIdAttribute(xo.getUserIdAttribute());
     data.setUserRealNameAttribute(xo.getUserRealNameAttribute());
+    data.setUserLastNameAttribute(xo.getUserLastNameAttribute());
+    data.setUserCompanyAttribute(xo.getUserCompanyAttribute());
     data.setUserEmailAddressAttribute(xo.getUserEmailAddressAttribute());
     data.setUserPasswordAttribute(xo.getUserPasswordAttribute());
     data.setLdapGroupsAsRoles(xo.getLdapGroupsAsRoles() != null && xo.getLdapGroupsAsRoles());
@@ -68,6 +74,10 @@ public final class LdapServerXoMapper
     data.setGroupMemberAttribute(xo.getGroupMemberAttribute());
     data.setGroupMemberFormat(xo.getGroupMemberFormat());
     data.setUserMemberOfAttribute(xo.getUserMemberOfAttribute());
+    data.setGroupDynamicMemberAttribute(xo.getGroupDynamicMemberAttribute());
+    data.setGroupLdapFilter(xo.getGroupLdapFilter());
+    data.setDefaultMembersGroup(xo.getDefaultMembersGroup());
+    data.setGroupLabelAttribute(xo.getGroupLabelAttribute());
     return data;
   }
 
@@ -88,12 +98,18 @@ public final class LdapServerXoMapper
     xo.setConnectionTimeoutSeconds(configuration.getConnectionTimeoutSeconds());
     xo.setConnectionRetryDelaySeconds(configuration.getConnectionRetryDelaySeconds());
     xo.setMaxIncidentsCount(configuration.getMaxIncidentsCount());
+    xo.setConnectionRetries(configuration.getConnectionRetries());
+    xo.setSizeLimit(configuration.getSizeLimit());
+    xo.setTimeLimitSeconds(configuration.getTimeLimitSeconds());
+    xo.setSearchBehavior(configuration.getSearchBehavior());
     xo.setUserBaseDn(configuration.getUserBaseDn());
     xo.setUserSubtree(configuration.isUserSubtree());
     xo.setUserObjectClass(configuration.getUserObjectClass());
     xo.setUserLdapFilter(configuration.getUserLdapFilter());
     xo.setUserIdAttribute(configuration.getUserIdAttribute());
     xo.setUserRealNameAttribute(configuration.getUserRealNameAttribute());
+    xo.setUserLastNameAttribute(configuration.getUserLastNameAttribute());
+    xo.setUserCompanyAttribute(configuration.getUserCompanyAttribute());
     xo.setUserEmailAddressAttribute(configuration.getUserEmailAddressAttribute());
     xo.setUserPasswordAttribute(configuration.getUserPasswordAttribute());
     xo.setLdapGroupsAsRoles(configuration.isLdapGroupsAsRoles());
@@ -105,6 +121,10 @@ public final class LdapServerXoMapper
     xo.setGroupMemberAttribute(configuration.getGroupMemberAttribute());
     xo.setGroupMemberFormat(configuration.getGroupMemberFormat());
     xo.setUserMemberOfAttribute(configuration.getUserMemberOfAttribute());
+    xo.setGroupDynamicMemberAttribute(configuration.getGroupDynamicMemberAttribute());
+    xo.setGroupLdapFilter(configuration.getGroupLdapFilter());
+    xo.setDefaultMembersGroup(configuration.getDefaultMembersGroup());
+    xo.setGroupLabelAttribute(configuration.getGroupLabelAttribute());
     return xo;
   }
 
@@ -112,6 +132,8 @@ public final class LdapServerXoMapper
     return new LdapUserXO(
         userInfo.getUsername(),
         userInfo.getRealName(),
+        userInfo.getLastName(),
+        userInfo.getCompany(),
         userInfo.getEmailAddress(),
         userInfo.getGroups());
   }

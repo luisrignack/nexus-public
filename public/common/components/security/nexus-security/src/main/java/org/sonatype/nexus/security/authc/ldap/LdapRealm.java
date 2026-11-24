@@ -109,6 +109,9 @@ public class LdapRealm
         Set<String> roleIds = configuration.isLdapGroupsAsRoles()
             ? mapRoles(userInfo.getGroups())
             : new HashSet<>();
+        if (configuration.getDefaultMembersGroup() != null && !configuration.getDefaultMembersGroup().isBlank()) {
+          roleIds.add(configuration.getDefaultMembersGroup());
+        }
         provisionUser(configuration, userInfo, roleIds);
 
         SimpleAccount account = new SimpleAccount(userInfo.getUsername(), password, REALM_NAME);
@@ -190,6 +193,7 @@ public class LdapRealm
     try {
       user = securitySystem.getUser(userInfo.getUsername(), source);
       user.setFirstName(orDefault(userInfo.getRealName(), user.getFirstName()));
+      user.setLastName(orDefault(userInfo.getLastName(), user.getLastName()));
       user.setEmailAddress(orDefault(userInfo.getEmailAddress(), user.getEmailAddress()));
       securitySystem.updateUser(user);
     }
@@ -197,7 +201,7 @@ public class LdapRealm
       user = new User();
       user.setUserId(userInfo.getUsername());
       user.setFirstName(orDefault(userInfo.getRealName(), ""));
-      user.setLastName("");
+      user.setLastName(orDefault(userInfo.getLastName(), ""));
       user.setEmailAddress(orDefault(userInfo.getEmailAddress(), ""));
       user.setSource(source);
       user.setStatus(UserStatus.active);

@@ -157,12 +157,18 @@ describe('ldapFormMachine', () => {
         connectionTimeout: 30,
         connectionRetryDelay: 300,
         maxIncidentsCount: 3,
+        connectionRetries: 1,
+        sizeLimit: 0,
+        timeLimitSeconds: 0,
+        searchBehavior: 'EXACT',
         userBaseDn: '',
         userSubtree: false,
         userObjectClass: 'inetOrgPerson',
         userLdapFilter: '',
         userIdAttribute: 'uid',
         userRealNameAttribute: 'cn',
+        userLastNameAttribute: 'sn',
+        userCompanyAttribute: 'ou',
         userEmailAddressAttribute: 'mail',
         userPasswordAttribute: '',
         ldapGroupsAsRoles: true,
@@ -195,6 +201,34 @@ describe('ldapFormMachine', () => {
       expect(state.context.data.userObjectClass).toBe('person');
       expect(state.context.data.ldapGroupsAsRoles).toBe(true);
       expect(state.context.data.groupType).toBe('static');
+
+      service.stop();
+    });
+
+    it('loads the extended connection, user and group fields in edit mode', async () => {
+      const server = buildPreloadedServer({
+        connectionRetries: 3,
+        sizeLimit: 500,
+        timeLimitSeconds: 20,
+        searchBehavior: 'SUBANY',
+        userLastNameAttribute: 'sn',
+        userCompanyAttribute: 'o',
+        groupLdapFilter: '(objectCategory=group)',
+        defaultMembersGroup: 'members',
+        groupLabelAttribute: 'description',
+      });
+      const service = await startAndLoad(createLdapFormMachine(server.id, server));
+      const data = service.getSnapshot().context.data;
+
+      expect(data.connectionRetries).toBe(3);
+      expect(data.sizeLimit).toBe(500);
+      expect(data.timeLimitSeconds).toBe(20);
+      expect(data.searchBehavior).toBe('SUBANY');
+      expect(data.userLastNameAttribute).toBe('sn');
+      expect(data.userCompanyAttribute).toBe('o');
+      expect(data.groupLdapFilter).toBe('(objectCategory=group)');
+      expect(data.defaultMembersGroup).toBe('members');
+      expect(data.groupLabelAttribute).toBe('description');
 
       service.stop();
     });
@@ -495,6 +529,31 @@ describe('ldapFormMachine', () => {
         expect(errors[field as keyof typeof errors]).toBe(expectedMessage);
       }
     );
+
+    it.each(['connectionRetries', 'sizeLimit', 'timeLimitSeconds'] as const)(
+      'rejects a negative %s',
+      (field) => {
+        const errors = validateConnection({ ...validLdapFormData(), [field]: -1 });
+        expect(errors[field]).toBe('Must be a number 0 or greater');
+      }
+    );
+
+    it('accepts zero for the optional retry and limit fields', () => {
+      const errors = validateConnection({
+        ...validLdapFormData(),
+        connectionRetries: 0,
+        sizeLimit: 0,
+        timeLimitSeconds: 0,
+      });
+      expect(errors.connectionRetries).toBeFalsy();
+      expect(errors.sizeLimit).toBeFalsy();
+      expect(errors.timeLimitSeconds).toBeFalsy();
+    });
+
+    it('rejects an unknown search behavior', () => {
+      const errors = validateConnection({ ...validLdapFormData(), searchBehavior: 'CONTAINS' });
+      expect(errors.searchBehavior).toBeTruthy();
+    });
   });
 
   describe('user mapping validation', () => {
@@ -923,6 +982,17 @@ describe('ldapFormMachine', () => {
       });
       const errors = validateLdap(data);
       expect(errors.userMemberOfAttribute).toBeTruthy();
+    });
+
+    it('accepts a dynamic member attribute instead of userMemberOfAttribute', () => {
+      const data = validLdapFormData({
+        ldapGroupsAsRoles: true,
+        groupType: 'dynamic',
+        userMemberOfAttribute: '',
+        groupDynamicMemberAttribute: 'memberURL',
+      });
+      const errors = validateLdap(data);
+      expect(errors.userMemberOfAttribute).toBeFalsy();
     });
 
     it('flags duplicate name on create when existingNames provided', () => {

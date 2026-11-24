@@ -42,12 +42,18 @@ interface RestLdapServer {
   connectionTimeoutSeconds: number;
   connectionRetryDelaySeconds: number;
   maxIncidentsCount: number;
+  connectionRetries?: number;
+  sizeLimit?: number;
+  timeLimitSeconds?: number;
+  searchBehavior?: string;
   userBaseDn?: string;
   userSubtree: boolean;
   userObjectClass: string;
   userLdapFilter?: string;
   userIdAttribute: string;
   userRealNameAttribute: string;
+  userLastNameAttribute?: string;
+  userCompanyAttribute?: string;
   userEmailAddressAttribute: string;
   userPasswordAttribute?: string;
   ldapGroupsAsRoles: boolean;
@@ -59,6 +65,10 @@ interface RestLdapServer {
   groupMemberAttribute?: string;
   groupMemberFormat?: string;
   userMemberOfAttribute?: string;
+  groupDynamicMemberAttribute?: string;
+  groupLdapFilter?: string;
+  defaultMembersGroup?: string;
+  groupLabelAttribute?: string;
 }
 
 /**
@@ -130,12 +140,18 @@ function restToLdapServer(rest: RestLdapServer): LdapServer {
     connectionTimeout: rest.connectionTimeoutSeconds,
     connectionRetryDelay: rest.connectionRetryDelaySeconds,
     maxIncidentsCount: rest.maxIncidentsCount,
+    connectionRetries: rest.connectionRetries,
+    sizeLimit: rest.sizeLimit,
+    timeLimitSeconds: rest.timeLimitSeconds,
+    searchBehavior: rest.searchBehavior,
     userBaseDn: rest.userBaseDn,
     userSubtree: rest.userSubtree,
     userObjectClass: rest.userObjectClass,
     userLdapFilter: rest.userLdapFilter,
     userIdAttribute: rest.userIdAttribute,
     userRealNameAttribute: rest.userRealNameAttribute,
+    userLastNameAttribute: rest.userLastNameAttribute,
+    userCompanyAttribute: rest.userCompanyAttribute,
     userEmailAddressAttribute: rest.userEmailAddressAttribute,
     userPasswordAttribute: rest.userPasswordAttribute,
     ldapGroupsAsRoles: rest.ldapGroupsAsRoles,
@@ -147,6 +163,10 @@ function restToLdapServer(rest: RestLdapServer): LdapServer {
     groupMemberAttribute: rest.groupMemberAttribute,
     groupMemberFormat: rest.groupMemberFormat,
     userMemberOfAttribute: rest.userMemberOfAttribute,
+    groupDynamicMemberAttribute: rest.groupDynamicMemberAttribute,
+    groupLdapFilter: rest.groupLdapFilter,
+    defaultMembersGroup: rest.defaultMembersGroup,
+    groupLabelAttribute: rest.groupLabelAttribute,
   };
 }
 
@@ -169,12 +189,18 @@ function ldapFormDataToRestRequest(data: LdapFormData): Record<string, unknown> 
     connectionTimeoutSeconds: data.connectionTimeout || 30,
     connectionRetryDelaySeconds: data.connectionRetryDelay || 300,
     maxIncidentsCount: data.maxIncidentsCount || 3,
+    connectionRetries: data.connectionRetries ?? 1,
+    sizeLimit: data.sizeLimit ?? 0,
+    timeLimitSeconds: data.timeLimitSeconds ?? 0,
+    searchBehavior: data.searchBehavior || 'EXACT',
     userBaseDn: data.userBaseDn || undefined,
     userSubtree: data.userSubtree || false,
     userObjectClass: data.userObjectClass,
     userLdapFilter: data.userLdapFilter || undefined,
     userIdAttribute: data.userIdAttribute,
     userRealNameAttribute: data.userRealNameAttribute,
+    userLastNameAttribute: data.userLastNameAttribute || undefined,
+    userCompanyAttribute: data.userCompanyAttribute || undefined,
     userEmailAddressAttribute: data.userEmailAddressAttribute,
     userPasswordAttribute: data.userPasswordAttribute || undefined,
     ldapGroupsAsRoles: data.ldapGroupsAsRoles,
@@ -187,6 +213,10 @@ function ldapFormDataToRestRequest(data: LdapFormData): Record<string, unknown> 
     groupMemberAttribute: data.groupMemberAttribute || undefined,
     groupMemberFormat: data.groupMemberFormat || undefined,
     userMemberOfAttribute: data.userMemberOfAttribute || undefined,
+    groupDynamicMemberAttribute: data.groupDynamicMemberAttribute || undefined,
+    groupLdapFilter: data.groupLdapFilter || undefined,
+    defaultMembersGroup: data.defaultMembersGroup || undefined,
+    groupLabelAttribute: data.groupLabelAttribute || undefined,
   };
 }
 

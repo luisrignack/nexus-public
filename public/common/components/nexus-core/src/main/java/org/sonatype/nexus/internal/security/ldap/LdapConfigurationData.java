@@ -54,6 +54,14 @@ public class LdapConfigurationData
 
   private int maxIncidentsCount;
 
+  private int connectionRetries;
+
+  private int sizeLimit;
+
+  private int timeLimitSeconds;
+
+  private String searchBehavior = "EXACT";
+
   private String userBaseDn;
 
   private boolean userSubtree;
@@ -65,6 +73,10 @@ public class LdapConfigurationData
   private String userIdAttribute;
 
   private String userRealNameAttribute;
+
+  private String userLastNameAttribute;
+
+  private String userCompanyAttribute;
 
   private String userEmailAddressAttribute;
 
@@ -87,6 +99,14 @@ public class LdapConfigurationData
   private String groupMemberFormat;
 
   private String userMemberOfAttribute;
+
+  private String groupDynamicMemberAttribute;
+
+  private String groupLdapFilter;
+
+  private String defaultMembersGroup;
+
+  private String groupLabelAttribute;
 
   @Override
   public String getId() {
@@ -385,5 +405,95 @@ public class LdapConfigurationData
 
   public void setUserMemberOfAttribute(final String userMemberOfAttribute) {
     this.userMemberOfAttribute = userMemberOfAttribute;
+  }
+
+  @Override
+  public int getConnectionRetries() {
+    return connectionRetries;
+  }
+
+  public void setConnectionRetries(final int connectionRetries) {
+    this.connectionRetries = connectionRetries;
+  }
+
+  @Override
+  public int getSizeLimit() {
+    return sizeLimit;
+  }
+
+  public void setSizeLimit(final int sizeLimit) {
+    this.sizeLimit = sizeLimit;
+  }
+
+  @Override
+  public int getTimeLimitSeconds() {
+    return timeLimitSeconds;
+  }
+
+  public void setTimeLimitSeconds(final int timeLimitSeconds) {
+    this.timeLimitSeconds = timeLimitSeconds;
+  }
+
+  @Override
+  public String getSearchBehavior() {
+    return searchBehavior;
+  }
+
+  public void setSearchBehavior(final String searchBehavior) {
+    this.searchBehavior = searchBehavior;
+  }
+
+  @Override
+  public String getUserLastNameAttribute() {
+    return userLastNameAttribute;
+  }
+
+  public void setUserLastNameAttribute(final String userLastNameAttribute) {
+    this.userLastNameAttribute = userLastNameAttribute;
+  }
+
+  @Override
+  public String getUserCompanyAttribute() {
+    return userCompanyAttribute;
+  }
+
+  public void setUserCompanyAttribute(final String userCompanyAttribute) {
+    this.userCompanyAttribute = userCompanyAttribute;
+  }
+
+  @Override
+  public String getGroupDynamicMemberAttribute() {
+    return groupDynamicMemberAttribute;
+  }
+
+  public void setGroupDynamicMemberAttribute(final String groupDynamicMemberAttribute) {
+    this.groupDynamicMemberAttribute = groupDynamicMemberAttribute;
+  }
+
+  @Override
+  public String getGroupLdapFilter() {
+    return groupLdapFilter;
+  }
+
+  public void setGroupLdapFilter(final String groupLdapFilter) {
+    this.groupLdapFilter = groupLdapFilter;
+  }
+
+  @Override
+  public String getDefaultMembersGroup() {
+    return defaultMembersGroup;
+  }
+
+  public void setDefaultMembersGroup(final String defaultMembersGroup) {
+    this.defaultMembersGroup = defaultMembersGroup;
+  }
+
+  @Override
+  public String getGroupLabelAttribute() {
+    return groupLabelAttribute;
+  }
+
+  public void setGroupLabelAttribute(final String groupLabelAttribute) {
+    this.groupLabelAttribute = groupLabelAttribute;
   }
 }

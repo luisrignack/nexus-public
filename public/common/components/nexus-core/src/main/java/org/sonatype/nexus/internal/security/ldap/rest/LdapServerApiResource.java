@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.internal.security.ldap.rest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.sonatype.nexus.internal.security.ldap.LdapConfigurationData;
+import org.sonatype.nexus.internal.security.ldap.LdapConfigurationStoreImpl;
 import org.sonatype.nexus.rest.Resource;
 import org.sonatype.nexus.security.authc.ldap.LdapRealm;
 import org.sonatype.nexus.security.ldap.LdapConfiguration;
@@ -171,13 +174,31 @@ public class LdapServerApiResource
     return Response.noContent().build();
   }
 
+  @GET
+  @Path("/templates")
+  @RequiresAuthentication
+  @RequiresPermissions("nexus:ldap:read")
+  public List<LdapSchemaTemplateXO> templates() {
+    return LdapSchemaTemplateXO.templates();
+  }
+
+  @DELETE
+  @Path("/cache")
+  @RequiresAuthentication
+  @RequiresPermissions("nexus:ldap:update")
+  public Response clearCache() {
+    // The realm does not cache LDAP results; the endpoint exists so the admin UI action is harmless.
+    log.debug("LDAP cache clear requested (no cache is enabled)");
+    return Response.noContent().build();
+  }
+
   @POST
   @Path("/verify-connection")
   @RequiresAuthentication
   @RequiresPermissions("nexus:ldap:read")
   public Response verifyConnection(@NotNull @Valid final LdapServerXO xo) {
     try {
-      ldapDirectory.verifyConnection(LdapServerXoMapper.toConfiguration(xo));
+      ldapDirectory.verifyConnection(resolveConfiguration(xo));
       return Response.ok().build();
     }
     catch (Exception e) {
@@ -190,13 +211,15 @@ public class LdapServerApiResource
   @Path("/verify-login")
   @RequiresAuthentication
   @RequiresPermissions("nexus:ldap:read")
-  public Response verifyLogin(@NotNull @Valid final LdapServerXO xo) {
+  public Response verifyLogin(@NotNull @Valid final LdapVerifyLoginXO xo) {
     try {
-      if (xo.getAuthUsername() == null || xo.getAuthPassword() == null) {
-        throw new IllegalArgumentException("Username and password are required");
+      if (xo.getLdapServer() == null || xo.getBase64Username() == null || xo.getBase64Password() == null) {
+        throw new IllegalArgumentException("Server, username and password are required");
       }
-      ldapDirectory.authenticate(
-          LdapServerXoMapper.toConfiguration(xo), xo.getAuthUsername(), xo.getAuthPassword().toCharArray());
+      String username = new String(Base64.getDecoder().decode(xo.getBase64Username()), StandardCharsets.UTF_8);
+      char[] password = new String(Base64.getDecoder().decode(xo.getBase64Password()), StandardCharsets.UTF_8)
+          .toCharArray();
+      ldapDirectory.authenticate(resolveConfiguration(xo.getLdapServer()), username, password);
       return Response.ok().build();
     }
     catch (Exception e) {
@@ -212,7 +235,7 @@ public class LdapServerApiResource
   public List<LdapUserXO> verifyUserMapping(@NotNull @Valid final LdapServerXO xo) {
     try {
       List<LdapUserXO> users = new ArrayList<>();
-      for (LdapUserInfo userInfo : ldapDirectory.verifyUserMapping(LdapServerXoMapper.toConfiguration(xo))) {
+      for (LdapUserInfo userInfo : ldapDirectory.verifyUserMapping(resolveConfiguration(xo))) {
         users.add(LdapServerXoMapper.toUserXO(userInfo));
       }
       return users;
@@ -221,6 +244,24 @@ public class LdapServerApiResource
       log.debug("LDAP user mapping verification failed", e);
       throw new WebApplicationException(e.getMessage(), Response.Status.BAD_REQUEST);
     }
+  }
+
+  /**
+   * Restores the encrypted bind password when the UI sends back the placeholder instead of the
+   * secret it never received.
+   */
+  private LdapConfiguration resolveConfiguration(final LdapServerXO xo) {
+    if (!LdapConfigurationStoreImpl.PASSWORD_PLACEHOLDER.equals(xo.getAuthPassword())) {
+      return LdapServerXoMapper.toConfiguration(xo);
+    }
+    String key = xo.getId() != null ? xo.getId() : xo.getName();
+    LdapConfiguration stored = configurationStore.list().stream()
+        .filter(c -> c.getId().equals(key) || c.getName().equals(key))
+        .findFirst()
+        .orElseThrow(() -> new WebApplicationException("LDAP server not found", Response.Status.NOT_FOUND));
+    LdapServerXO resolved = LdapServerXoMapper.toXO(stored);
+    resolved.setAuthPassword(stored.getAuthPassword());
+    return LdapServerXoMapper.toConfiguration(resolved);
   }
 
   /**

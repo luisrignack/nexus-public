@@ -5,15 +5,15 @@
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
  * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
- *
- * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
- * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
- * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.internal.security.ldap.rest;
 
 import java.util.Set;
 
+/**
+ * Result of the "verify user mapping" task. Both the legacy field names and the names used by the
+ * current admin UI are exposed so either client can consume the response.
+ */
 public class LdapUserXO
 {
   private String userId;
@@ -21,6 +21,10 @@ public class LdapUserXO
   private String firstName;
 
   private String lastName;
+
+  private String company;
+
+  private String realName;
 
   private String email;
 
@@ -30,18 +34,21 @@ public class LdapUserXO
     // deserialization
   }
 
-  public LdapUserXO(final String userId, final String name, final String email, final Set<String> roles) {
+  public LdapUserXO(
+      final String userId,
+      final String realName,
+      final String lastName,
+      final String company,
+      final String email,
+      final Set<String> roles)
+  {
     this.userId = userId;
+    this.realName = realName;
+    this.lastName = lastName;
+    this.company = company;
     this.email = email;
     this.roles = roles;
-    if (name != null && name.contains(" ")) {
-      String[] parts = name.split("\\s+", 2);
-      this.firstName = parts[0];
-      this.lastName = parts[1];
-    }
-    else {
-      this.firstName = name;
-    }
+    this.firstName = realName;
   }
 
   public String getUserId() {
@@ -50,6 +57,11 @@ public class LdapUserXO
 
   public void setUserId(final String userId) {
     this.userId = userId;
+  }
+
+  /** Alias used by the current admin UI. */
+  public String getUsername() {
+    return userId;
   }
 
   public String getFirstName() {
@@ -68,6 +80,22 @@ public class LdapUserXO
     this.lastName = lastName;
   }
 
+  public String getCompany() {
+    return company;
+  }
+
+  public void setCompany(final String company) {
+    this.company = company;
+  }
+
+  public String getRealName() {
+    return realName;
+  }
+
+  public void setRealName(final String realName) {
+    this.realName = realName;
+  }
+
   public String getEmail() {
     return email;
   }
@@ -82,5 +110,10 @@ public class LdapUserXO
 
   public void setRoles(final Set<String> roles) {
     this.roles = roles;
+  }
+
+  /** Alias used by the current admin UI for the mapped groups. */
+  public Set<String> getMembership() {
+    return roles;
   }
 }

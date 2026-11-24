@@ -60,6 +60,12 @@ public interface LdapDirectory
     String getRealName();
 
     @Nullable
+    String getLastName();
+
+    @Nullable
+    String getCompany();
+
+    @Nullable
     String getEmailAddress();
 
     /** Group identifiers (values of the configured {@code groupIdAttribute}), may be empty. */

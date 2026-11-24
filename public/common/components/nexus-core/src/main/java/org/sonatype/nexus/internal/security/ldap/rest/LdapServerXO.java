@@ -55,6 +55,14 @@ public class LdapServerXO
 
   private Integer maxIncidentsCount;
 
+  private Integer connectionRetries;
+
+  private Integer sizeLimit;
+
+  private Integer timeLimitSeconds;
+
+  private String searchBehavior;
+
   private String userBaseDn;
 
   private Boolean userSubtree;
@@ -66,6 +74,10 @@ public class LdapServerXO
   private String userIdAttribute;
 
   private String userRealNameAttribute;
+
+  private String userLastNameAttribute;
+
+  private String userCompanyAttribute;
 
   private String userEmailAddressAttribute;
 
@@ -88,6 +100,14 @@ public class LdapServerXO
   private String groupMemberFormat;
 
   private String userMemberOfAttribute;
+
+  private String groupDynamicMemberAttribute;
+
+  private String groupLdapFilter;
+
+  private String defaultMembersGroup;
+
+  private String groupLabelAttribute;
 
   public String getId() {
     return id;
@@ -354,5 +374,85 @@ public class LdapServerXO
 
   public void setUserMemberOfAttribute(final String userMemberOfAttribute) {
     this.userMemberOfAttribute = userMemberOfAttribute;
+  }
+
+  public Integer getConnectionRetries() {
+    return connectionRetries;
+  }
+
+  public void setConnectionRetries(final Integer connectionRetries) {
+    this.connectionRetries = connectionRetries;
+  }
+
+  public Integer getSizeLimit() {
+    return sizeLimit;
+  }
+
+  public void setSizeLimit(final Integer sizeLimit) {
+    this.sizeLimit = sizeLimit;
+  }
+
+  public Integer getTimeLimitSeconds() {
+    return timeLimitSeconds;
+  }
+
+  public void setTimeLimitSeconds(final Integer timeLimitSeconds) {
+    this.timeLimitSeconds = timeLimitSeconds;
+  }
+
+  public String getSearchBehavior() {
+    return searchBehavior;
+  }
+
+  public void setSearchBehavior(final String searchBehavior) {
+    this.searchBehavior = searchBehavior;
+  }
+
+  public String getUserLastNameAttribute() {
+    return userLastNameAttribute;
+  }
+
+  public void setUserLastNameAttribute(final String userLastNameAttribute) {
+    this.userLastNameAttribute = userLastNameAttribute;
+  }
+
+  public String getUserCompanyAttribute() {
+    return userCompanyAttribute;
+  }
+
+  public void setUserCompanyAttribute(final String userCompanyAttribute) {
+    this.userCompanyAttribute = userCompanyAttribute;
+  }
+
+  public String getGroupDynamicMemberAttribute() {
+    return groupDynamicMemberAttribute;
+  }
+
+  public void setGroupDynamicMemberAttribute(final String groupDynamicMemberAttribute) {
+    this.groupDynamicMemberAttribute = groupDynamicMemberAttribute;
+  }
+
+  public String getGroupLdapFilter() {
+    return groupLdapFilter;
+  }
+
+  public void setGroupLdapFilter(final String groupLdapFilter) {
+    this.groupLdapFilter = groupLdapFilter;
+  }
+
+  public String getDefaultMembersGroup() {
+    return defaultMembersGroup;
+  }
+
+  public void setDefaultMembersGroup(final String defaultMembersGroup) {
+    this.defaultMembersGroup = defaultMembersGroup;
+  }
+
+  public String getGroupLabelAttribute() {
+    return groupLabelAttribute;
+  }
+
+  public void setGroupLabelAttribute(final String groupLabelAttribute) {
+    this.groupLabelAttribute = groupLabelAttribute;
   }
 }

@@ -174,6 +174,17 @@ export function LdapForm({
     formData.maxIncidentsCount != null && !Number.isNaN(formData.maxIncidentsCount)
       ? String(formData.maxIncidentsCount) : ''
   );
+  const [connectionRetriesRaw, setConnectionRetriesRaw] = useState<string>(() =>
+    formData.connectionRetries != null && !Number.isNaN(formData.connectionRetries)
+      ? String(formData.connectionRetries) : ''
+  );
+  const [sizeLimitRaw, setSizeLimitRaw] = useState<string>(() =>
+    formData.sizeLimit != null && !Number.isNaN(formData.sizeLimit) ? String(formData.sizeLimit) : ''
+  );
+  const [timeLimitSecondsRaw, setTimeLimitSecondsRaw] = useState<string>(() =>
+    formData.timeLimitSeconds != null && !Number.isNaN(formData.timeLimitSeconds)
+      ? String(formData.timeLimitSeconds) : ''
+  );
 
   // Re-sync the raw strings when the form resets to pristine (after a successful
   // save, discard, or initial load from the server) so the displayed values
@@ -193,7 +204,19 @@ export function LdapForm({
       formData.maxIncidentsCount != null && !Number.isNaN(formData.maxIncidentsCount)
         ? String(formData.maxIncidentsCount) : ''
     );
-  }, [form.isPristine, formData.connectionTimeout, formData.connectionRetryDelay, formData.maxIncidentsCount]);
+    setConnectionRetriesRaw(
+      formData.connectionRetries != null && !Number.isNaN(formData.connectionRetries)
+        ? String(formData.connectionRetries) : ''
+    );
+    setSizeLimitRaw(
+      formData.sizeLimit != null && !Number.isNaN(formData.sizeLimit) ? String(formData.sizeLimit) : ''
+    );
+    setTimeLimitSecondsRaw(
+      formData.timeLimitSeconds != null && !Number.isNaN(formData.timeLimitSeconds)
+        ? String(formData.timeLimitSeconds) : ''
+    );
+  }, [form.isPristine, formData.connectionTimeout, formData.connectionRetryDelay, formData.maxIncidentsCount,
+    formData.connectionRetries, formData.sizeLimit, formData.timeLimitSeconds]);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [templates, setTemplates] = useState<LdapSchemaTemplate[]>([]);
@@ -796,6 +819,68 @@ export function LdapForm({
                 error={form.validationErrors.maxIncidentsCount ?? undefined}
               />
             </Flex>
+
+            <Flex gap="3" className="ldap-form__field-row">
+              <SettingsTextInput
+                name="connectionRetries"
+                label="Connection Retries"
+                type="text"
+                value={connectionRetriesRaw}
+                onChange={(value) => {
+                  const val = value as string;
+                  setConnectionRetriesRaw(val);
+                  handleChange('connectionRetries', val.trim() === '' ? undefined : Number(val));
+                }}
+                helpText="Extra attempts when opening a connection (0 = none)"
+                disabled={!canEditFields}
+                error={form.validationErrors.connectionRetries ?? undefined}
+              />
+
+              <SettingsTextInput
+                name="sizeLimit"
+                label="Search Size Limit"
+                type="text"
+                value={sizeLimitRaw}
+                onChange={(value) => {
+                  const val = value as string;
+                  setSizeLimitRaw(val);
+                  handleChange('sizeLimit', val.trim() === '' ? undefined : Number(val));
+                }}
+                helpText="Maximum entries per search (0 = unlimited)"
+                disabled={!canEditFields}
+                error={form.validationErrors.sizeLimit ?? undefined}
+              />
+
+              <SettingsTextInput
+                name="timeLimitSeconds"
+                label="Search Time Limit (seconds)"
+                type="text"
+                value={timeLimitSecondsRaw}
+                onChange={(value) => {
+                  const val = value as string;
+                  setTimeLimitSecondsRaw(val);
+                  handleChange('timeLimitSeconds', val.trim() === '' ? undefined : Number(val));
+                }}
+                helpText="Per-search time limit (0 = no explicit limit)"
+                disabled={!canEditFields}
+                error={form.validationErrors.timeLimitSeconds ?? undefined}
+              />
+            </Flex>
+
+            <SettingsSelect
+              name="searchBehavior"
+              label="User Search Behavior"
+              value={formData.searchBehavior || 'EXACT'}
+              onChange={(value) => handleChange('searchBehavior', value)}
+              helpText="How the username is matched: exact, or as a substring at the start/end/anywhere"
+              disabled={!canEditFields}
+              options={[
+                { value: 'EXACT', label: 'Exact' },
+                { value: 'SUBANY', label: 'Contains' },
+                { value: 'SUBINIT', label: 'Starts with' },
+                { value: 'SUBFINAL', label: 'Ends with' },
+              ]}
+            />
           </SettingsFormSection>
 
           <Box className="ldap-form__verification">
@@ -912,6 +997,24 @@ export function LdapForm({
 
             <Flex gap="3" className="ldap-form__field-row">
               <SettingsTextInput
+                {...form.field('userLastNameAttribute')}
+                label="Last Name Attribute"
+                placeholder="sn"
+                helpText="Optional attribute containing the user's last name (e.g., sn)"
+                disabled={!canEditFields}
+              />
+
+              <SettingsTextInput
+                {...form.field('userCompanyAttribute')}
+                label="Company Attribute"
+                placeholder="ou"
+                helpText="Optional attribute containing the user's company or department"
+                disabled={!canEditFields}
+              />
+            </Flex>
+
+            <Flex gap="3" className="ldap-form__field-row">
+              <SettingsTextInput
                 {...form.field('userEmailAddressAttribute')}
                 label="Email Attribute"
                 placeholder="mail"
@@ -952,6 +1055,22 @@ export function LdapForm({
                     { value: 'static', label: 'Static Groups' },
                     { value: 'dynamic', label: 'Dynamic Groups' },
                   ]}
+                />
+
+                <SettingsTextInput
+                  {...form.field('defaultMembersGroup')}
+                  label="Default Members Group"
+                  placeholder="members"
+                  helpText="Optional role granted to every successfully authenticated LDAP user"
+                  disabled={!canEditFields}
+                />
+
+                <SettingsTextInput
+                  {...form.field('groupLabelAttribute')}
+                  label="Group Label Attribute"
+                  placeholder="description"
+                  helpText="Optional group attribute stored as a human-readable label for mapped groups"
+                  disabled={!canEditFields}
                 />
 
                 {formData.groupType === 'static' && (
@@ -1007,18 +1126,35 @@ export function LdapForm({
                       required
                       disabled={!canEditFields}
                     />
+
+                    <SettingsTextInput
+                      {...form.field('groupLdapFilter')}
+                      label="Group LDAP Filter"
+                      placeholder="(objectCategory=group)"
+                      helpText="Optional filter term ANDed with the group search filter"
+                      disabled={!canEditFields}
+                    />
                   </>
                 )}
 
                 {formData.groupType === 'dynamic' && (
-                  <SettingsTextInput
-                    {...form.field('userMemberOfAttribute')}
-                    label="Group member of attribute"
-                    placeholder="memberOf"
-                    helpText="Set this to the attribute used to store the attribute which holds groups DN in the user object"
-                    required
-                    disabled={!canEditFields}
-                  />
+                  <>
+                    <SettingsTextInput
+                      {...form.field('groupDynamicMemberAttribute')}
+                      label="Dynamic Member Attribute"
+                      placeholder="memberURL"
+                      helpText="Optional group attribute holding dynamic member rules (e.g., memberURL)"
+                      disabled={!canEditFields}
+                    />
+
+                    <SettingsTextInput
+                      {...form.field('userMemberOfAttribute')}
+                      label="Group member of attribute"
+                      placeholder="memberOf"
+                      helpText="Attribute holding group DNs on the user object; required unless a dynamic member attribute is set"
+                      disabled={!canEditFields}
+                    />
+                  </>
                 )}
               </>
             )}

@@ -101,6 +101,18 @@ export function validateConnection(data: LdapFormData, isCreate = true, existing
     errors.maxIncidentsCount = 'Must be a number 0 or greater';
   }
 
+  // Optional retry/limit settings: 0 means "no retry"/"unlimited"/"no explicit time limit".
+  for (const field of ['connectionRetries', 'sizeLimit', 'timeLimitSeconds'] as const) {
+    const value = data[field];
+    if (value != null && (Number.isNaN(value) || !Number.isInteger(value) || value < 0)) {
+      errors[field] = 'Must be a number 0 or greater';
+    }
+  }
+
+  if (data.searchBehavior && !['EXACT', 'SUBANY', 'SUBINIT', 'SUBFINAL'].includes(data.searchBehavior)) {
+    errors.searchBehavior = 'Select a valid search behavior';
+  }
+
   return errors;
 }
 
@@ -143,7 +155,9 @@ export function validateUserGroup(data: LdapFormData): ValidationErrors {
         errors.groupMemberFormat = 'Group member format is required';
       }
     } else if (data.groupType === 'dynamic') {
-      if (!data.userMemberOfAttribute?.trim()) {
+      // Either the classic memberOf attribute on the user or a dynamic member rule
+      // attribute on the group entry is enough to resolve memberships.
+      if (!data.groupDynamicMemberAttribute?.trim() && !data.userMemberOfAttribute?.trim()) {
         errors.userMemberOfAttribute = 'User member of attribute is required';
       }
     }
@@ -187,12 +201,18 @@ function serverToFormData(server?: LdapServer | null): LdapFormData {
         connectionTimeout: server.connectionTimeout,
         connectionRetryDelay: server.connectionRetryDelay,
         maxIncidentsCount: server.maxIncidentsCount,
+        connectionRetries: server.connectionRetries,
+        sizeLimit: server.sizeLimit,
+        timeLimitSeconds: server.timeLimitSeconds,
+        searchBehavior: server.searchBehavior,
         userBaseDn: server.userBaseDn,
         userSubtree: server.userSubtree,
         userObjectClass: server.userObjectClass,
         userLdapFilter: server.userLdapFilter,
         userIdAttribute: server.userIdAttribute,
         userRealNameAttribute: server.userRealNameAttribute,
+        userLastNameAttribute: server.userLastNameAttribute,
+        userCompanyAttribute: server.userCompanyAttribute,
         userEmailAddressAttribute: server.userEmailAddressAttribute,
         userPasswordAttribute: server.userPasswordAttribute,
         ldapGroupsAsRoles: server.ldapGroupsAsRoles,
@@ -204,6 +224,10 @@ function serverToFormData(server?: LdapServer | null): LdapFormData {
         groupMemberAttribute: server.groupMemberAttribute,
         groupMemberFormat: server.groupMemberFormat,
         userMemberOfAttribute: server.userMemberOfAttribute,
+        groupDynamicMemberAttribute: server.groupDynamicMemberAttribute,
+        groupLdapFilter: server.groupLdapFilter,
+        defaultMembersGroup: server.defaultMembersGroup,
+        groupLabelAttribute: server.groupLabelAttribute,
       }
     : { ...DEFAULT_LDAP_SERVER };
 }
@@ -264,6 +288,8 @@ export function createLdapFormMachine(
             userLdapFilter: template.userLdapFilter ?? context.data.userLdapFilter,
             userIdAttribute: template.userIdAttribute ?? context.data.userIdAttribute,
             userRealNameAttribute: template.userRealNameAttribute ?? context.data.userRealNameAttribute,
+            userLastNameAttribute: template.userLastNameAttribute ?? context.data.userLastNameAttribute,
+            userCompanyAttribute: template.userCompanyAttribute ?? context.data.userCompanyAttribute,
             userEmailAddressAttribute: template.userEmailAddressAttribute ?? context.data.userEmailAddressAttribute,
             userPasswordAttribute: template.userPasswordAttribute ?? context.data.userPasswordAttribute,
             ldapGroupsAsRoles: template.ldapGroupsAsRoles ?? context.data.ldapGroupsAsRoles,
@@ -275,6 +301,10 @@ export function createLdapFormMachine(
             groupMemberAttribute: template.groupMemberAttribute ?? context.data.groupMemberAttribute,
             groupMemberFormat: template.groupMemberFormat ?? context.data.groupMemberFormat,
             userMemberOfAttribute: template.userMemberOfAttribute ?? context.data.userMemberOfAttribute,
+            groupDynamicMemberAttribute: template.groupDynamicMemberAttribute ?? context.data.groupDynamicMemberAttribute,
+            groupLdapFilter: template.groupLdapFilter ?? context.data.groupLdapFilter,
+            defaultMembersGroup: template.defaultMembersGroup ?? context.data.defaultMembersGroup,
+            groupLabelAttribute: template.groupLabelAttribute ?? context.data.groupLabelAttribute,
           },
         };
       }),

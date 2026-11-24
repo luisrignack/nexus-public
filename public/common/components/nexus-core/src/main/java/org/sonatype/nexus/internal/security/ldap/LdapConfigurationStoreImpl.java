@@ -41,6 +41,16 @@ import org.springframework.stereotype.Component;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.CONNECTION_RETRIES;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.SIZE_LIMIT;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.TIME_LIMIT_SECONDS;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.SEARCH_BEHAVIOR;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.USER_LAST_NAME_ATTRIBUTE;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.USER_COMPANY_ATTRIBUTE;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.GROUP_DYNAMIC_MEMBER_ATTRIBUTE;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.GROUP_LDAP_FILTER;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.DEFAULT_MEMBERS_GROUP;
+import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.GROUP_LABEL_ATTRIBUTE;
 import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.AUTH_PASSWORD;
 import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.AUTH_REALM;
 import static org.sonatype.nexus.internal.security.ldap.LdapCapabilityProperties.AUTH_SCHEME;
@@ -272,12 +282,18 @@ public class LdapConfigurationStoreImpl
     data.setConnectionTimeoutSeconds(parseInt(properties.get(CONNECTION_TIMEOUT_SECONDS), 30));
     data.setConnectionRetryDelaySeconds(parseInt(properties.get(CONNECTION_RETRY_DELAY_SECONDS), 30));
     data.setMaxIncidentsCount(parseInt(properties.get(MAX_INCIDENTS_COUNT), 30));
+    data.setConnectionRetries(parseInt(properties.get(CONNECTION_RETRIES), 1));
+    data.setSizeLimit(parseInt(properties.get(SIZE_LIMIT), 0));
+    data.setTimeLimitSeconds(parseInt(properties.get(TIME_LIMIT_SECONDS), 0));
+    data.setSearchBehavior(orDefault(properties.get(SEARCH_BEHAVIOR), "EXACT"));
     data.setUserBaseDn(properties.get(USER_BASE_DN));
     data.setUserSubtree(parseBoolean(properties.get(USER_SUBTREE), true));
     data.setUserObjectClass(properties.get(USER_OBJECT_CLASS));
     data.setUserLdapFilter(properties.get(USER_LDAP_FILTER));
     data.setUserIdAttribute(properties.get(USER_ID_ATTRIBUTE));
     data.setUserRealNameAttribute(properties.get(USER_REAL_NAME_ATTRIBUTE));
+    data.setUserLastNameAttribute(properties.get(USER_LAST_NAME_ATTRIBUTE));
+    data.setUserCompanyAttribute(properties.get(USER_COMPANY_ATTRIBUTE));
     data.setUserEmailAddressAttribute(properties.get(USER_EMAIL_ADDRESS_ATTRIBUTE));
     data.setUserPasswordAttribute(properties.get(USER_PASSWORD_ATTRIBUTE));
     data.setLdapGroupsAsRoles(parseBoolean(properties.get(LDAP_GROUPS_AS_ROLES), false));
@@ -289,6 +305,10 @@ public class LdapConfigurationStoreImpl
     data.setGroupMemberAttribute(properties.get(GROUP_MEMBER_ATTRIBUTE));
     data.setGroupMemberFormat(properties.get(GROUP_MEMBER_FORMAT));
     data.setUserMemberOfAttribute(properties.get(USER_MEMBER_OF_ATTRIBUTE));
+    data.setGroupDynamicMemberAttribute(properties.get(GROUP_DYNAMIC_MEMBER_ATTRIBUTE));
+    data.setGroupLdapFilter(properties.get(GROUP_LDAP_FILTER));
+    data.setDefaultMembersGroup(properties.get(DEFAULT_MEMBERS_GROUP));
+    data.setGroupLabelAttribute(properties.get(GROUP_LABEL_ATTRIBUTE));
     return data;
   }
 
@@ -310,12 +330,18 @@ public class LdapConfigurationStoreImpl
     properties.put(CONNECTION_TIMEOUT_SECONDS, Integer.toString(configuration.getConnectionTimeoutSeconds()));
     properties.put(CONNECTION_RETRY_DELAY_SECONDS, Integer.toString(configuration.getConnectionRetryDelaySeconds()));
     properties.put(MAX_INCIDENTS_COUNT, Integer.toString(configuration.getMaxIncidentsCount()));
+    properties.put(CONNECTION_RETRIES, Integer.toString(configuration.getConnectionRetries()));
+    properties.put(SIZE_LIMIT, Integer.toString(configuration.getSizeLimit()));
+    properties.put(TIME_LIMIT_SECONDS, Integer.toString(configuration.getTimeLimitSeconds()));
+    properties.put(SEARCH_BEHAVIOR, configuration.getSearchBehavior());
     putIfNotNull(properties, USER_BASE_DN, configuration.getUserBaseDn());
     properties.put(USER_SUBTREE, Boolean.toString(configuration.isUserSubtree()));
     putIfNotNull(properties, USER_OBJECT_CLASS, configuration.getUserObjectClass());
     putIfNotNull(properties, USER_LDAP_FILTER, configuration.getUserLdapFilter());
     putIfNotNull(properties, USER_ID_ATTRIBUTE, configuration.getUserIdAttribute());
     putIfNotNull(properties, USER_REAL_NAME_ATTRIBUTE, configuration.getUserRealNameAttribute());
+    putIfNotNull(properties, USER_LAST_NAME_ATTRIBUTE, configuration.getUserLastNameAttribute());
+    putIfNotNull(properties, USER_COMPANY_ATTRIBUTE, configuration.getUserCompanyAttribute());
     putIfNotNull(properties, USER_EMAIL_ADDRESS_ATTRIBUTE, configuration.getUserEmailAddressAttribute());
     putIfNotNull(properties, USER_PASSWORD_ATTRIBUTE, configuration.getUserPasswordAttribute());
     properties.put(LDAP_GROUPS_AS_ROLES, Boolean.toString(configuration.isLdapGroupsAsRoles()));
@@ -327,6 +353,10 @@ public class LdapConfigurationStoreImpl
     putIfNotNull(properties, GROUP_MEMBER_ATTRIBUTE, configuration.getGroupMemberAttribute());
     putIfNotNull(properties, GROUP_MEMBER_FORMAT, configuration.getGroupMemberFormat());
     putIfNotNull(properties, USER_MEMBER_OF_ATTRIBUTE, configuration.getUserMemberOfAttribute());
+    putIfNotNull(properties, GROUP_DYNAMIC_MEMBER_ATTRIBUTE, configuration.getGroupDynamicMemberAttribute());
+    putIfNotNull(properties, GROUP_LDAP_FILTER, configuration.getGroupLdapFilter());
+    putIfNotNull(properties, DEFAULT_MEMBERS_GROUP, configuration.getDefaultMembersGroup());
+    putIfNotNull(properties, GROUP_LABEL_ATTRIBUTE, configuration.getGroupLabelAttribute());
     properties.put(ORDER, Integer.toString(order));
 
     String secretToken = resolveSecretToken(existingSecretToken, configuration.getAuthPassword());
