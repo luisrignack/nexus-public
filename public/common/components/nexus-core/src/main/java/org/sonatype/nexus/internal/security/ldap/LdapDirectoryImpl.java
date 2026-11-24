@@ -27,8 +27,9 @@ import javax.naming.directory.SearchResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.crypto.secrets.Secret;
 import org.sonatype.nexus.crypto.secrets.SecretsService;
 import org.sonatype.nexus.security.ldap.LdapConfiguration;
@@ -54,9 +55,10 @@ import org.springframework.stereotype.Component;
 @Singleton
 @Named("LdapDirectory")
 public class LdapDirectoryImpl
-    extends ComponentSupport
     implements LdapDirectory
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private static final String SIMPLE = "SIMPLE";
 
   private static final String NONE = "NONE";

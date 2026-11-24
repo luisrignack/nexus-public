@@ -602,6 +602,93 @@
         <version>3.98.1-01</version>
       </dependency>
 
+      <!-- Formatos añadidos por el fork -->
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-alpine</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-ansible</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-cargo</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-cocoapods</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-conan</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-docker</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-gitlfs</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-go</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-helm</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-npm</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-nuget</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-p2</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-pub</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-pypi</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-rubygems</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-swift</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.common.components</groupId>
+        <artifactId>nexus-repository-yum</artifactId>
+        <version>3.98.1-01</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

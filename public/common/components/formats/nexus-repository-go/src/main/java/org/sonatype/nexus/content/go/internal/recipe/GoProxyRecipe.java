@@ -13,7 +13,6 @@
 package org.sonatype.nexus.content.go.internal.recipe;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -55,7 +54,6 @@ import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or
 @AvailabilityVersion(from = "1.0")
 @Component
 @Qualifier(GoProxyRecipe.NAME)
-@Priority(Integer.MAX_VALUE)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Singleton
 public class GoProxyRecipe

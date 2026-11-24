@@ -14,8 +14,8 @@ package org.sonatype.nexus.content.npm.internal.recipe;
 
 import jakarta.inject.Singleton;
 
-import org.sonatype.goodies.i18n.I18N;
-import org.sonatype.goodies.i18n.MessageBundle;
+import org.sonatype.nexus.common.i18n.I18N;
+import org.sonatype.nexus.common.i18n.MessageBundle;
 import org.sonatype.nexus.common.upgrade.AvailabilityVersion;
 import org.sonatype.nexus.content.npm.NpmContentFacet;
 import org.sonatype.nexus.formfields.RepositoryCombobox;

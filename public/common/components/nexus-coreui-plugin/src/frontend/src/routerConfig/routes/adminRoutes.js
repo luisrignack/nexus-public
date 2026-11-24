@@ -65,7 +65,7 @@ const TasksExtJSWrapper = lazyLoad(() => import('../../components/pages/admin/Ta
 const Capabilities = lazyLoad(() => import('../../components/pages/admin/Capabilities/Capabilities'));
 const BlobStoresList = lazyLoad(() => import('../../components/pages/admin/BlobStores/BlobStoresList'));
 const BlobStoresForm = lazyLoad(() => import('../../components/pages/admin/BlobStores/BlobStoresForm'));
-const LdapServers = lazyLoad(() => import('../../components/pages/admin/LdapServers/LdapServers'));
+const LdapServersExt = lazyLoad(() => import('../../components/pages/admin/LdapServers/LdapServersExt'));
 const AdminRepositoriesDirectoryPage = lazyLoad(() => import('../../components/pages/AdminRepositories/AdminRepositoriesDirectoryPage'));
 const AdminSecurityDirectoryPage = lazyLoad(() => import('../../components/pages/AdminSecurity/AdminSecurityDirectoryPage'));
 const AdminSystemDirectoryPage = lazyLoad(() => import('../../components/pages/AdminSystem/AdminSystemDirectoryPage'));
@@ -466,7 +466,7 @@ export const adminRoutes = [
   {
     name: ADMIN.SECURITY.LDAP.ROOT,
     url: '/ldap:itemId',
-    component: LdapServers,
+    component: LdapServersExt,
     data: {
       visibilityRequirements: {
         permissions: [Permissions.LDAP.READ],

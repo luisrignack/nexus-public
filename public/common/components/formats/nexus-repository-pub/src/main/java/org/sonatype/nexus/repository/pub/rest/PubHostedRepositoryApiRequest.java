@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties({"format", "type"})
 public class PubHostedRepositoryApiRequest
-    extends HostedRepositoryApiRequest
+    extends HostedRepositoryApiRequest<HostedStorageAttributes>
 {
   private final PubAttributes pub;
 

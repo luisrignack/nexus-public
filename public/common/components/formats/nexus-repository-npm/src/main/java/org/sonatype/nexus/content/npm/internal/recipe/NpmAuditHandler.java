@@ -19,8 +19,9 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
@@ -62,9 +63,10 @@ import static org.sonatype.nexus.repository.view.ContentTypes.APPLICATION_JSON;
 @Component
 @Singleton
 public class NpmAuditHandler
-    extends ComponentSupport
     implements Handler
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private static final String AUDIT_PREFIX = "-/npm/v1/security/audits";

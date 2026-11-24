@@ -34,8 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.docker.internal.DockerCache.Entry;

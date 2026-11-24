@@ -16,24 +16,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.internal.security.ldap.LdapConfigurationData;
 import org.sonatype.nexus.rest.Resource;
 import org.sonatype.nexus.security.authc.ldap.LdapRealm;
@@ -55,9 +56,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Produces(MediaType.APPLICATION_JSON)
 @Path(LdapServerApiResource.RESOURCE_PATH)
 public class LdapServerApiResource
-    extends ComponentSupport
     implements Resource
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   public static final String RESOURCE_PATH = "/v1/security/ldap";
 
   private final LdapConfigurationStore configurationStore;

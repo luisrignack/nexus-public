@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.yum.rest;
 
+import org.sonatype.nexus.repository.rest.api.model.HostedStorageAttributes;
+
 import org.sonatype.nexus.repository.rest.api.HostedRepositoryApiRequestToConfigurationConverter;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -21,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class YumHostedRepositoryApiRequestToConfigurationConverter
-    extends HostedRepositoryApiRequestToConfigurationConverter<YumHostedRepositoryApiRequest>
+    extends HostedRepositoryApiRequestToConfigurationConverter<HostedStorageAttributes, YumHostedRepositoryApiRequest>
 {
   // no format-specific settings yet
 }

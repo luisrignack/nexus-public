@@ -14,12 +14,13 @@ package org.sonatype.nexus.internal.security.usertoken.rest;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.internal.security.usertoken.UserTokenService;
 import org.sonatype.nexus.rest.Resource;
 
@@ -27,7 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Component;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * Resets a specific user's token from the user administration screen.
@@ -39,9 +40,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Path("/v1/security/users")
 public class UserTokenResetApiResource
-    extends ComponentSupport
     implements Resource
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private final UserTokenService userTokens;
 
   @Inject

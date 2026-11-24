@@ -28,6 +28,7 @@ import ReplicationConfiguration from './facets/ReplicationConfiguration';
 import RepodataDepthConfiguration from './facets/RepodataDepthConfiguration';
 import RpmDeployPolicyConfiguration from './facets/RpmDeployPolicyConfiguration';
 import VersionPolicyConfiguration from './facets/VersionPolicyConfiguration';
+import NpmConfiguration from './facets/NpmConfiguration';
 import LayoutPolicyConfiguration from './facets/LayoutPolicyConfiguration';
 import RepositoryConnectorsConfiguration from './facets/RepositoryConnectorsConfiguration';
 import RegistryApiSupportConfiguration from './facets/RegistryApiSupportConfiguration';
@@ -265,9 +266,12 @@ const repositoryFormats = {
     })
   },
   npm_proxy: {
-    facets: [...genericFacets.proxy],
+    facets: [NpmConfiguration, ...genericFacets.proxy],
     defaultValues: {
-      ...genericDefaultValues.proxy
+      ...genericDefaultValues.proxy,
+      npm: {
+        removeQuarantined: false
+      }
     },
     validators: (data) => ({
       ...genericValidators.proxy(data)

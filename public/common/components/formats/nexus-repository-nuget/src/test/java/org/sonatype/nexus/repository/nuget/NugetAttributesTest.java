@@ -30,7 +30,9 @@ import static org.junit.Assert.assertTrue;
 public class NugetAttributesTest
     extends TestSupport
 {
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper()
+      .setFilterProvider(new com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider()
+          .setFailOnUnknownId(false));
 
   private static final String PROXY_REQUEST = "{"
       + "\"name\":\"nuget.org-proxy\","

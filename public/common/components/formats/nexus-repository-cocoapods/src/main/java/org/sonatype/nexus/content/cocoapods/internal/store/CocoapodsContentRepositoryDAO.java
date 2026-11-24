@@ -10,29 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.content.cocoapods.internal.store;
 
-import React from 'react';
+import org.sonatype.nexus.repository.content.store.ContentRepositoryDAO;
 
-import SearchFeatureExt from './SearchFeatureExt';
-import UIStrings from '../../../../constants/UIStrings';
-
-export default function SearchAnsibleExt() {
-  return (
-    <SearchFeatureExt
-      title={UIStrings.SEARCH.ANSIBLE.MENU.text}
-      icon={UIStrings.SEARCH.ANSIBLE.MENU.icon}
-      filter={{
-        id: 'ansible',
-        name: 'ansible',
-        text: UIStrings.SEARCH.ANSIBLE.MENU.text,
-        description: UIStrings.SEARCH.ANSIBLE.MENU.description,
-        readOnly: true,
-        criterias: [
-          {id: 'format', value: 'ansible', hidden: true},
-          {id: 'name.raw'},
-          {id: 'version'}
-        ]
-      }}
-    />
-  );
+/**
+ * @since 3.24
+ */
+public interface CocoapodsContentRepositoryDAO
+    extends ContentRepositoryDAO
+{
+  // nothing to add...
 }

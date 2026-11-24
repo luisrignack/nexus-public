@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.yum.rest;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;

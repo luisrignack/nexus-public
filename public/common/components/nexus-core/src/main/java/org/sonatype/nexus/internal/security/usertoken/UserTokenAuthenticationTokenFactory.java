@@ -18,9 +18,9 @@ import java.util.Base64;
 import javax.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.security.authc.AuthenticationTokenFactory;
 import org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationToken;

@@ -13,7 +13,6 @@
 package org.sonatype.nexus.content.nuget.internal.recipe;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Priority;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -51,7 +50,6 @@ import static org.sonatype.nexus.repository.http.HttpHandlers.notFound;
 @AvailabilityVersion(from = "1.0")
 @Component
 @Qualifier(NugetProxyRecipe.NAME)
-@Priority(Integer.MAX_VALUE)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Singleton
 public class NugetProxyRecipe

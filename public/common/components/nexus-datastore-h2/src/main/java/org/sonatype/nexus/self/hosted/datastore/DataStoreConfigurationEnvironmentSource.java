@@ -21,8 +21,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.datastore.DataStoreConfigurationSource;
 import org.sonatype.nexus.datastore.api.DataStoreConfiguration;
 
@@ -53,9 +54,10 @@ import org.springframework.stereotype.Component;
 @Order(DataStoreConfigurationSource.ORDER_ENVIRONMENT_VALUES)
 @Singleton
 public class DataStoreConfigurationEnvironmentSource
-    extends ComponentSupport
     implements DataStoreConfigurationSource
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   public static final String SOURCE = "environment";
 
   private static final String ENV_PREFIX = "NEXUS_DATASTORE_";

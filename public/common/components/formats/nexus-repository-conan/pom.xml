@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.sonatype.nexus.common.components</groupId>
     <artifactId>nexus-common-components-formats-parent</artifactId>
-    <version>3.89.0-09</version>
+    <version>3.98.1-01</version>
   </parent>
 
   <artifactId>nexus-repository-conan</artifactId>
@@ -63,6 +63,13 @@
       <artifactId>nexus-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.goodies</groupId>
+      <artifactId>goodies-testsupport</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>

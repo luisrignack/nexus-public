@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.yum.rest;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -20,12 +20,11 @@ import jakarta.inject.Singleton;
 import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceBeta;
 import org.sonatype.nexus.rest.APIConstants;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Component;
 
 import static org.sonatype.nexus.repository.yum.rest.YumHostedRepositoriesApiResourceBeta.RESOURCE_URI;
 
-@Api(hidden = true)
 @Component
 @Singleton
 @Path(RESOURCE_URI)

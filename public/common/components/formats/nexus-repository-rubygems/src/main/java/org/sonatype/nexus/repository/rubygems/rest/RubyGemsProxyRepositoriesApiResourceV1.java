@@ -14,7 +14,7 @@ package org.sonatype.nexus.repository.rubygems.rest;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceV1;
 

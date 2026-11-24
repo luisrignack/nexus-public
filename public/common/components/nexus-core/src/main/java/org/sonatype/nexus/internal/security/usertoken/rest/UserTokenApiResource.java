@@ -12,16 +12,18 @@
  */
 package org.sonatype.nexus.internal.security.usertoken.rest;
 
-import jakarta.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response.Status;
+
 import org.sonatype.nexus.internal.security.usertoken.UserTokenConfiguration;
 import org.sonatype.nexus.internal.security.usertoken.UserTokenService;
 import org.sonatype.nexus.rest.Resource;
@@ -29,7 +31,7 @@ import org.sonatype.nexus.rest.Resource;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * Administration of the user token feature.
@@ -39,9 +41,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
 public abstract class UserTokenApiResource
-    extends ComponentSupport
     implements Resource
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private final UserTokenService userTokens;
 
   @Inject

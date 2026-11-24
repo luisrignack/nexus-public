@@ -20,9 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.facet.ContentFacet;
 import org.sonatype.nexus.repository.content.fluent.FluentComponent;
@@ -40,8 +41,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Singleton
 public class NpmDistTagsManager
-    extends ComponentSupport
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   static final String DIST_TAGS_ATTRIBUTE = "dist-tags";
 
   /**

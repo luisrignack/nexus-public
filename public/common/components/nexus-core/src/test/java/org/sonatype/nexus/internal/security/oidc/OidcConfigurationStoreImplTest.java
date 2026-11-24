@@ -13,6 +13,7 @@
 package org.sonatype.nexus.internal.security.oidc;
 
 import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,8 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import org.mockito.ArgumentMatchers;
+
 import static org.mockito.Mockito.when;
 
 /**
@@ -76,14 +79,14 @@ public class OidcConfigurationStoreImplTest
     when(context.id()).thenReturn(new CapabilityIdentity("oidc.1"));
     when(context.notes()).thenReturn("notes");
     when(context.isActive()).thenReturn(true);
-    when(capabilityRegistry.get(any(Predicate.class))).thenReturn(List.of(reference));
+    when(capabilityRegistry.get(ArgumentMatchers.<Predicate<CapabilityReference>>any())).thenReturn((java.util.Collection) List.of(reference));
 
     store = new OidcConfigurationStoreImpl(capabilityRegistry, secretsService);
   }
 
   @Test
   public void loadReturnsNullWhenCapabilityMissing() {
-    when(capabilityRegistry.get(any(Predicate.class))).thenReturn(List.of());
+    when(capabilityRegistry.get(ArgumentMatchers.<Predicate<CapabilityReference>>any())).thenReturn((java.util.Collection) List.of());
 
     assertThat(store.load(), nullValue());
   }

@@ -140,6 +140,13 @@
       <artifactId>assertj-db</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.goodies</groupId>
+      <artifactId>goodies-testsupport</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>

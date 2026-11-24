@@ -38,17 +38,7 @@ Ext.define('NX.coreui.util.RepositoryUrls', {
    * @private
    */
   repositoryUrlStrategies: {
-    alpine: function (me, assetModel) {
-      var repositoryName = assetModel.get('repositoryName'),
-          assetName = assetModel.get('name');
-      return NX.util.Url.asLink(NX.util.Url.relativePath + '/repository/' + encodeURIComponent(repositoryName) + encodePath(assetName), assetName);
-    },
     maven2: function (me, assetModel) {
-      var repositoryName = assetModel.get('repositoryName'),
-          assetName = assetModel.get('name');
-      return NX.util.Url.asLink(NX.util.Url.relativePath + '/repository/' + encodeURIComponent(repositoryName) + encodePath(assetName), assetName);
-    },
-    ansible: function (me, assetModel) {
       var repositoryName = assetModel.get('repositoryName'),
           assetName = assetModel.get('name');
       return NX.util.Url.asLink(NX.util.Url.relativePath + '/repository/' + encodeURIComponent(repositoryName) + encodePath(assetName), assetName);

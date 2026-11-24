@@ -13,16 +13,15 @@
 package org.sonatype.nexus.repository.pypi.rest;
 
 import jakarta.inject.Singleton;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceBeta;
 import org.sonatype.nexus.rest.APIConstants;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.stereotype.Component;
 
-@Api(hidden = true)
 @Component
 @Singleton
 @Path(PyPiGroupRepositoriesApiResourceBeta.RESOURCE_URI)

@@ -321,12 +321,6 @@ export default {
             PLACEHOLDER: 'Enter a URL'
           }
         },
-        ROUTING: {
-          CAPTION: 'Registry Access',
-          HELP: 'Docker repositories are served by the shared registry endpoint and selected by the first path segment. No dedicated connector port is required.',
-          PULL_LABEL: 'Pull images with:',
-          PULL_TEMPLATE: (name) => `docker pull <host>/${name}/<image>`
-        },
         CONNECTORS: {
           CAPTION: 'Repository Connectors',
           HTTP: {

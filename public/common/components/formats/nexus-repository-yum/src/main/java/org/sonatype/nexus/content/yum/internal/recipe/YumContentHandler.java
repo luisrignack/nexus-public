@@ -17,8 +17,9 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.content.yum.YumContentFacet;
 import org.sonatype.nexus.content.yum.YumMetadataFacet;
 import org.sonatype.nexus.repository.Repository;
@@ -43,9 +44,10 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT;
 @Component
 @Singleton
 public class YumContentHandler
-    extends ComponentSupport
     implements Handler
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private static final String REPODATA = "repodata/";
 
   @Nonnull

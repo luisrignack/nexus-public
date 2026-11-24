@@ -13,6 +13,7 @@
 package org.sonatype.nexus.internal.security.usertoken;
 
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,6 +53,8 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import org.mockito.ArgumentMatchers;
+
 import static org.mockito.Mockito.when;
 
 public class UserTokenServiceImplTest
@@ -91,12 +94,12 @@ public class UserTokenServiceImplTest
     lenient().when(reference.context()).thenReturn(context);
     lenient().when(context.id()).thenReturn(CapabilityIdentity.capabilityIdentity("usertoken"));
     lenient().when(context.notes()).thenReturn("");
-    lenient().when(capabilityRegistry.get(any(Predicate.class))).thenReturn(List.of(reference));
+    lenient().when(capabilityRegistry.get(ArgumentMatchers.<Predicate<CapabilityReference>>any())).thenReturn((java.util.Collection) List.of(reference));
   }
 
   @Test
   public void getConfiguration_withoutCapability_returnsDisabled() {
-    when(capabilityRegistry.get(any(Predicate.class))).thenReturn(List.of());
+    when(capabilityRegistry.get(ArgumentMatchers.<Predicate<CapabilityReference>>any())).thenReturn((java.util.Collection) List.of());
 
     assertThat(underTest.getConfiguration(), is(UserTokenConfiguration.DISABLED));
     assertFalse(underTest.isEnabled());
@@ -133,7 +136,7 @@ public class UserTokenServiceImplTest
 
   @Test
   public void setConfiguration_withoutCapability_throws() {
-    when(capabilityRegistry.get(any(Predicate.class))).thenReturn(List.of());
+    when(capabilityRegistry.get(ArgumentMatchers.<Predicate<CapabilityReference>>any())).thenReturn((java.util.Collection) List.of());
 
     assertThrows(IllegalStateException.class,
         () -> underTest.setConfiguration(new UserTokenConfiguration(true, true, true, 10)));
@@ -236,7 +239,7 @@ public class UserTokenServiceImplTest
 
   @Test
   public void authenticate_disabled_isEmpty() {
-    when(capabilityRegistry.get(any(Predicate.class))).thenReturn(List.of());
+    when(capabilityRegistry.get(ArgumentMatchers.<Predicate<CapabilityReference>>any())).thenReturn((java.util.Collection) List.of());
 
     assertThat(underTest.authenticate(new String(TOKEN)), is(Optional.empty()));
     verifyNoInteractions(apiKeys);

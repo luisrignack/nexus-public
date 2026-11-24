@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.docker.rest;
 
+import org.sonatype.nexus.repository.rest.api.model.HostedStorageAttributes;
+
 import java.util.Collections;
 import java.util.List;
 

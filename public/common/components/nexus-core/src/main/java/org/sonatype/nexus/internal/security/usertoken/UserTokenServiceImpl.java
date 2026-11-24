@@ -19,8 +19,9 @@ import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.nexus.capability.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.capability.CapabilityRegistry;
@@ -50,9 +51,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Component
 @Singleton
 public class UserTokenServiceImpl
-    extends ComponentSupport
     implements UserTokenService
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   static final int CODE_LENGTH = 32;
 
   static final int TOKEN_LENGTH = CODE_LENGTH * 2;

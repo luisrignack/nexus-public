@@ -25,8 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.common.entity.Continuation;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.content.facet.ContentFacet;
@@ -54,8 +55,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Singleton
 public class NpmSearchHandler
-    extends ComponentSupport
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private static final int PAGE_SIZE = 500;

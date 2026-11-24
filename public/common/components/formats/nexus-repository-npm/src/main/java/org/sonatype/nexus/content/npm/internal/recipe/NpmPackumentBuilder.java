@@ -21,11 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.repository.content.AssetBlob;
 import org.sonatype.nexus.content.npm.NpmContentFacet;
 import org.sonatype.nexus.content.npm.internal.NpmDistTagsManager;
@@ -54,8 +55,9 @@ import static org.sonatype.nexus.repository.npm.internal.NpmCoordinatesHelper.de
 @Named
 @Singleton
 public class NpmPackumentBuilder
-    extends ComponentSupport
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private final NpmDistTagsManager distTagsManager;

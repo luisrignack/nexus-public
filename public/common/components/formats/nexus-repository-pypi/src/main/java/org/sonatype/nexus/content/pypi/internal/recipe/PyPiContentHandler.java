@@ -21,8 +21,9 @@ import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.content.pypi.PyPiContentFacet;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
@@ -54,9 +55,10 @@ import static org.sonatype.nexus.repository.view.ContentTypes.TEXT_HTML;
 @Component
 @Singleton
 public class PyPiContentHandler
-    extends ComponentSupport
     implements Handler
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private static final String[] UPLOAD_FILE_FIELDS = {"content", "file"};
 
   @Nonnull

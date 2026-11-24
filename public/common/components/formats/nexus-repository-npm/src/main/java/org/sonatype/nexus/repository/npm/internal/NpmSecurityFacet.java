@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.npm.internal;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.SecurityFacetSupport;

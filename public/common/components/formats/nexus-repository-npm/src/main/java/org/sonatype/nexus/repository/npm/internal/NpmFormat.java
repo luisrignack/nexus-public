@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.npm.internal;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
 

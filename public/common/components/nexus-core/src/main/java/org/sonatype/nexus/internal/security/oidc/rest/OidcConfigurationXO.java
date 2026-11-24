@@ -20,7 +20,6 @@ import org.sonatype.nexus.internal.security.oidc.OidcConfigurationData;
 import org.sonatype.nexus.internal.security.oidc.OidcConfigurationStoreImpl;
 import org.sonatype.nexus.security.oidc.OidcConfiguration;
 
-import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Transfer object for the OAuth2/OIDC configuration screen. Field names match the CoreUI form exactly.
@@ -143,7 +142,6 @@ public class OidcConfigurationXO
     this.clientId = clientId;
   }
 
-  @ApiModelProperty(value = "The client secret, write-only. Sending the masked placeholder keeps the stored value.")
   public String getClientSecret() {
     return clientSecret;
   }

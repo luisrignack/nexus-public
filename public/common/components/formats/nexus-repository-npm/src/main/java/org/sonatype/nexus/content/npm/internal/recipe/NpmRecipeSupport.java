@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.content.npm.internal.recipe;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import org.sonatype.nexus.content.npm.NpmContentFacet;
 import org.sonatype.nexus.repository.Format;

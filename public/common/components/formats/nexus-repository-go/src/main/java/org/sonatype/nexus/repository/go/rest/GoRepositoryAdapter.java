@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.go.rest;
 
+import org.sonatype.nexus.repository.rest.api.model.HostedStorageAttributes;
+
 import jakarta.inject.Inject;
 
 import org.sonatype.nexus.repository.Repository;

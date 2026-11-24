@@ -21,10 +21,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.content.npm.NpmContentFacet;
 import org.sonatype.nexus.content.npm.internal.NpmDistTagsManager;
 import org.sonatype.nexus.repository.Repository;
@@ -60,9 +61,10 @@ import static org.sonatype.nexus.repository.view.ContentTypes.APPLICATION_OCTET_
 @Component
 @Singleton
 public class NpmContentHandler
-    extends ComponentSupport
     implements Handler
 {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private static final long MAX_DOCUMENT_SIZE = 64L * 1024L * 1024L;

@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.rubygems.rest;
 
+import org.sonatype.nexus.repository.rest.api.model.HostedStorageAttributes;
+
 import org.sonatype.nexus.repository.rest.api.HostedRepositoryApiRequestToConfigurationConverter;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -21,6 +23,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RubyGemsHostedRepositoryApiRequestToConfigurationConverter
-    extends HostedRepositoryApiRequestToConfigurationConverter<RubyGemsHostedRepositoryApiRequest>
+    extends HostedRepositoryApiRequestToConfigurationConverter<HostedStorageAttributes, RubyGemsHostedRepositoryApiRequest>
 {
 }

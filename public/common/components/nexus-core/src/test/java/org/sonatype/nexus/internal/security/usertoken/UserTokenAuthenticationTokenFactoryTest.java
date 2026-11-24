@@ -16,8 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Optional;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationToken;
