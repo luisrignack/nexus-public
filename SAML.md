@@ -46,5 +46,6 @@ el valor especial `nameid` (por defecto) usa el `NameID` de la assertion.
 - Un único IdP por instancia.
 - No se firman las peticiones `AuthnRequest` (sp-initiated básico).
 - La caché de replay/estado es local al nodo; en HA hace falta una caché compartida.
-- El build del frontend (`yarn install`) no se pudo verificar en el entorno de desarrollo;
-  los cambios de UI son pequeños (activación del bundle `nexus-saml-plugin` y del tile de ajustes).
+- El build del frontend se verificó tras generar `yarn.lock` con Node 24 y restaurar `.yarnrc.yml`
+  (`nodeLinker: node-modules`); la assembly arranca y los endpoints responden `200`.
+  Para reproducirlo: `corepack yarn install` en la raíz con Node 24 antes de `mvn package`.
