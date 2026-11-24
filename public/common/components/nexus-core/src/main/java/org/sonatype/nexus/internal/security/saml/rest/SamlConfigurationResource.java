@@ -32,6 +32,7 @@ import jakarta.ws.rs.core.Context;
 
 import org.sonatype.nexus.internal.security.saml.SamlLoginFlow;
 import org.sonatype.nexus.rest.Resource;
+import org.sonatype.nexus.saml.SamlOpenSaml;
 import org.sonatype.nexus.security.saml.SamlConfiguration;
 import org.sonatype.nexus.security.saml.SamlConfigurationStore;
 
@@ -106,6 +107,7 @@ public class SamlConfigurationResource
   @Produces(APPLICATION_XML)
   @RequiresPermissions("nexus:saml-settings:read")
   public String metadata() throws Exception {
+    SamlOpenSaml.initialize();
     SamlConfiguration configuration = store.load();
     String entityId = configuration != null && configuration.getEntityId() != null
         && !configuration.getEntityId().isEmpty()

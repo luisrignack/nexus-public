@@ -26,3 +26,8 @@ out
 .zion/
 variables.properties
 admin-creds.txt
+
+# Generados por Yarn/frontend
+node_modules/
+.yarn/
+yarn.lock

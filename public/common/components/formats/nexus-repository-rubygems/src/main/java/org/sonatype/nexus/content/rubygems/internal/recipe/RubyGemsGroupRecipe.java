@@ -67,8 +67,8 @@ public class RubyGemsGroupRecipe
   public void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get());
     repository.attach(configure(viewFacet.get()));
-    repository.attach(groupFacet.get());
     repository.attach(contentFacet.get());
+    repository.attach(groupFacet.get());
     repository.attach(browseFacet.get());
   }
 

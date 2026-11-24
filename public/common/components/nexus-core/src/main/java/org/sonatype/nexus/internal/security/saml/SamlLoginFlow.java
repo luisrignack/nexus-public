@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,13 +37,13 @@ import org.sonatype.nexus.security.authc.saml.SamlAuthenticationToken;
 import org.sonatype.nexus.security.saml.SamlConfiguration;
 import org.sonatype.nexus.security.saml.SamlConfigurationStore;
 import org.sonatype.nexus.saml.SamlEntityMetadata;
+import org.sonatype.nexus.saml.SamlOpenSaml;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
-import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.schema.XSString;
@@ -89,8 +88,6 @@ public class SamlLoginFlow
 
   private static final Logger log = LoggerFactory.getLogger(SamlLoginFlow.class);
 
-  private static final AtomicBoolean OPEN_SAML_INITIALIZED = new AtomicBoolean();
-
   private static final int CLOCK_SKEW_SECONDS = 120;
 
   private final SamlConfigurationStore configurationStore;
@@ -112,7 +109,7 @@ public class SamlLoginFlow
       return Outcome.error(503, "SAML single sign-on is not configured");
     }
     try {
-      initializeOpenSaml();
+      SamlOpenSaml.initialize();
       SamlEntityMetadata metadata = SamlEntityMetadata.fromXml(configuration.getIdpMetadata());
 
       AuthnRequest authnRequest = build(AuthnRequest.DEFAULT_ELEMENT_NAME);
@@ -149,7 +146,7 @@ public class SamlLoginFlow
       return Outcome.error(503, "SAML single sign-on is not configured");
     }
     try {
-      initializeOpenSaml();
+      SamlOpenSaml.initialize();
       String rawResponse = request.getParameter("SAMLResponse");
       if (rawResponse == null || rawResponse.isEmpty()) {
         return Outcome.error(400, "Missing SAMLResponse");
@@ -357,17 +354,6 @@ public class SamlLoginFlow
     return writer.toString();
   }
 
-  private static void initializeOpenSaml() {
-    if (OPEN_SAML_INITIALIZED.compareAndSet(false, true)) {
-      try {
-        InitializationService.initialize();
-      }
-      catch (Exception e) {
-        OPEN_SAML_INITIALIZED.set(false);
-        throw new IllegalStateException("Unable to initialize OpenSAML", e);
-      }
-    }
-  }
 
   private static String entityId(final SamlConfiguration configuration, @Nullable final HttpServletRequest request) {
     if (configuration.getEntityId() != null && !configuration.getEntityId().isEmpty()) {

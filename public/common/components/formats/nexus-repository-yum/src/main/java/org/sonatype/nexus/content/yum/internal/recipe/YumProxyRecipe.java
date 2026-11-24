@@ -97,8 +97,8 @@ public class YumProxyRecipe
     repository.attach(configure(viewFacet.get()));
     repository.attach(httpClientFacet.get());
     repository.attach(negativeCacheFacet.get());
-    repository.attach(proxyFacet.get());
     repository.attach(contentFacet.get());
+    repository.attach(proxyFacet.get());
     repository.attach(maintenanceFacet.get());
     repository.attach(searchFacet.get());
     repository.attach(browseFacet.get());

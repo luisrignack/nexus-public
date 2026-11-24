@@ -51,6 +51,7 @@ public final class SamlEntityMetadata
     if (xml == null || xml.trim().isEmpty()) {
       throw new IllegalArgumentException("IdP metadata is empty");
     }
+    SamlOpenSaml.initialize();
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
