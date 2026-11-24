@@ -103,7 +103,8 @@ Ext.define('NX.coreui.app.PluginConfig', {
     {
       id: 'NX.coreui.controller.LdapServers',
       active: function () {
-        return NX.app.Application.bundleActive('nexus-ldap-plugin');
+        // El fork implementa LDAP en Core; no depende del bundle Pro nexus-ldap-plugin.
+        return true;
       }
     },
     {
