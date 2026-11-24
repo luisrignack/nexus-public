@@ -250,7 +250,6 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
         visibilityRequirements: {
           requiresPermission: 'nexus:*',
           bundle: 'nexus-saml-plugin',
-          editions: PRO_FAMILY_EDITIONS,
         },
       },
       {

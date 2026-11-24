@@ -131,7 +131,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.common.components</groupId>
         <artifactId>nexus-backup</artifactId>
-        <version>3.89.0-09</version>
+        <version>3.98.1-01</version>
       </dependency>
 
       <dependency>
@@ -395,7 +395,7 @@
       <dependency>
         <groupId>org.sonatype.nexus.common.components</groupId>
         <artifactId>nexus-sbom</artifactId>
-        <version>3.89.0-09</version>
+        <version>3.98.1-01</version>
       </dependency>
 
       <dependency>

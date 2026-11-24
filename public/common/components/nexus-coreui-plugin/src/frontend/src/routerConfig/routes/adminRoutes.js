@@ -587,7 +587,6 @@ export const adminRoutes = [
       visibilityRequirements: {
         bundle: 'nexus-saml-plugin',
         permissions: ['nexus:*'],
-        editions: PRO_FAMILY_EDITIONS,
       },
       title: ADMIN.SECURITY.SAML.TITLE,
     },

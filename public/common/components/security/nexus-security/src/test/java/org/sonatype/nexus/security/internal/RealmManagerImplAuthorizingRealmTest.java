@@ -19,6 +19,7 @@ import org.sonatype.nexus.security.AbstractSecurityTest;
 import org.sonatype.nexus.security.AbstractSecurityTest.BaseSecurityConfiguration;
 import org.sonatype.nexus.security.authc.ldap.LdapRealm;
 import org.sonatype.nexus.security.authc.oidc.OidcRealm;
+import org.sonatype.nexus.security.authc.saml.SamlRealm;
 import org.sonatype.nexus.security.realm.RealmManager;
 import org.sonatype.nexus.security.realm.SecurityRealm;
 
@@ -61,10 +62,10 @@ class RealmManagerImplAuthorizingRealmTest
   void testGetAvailableRealms() {
     assertThat(underTest.getAvailableRealms().stream().map(SecurityRealm::getId).collect(toList()),
         is(asList(LdapRealm.REALM_NAME, AuthenticatingRealmImpl.NAME, "MockRealmA", "MockRealmB", "MockRealmC",
-            OidcRealm.REALM_NAME)));
+            OidcRealm.REALM_NAME, SamlRealm.REALM_NAME)));
     assertThat(underTest.getAvailableRealms(true).stream().map(SecurityRealm::getId).collect(toList()),
         is(asList(LdapRealm.REALM_NAME, AuthenticatingRealmImpl.NAME, AuthorizingRealmImpl.NAME, "MockRealmA",
-            "MockRealmB", "MockRealmC", OidcRealm.REALM_NAME)));
+            "MockRealmB", "MockRealmC", OidcRealm.REALM_NAME, SamlRealm.REALM_NAME)));
   }
 
   @Test

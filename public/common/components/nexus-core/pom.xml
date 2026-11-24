@@ -26,6 +26,11 @@
   <artifactId>nexus-core</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <!-- OpenSAML is Apache 2.0 licensed; Sonatype pins the same version for its Pro SAML plugin. -->
+    <opensaml.version>4.0.1</opensaml.version>
+  </properties>
+
   <dependencies>
 
     <dependency>
@@ -145,6 +150,28 @@
       <artifactId>goodies-testsupport</artifactId>
       <version>3.0.0</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- SAML 2.0 service provider (implemented from the public SAML specification). -->
+    <dependency>
+      <groupId>org.opensaml</groupId>
+      <artifactId>opensaml-core</artifactId>
+      <version>${opensaml.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opensaml</groupId>
+      <artifactId>opensaml-saml-impl</artifactId>
+      <version>${opensaml.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opensaml</groupId>
+      <artifactId>opensaml-xmlsec-impl</artifactId>
+      <version>${opensaml.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opensaml</groupId>
+      <artifactId>opensaml-security-impl</artifactId>
+      <version>${opensaml.version}</version>
     </dependency>
 
   </dependencies>

@@ -100,6 +100,8 @@ public class NexusSecurityContributor
 
   private static final String OIDC_SETTINGS_DOMAIN = "oidc-settings";
 
+  private static final String SAML_SETTINGS_DOMAIN = "saml-settings";
+
   private static final String LDAP_DOMAIN = "ldap";
 
   public static final String NX_HEALTHCHECK_READ_PRIV_ID = "nx-healthcheck-read";
@@ -169,6 +171,14 @@ public class NexusSecurityContributor
     configuration.addPrivilege(createApplicationPrivilege(
         "nx-oidc-settings-update", UPDATE_DESCRIPTION_BASE + "OAuth2/OIDC Settings",
         OIDC_SETTINGS_DOMAIN, ACTION_UPDATE));
+
+    // SAML single sign-on: settings are managed through the admin screen
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-saml-settings-read", READ_DESCRIPTION_BASE + "SAML Settings",
+        SAML_SETTINGS_DOMAIN, ACTION_READ));
+    configuration.addPrivilege(createApplicationPrivilege(
+        "nx-saml-settings-update", UPDATE_DESCRIPTION_BASE + "SAML Settings",
+        SAML_SETTINGS_DOMAIN, ACTION_UPDATE));
 
     // LDAP server configuration
     createCrudAndAllApplicationPrivileges("nx-ldap", LDAP_DOMAIN).forEach(configuration::addPrivilege);
