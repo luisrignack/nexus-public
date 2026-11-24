@@ -27,15 +27,20 @@ Todos los campos se persisten en la capability LDAP (`LdapCapabilityProperties`)
 
 | Método | Ruta | Cambio |
 |---|---|---|
-| `POST` | `/service/rest/internal/ui/ldap/verify-login` | Ahora recibe `LdapVerifyLoginXO`: servidor + usuario/contraseña en Base64. |
-| `GET` | `/service/rest/internal/ui/ldap/templates` | Plantillas de esquema preconstruidas. |
-| `DELETE` | `/service/rest/internal/ui/ldap/cache` | Sin operación (el realm no cachea resultados). |
-| `POST` | `/service/rest/internal/ui/ldap/verify-connection`, `verify-user-mapping` | Restauran la contraseña enlazada almacenada cuando la UI reenvía el marcador de posición. |
+| `POST` | `/service/rest/v1/security/ldap/verify-login` | Ahora recibe `LdapVerifyLoginXO`: servidor + usuario/contraseña en Base64. |
+| `GET` | `/service/rest/v1/security/ldap/templates` | Plantillas de esquema preconstruidas. |
+| `DELETE` | `/service/rest/v1/security/ldap/cache` | Sin operación (el realm no cachea resultados). |
+| `POST` | `/service/rest/v1/security/ldap/verify-connection`, `verify-user-mapping` | Restauran la contraseña enlazada almacenada cuando la UI reenvía el marcador de posición. |
 
 `LdapUserXO` expone tanto los nombres antiguos (`userId`, `firstName`, `lastName`, `roles`) como
 los de la UI actual (`username`, `realName`, `membership`, `company`).
 
 ## Seguridad
+
+- LDAPS con `useTrustStore=true` usa ahora `trustStore.getSSLContext().getSocketFactory()`; antes se
+  invocaba por reflexión un método inexistente y la opción no tenía efecto.
+- Si el certificado de `lds.etecsa.cu` es autofirmado y no se activa el trust store de Nexus, hay que
+  importarlo al `cacerts` de la JVM o arrancar con `-Djavax.net.ssl.trustStore=...`.
 
 - El filtro de usuario aplica escape RFC 4515 al nombre de usuario; los comodines se añaden
   después del escape, de modo que `searchBehavior` no permite inyectar filtros.
