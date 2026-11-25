@@ -27,6 +27,13 @@ El texto visible de marca pasó a **"Gestor de repositorios empresarial"** en:
 Se conservan las referencias legales a Sonatype en `COPYRIGHT.vm` y en los ficheros `LICENSE`,
 porque forman parte de la licencia EPL del código base.
 
+## Tipografía del acceso
+
+El texto de bienvenida del login se presenta con **Inter 600, 22 px / 1.25**, color `#0B2A4A`,
+`letter-spacing: -0.015em` y `text-wrap: balance` (dos líneas equilibradas, sin punto final).
+La tarjeta usa radio de 16 px, sombra suave y una franja superior con el degradado de marca;
+el isotipo pasa a 56 px y el área central tiene un degradado radial azul muy claro.
+
 ## Cache
 
 Las URLs de logo llevan `?_c=etecsa-1` y el `nexus.webresources.cachebuster` de la instancia local

@@ -23,6 +23,11 @@ $color-error: var(--red-9, #ef4444);
 $color-error-bg: var(--red-2, #fef2f2);
 $color-error-border: var(--red-6, #fecaca);
 
+// Identidad ETECSA
+$brand-navy: #0b2a4a;
+$brand-blue: #0b3b7a;
+$brand-cyan: #2476c3;
+
 // Theme wrapper - transparent, no stretching
 .login-theme-wrapper {
   // Override Radix Theme default background and dimensions
@@ -40,11 +45,17 @@ $color-error-border: var(--red-6, #fecaca);
 
 // Login card (Radix Card)
 .login-card {
-  width: 420px;
+  width: 440px;
   max-width: 100%; // Responsive: shrink on small viewports
   background-color: $color-surface-light !important;
-  border: 1px solid $color-border;
-  box-shadow: none !important;
+  // Franja de marca de 4 px en la parte superior de la tarjeta
+  background-image: linear-gradient(90deg, $brand-blue, $brand-cyan);
+  background-size: 100% 4px;
+  background-repeat: no-repeat;
+  border: 1px solid rgba(11, 59, 122, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(11, 59, 122, 0.12) !important;
+  overflow: hidden;
 
   // Remove Radix Card ::before pseudo-element background (required to override Radix defaults)
   &.rt-Card:where(.rt-variant-surface)::before {
@@ -60,16 +71,23 @@ $color-error-border: var(--red-6, #fecaca);
   }
 
   &__mark {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
     display: block;
   }
 
   &__title {
+    font-family: var(--font-family-base, 'Inter', system-ui, sans-serif);
+    font-size: 22px;
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: $brand-navy;
     text-align: center;
-    margin: 0;
-    color: $color-text-primary;
+    margin: 0 auto;
+    max-width: 19ch;
+    text-wrap: balance;
   }
 
   &__subtitle {
@@ -118,9 +136,23 @@ $color-error-border: var(--red-6, #fecaca);
 // Submit button styling
 .login-submit {
   cursor: pointer;
+  min-height: 44px;
+  border-radius: 8px;
+  font-weight: 500;
 
   &:disabled {
     cursor: not-allowed;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .login-card__title {
+    font-size: 20px;
   }
 }
 
