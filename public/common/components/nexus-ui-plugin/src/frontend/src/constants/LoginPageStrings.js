@@ -17,7 +17,7 @@
 
 export default {
   LOGIN_TITLE: 'Welcome',
-  LOGIN_SUBTITLE: 'Login to continue',
+  LOGIN_SUBTITLE: 'Bienvenidos al Gestor empresarial de repositorios.',
   SIGNIN_TITLE: 'Sign in to Nexus Repository',
   SIGNIN_BUTTON: 'Sign in',
   SIGNIN_BUTTON_LOADING: 'Signing in...',
