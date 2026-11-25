@@ -63,6 +63,15 @@ services:
       CLAMAV_PORT: "3310"
       MAX_SCAN_BYTES: "${MAX_SCAN_BYTES:-209715200}"
       BRIDGE_PORT: "8082"
+      SCAN_ENGINE: "${SCAN_ENGINE:-clamav}"
+      KASPERSKY_SCAN_CMD: "${KASPERSKY_SCAN_CMD:-kavscan --scan-file {file}}"
+      KASPERSKY_CMD_TIMEOUT: "${KASPERSKY_CMD_TIMEOUT:-120}"
+      KASPERSKY_API_URL: "${KASPERSKY_API_URL:-}"
+      KASPERSKY_TOKEN: "${KASPERSKY_TOKEN:-}"
+      KASPERSKY_TOKEN_FILE: "${KASPERSKY_TOKEN_FILE:-}"
+      KASPERSKY_VERIFY_TLS: "${KASPERSKY_VERIFY_TLS:-true}"
+      # Para Kaspersky CLI con licencia local, descomenta y ajusta la ruta del binario/licencia:
+      # - ./kaspersky:/opt/kaspersky:ro
     ports:
       - "127.0.0.1:${MALWARE_BRIDGE_PORT:-8082}:8082"
     depends_on:
