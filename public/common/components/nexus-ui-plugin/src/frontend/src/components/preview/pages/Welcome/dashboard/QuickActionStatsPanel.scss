@@ -22,7 +22,7 @@
 }
 
 .nxrm-quick-action-stat-card--healthy {
-  border-left: 4px solid var(--green-9);
+  border-left: 4px solid var(--blue-9);
 }
 
 .nxrm-quick-action-stats__grid {
@@ -94,7 +94,7 @@
   }
 
   &__icon--healthy {
-    color: var(--green-9);
+    color: var(--blue-9);
     flex-shrink: 0;
   }
 

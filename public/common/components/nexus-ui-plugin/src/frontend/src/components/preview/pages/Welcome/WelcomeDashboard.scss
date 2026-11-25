@@ -31,7 +31,7 @@
 
   &__hero-accent {
     height: 3px;
-    background: linear-gradient(90deg, #00bb6c, #6366f1, #f59e0b);
+    background: linear-gradient(90deg, #006bbf, #6366f1, #f59e0b);
     border-radius: 2px;
     margin-bottom: var(--space-5, 20px);
   }
@@ -311,7 +311,7 @@
     gap: 4px;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--color-primary, #00bb6c);
+    color: var(--color-primary, #006bbf);
     text-decoration: none;
     transition: color var(--transition-fast, 150ms ease);
 

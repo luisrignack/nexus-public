@@ -337,7 +337,7 @@ export function WelcomeDashboard({
                 title="Requests Over Time"
                 icon={<TrendingUp size={16} />}
                 data={usageHistory.requestsDaily}
-                color="#00bb6c"
+                color="#006bbf"
                 emptyMessage="Request data will appear here once your instance has activity"
               />
               <TrendCard
