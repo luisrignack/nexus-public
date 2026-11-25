@@ -1,0 +1,76 @@
+name: nexus-fork-antivirus
+
+services:
+  nexus:
+    build:
+      context: ../..
+      dockerfile: docker/nexus-antivirus/Dockerfile
+    image: ${NEXUS_IMAGE:-nexus-fork:3.98.1-01-local}
+    container_name: nexus-fork
+    restart: unless-stopped
+    ports:
+      - "${NEXUS_HTTP_PORT:-8081}:8081"
+    environment:
+      INSTALL4J_ADD_VM_PARAMS: >-
+        -Xms${NEXUS_XMS:-1g} -Xmx${NEXUS_XMX:-2g}
+        -Djava.net.preferIPv4Stack=true
+      NEXUS_CACHEBUSTER: ${NEXUS_CACHEBUSTER:-docker-1}
+    volumes:
+      - nexus-data:/nexus-data
+    depends_on:
+      clamav:
+        condition: service_healthy
+      malware-bridge:
+        condition: service_healthy
+    networks:
+      - nexus-net
+
+  clamav:
+    image: ${CLAMAV_IMAGE:-clamav/clamav:1.4.7-debian}
+    container_name: nexus-clamav
+    restart: unless-stopped
+    environment:
+      CLAMD_START_IF_LOCAL: "1"
+      FRESHCLAM_START_IF_LOCAL: "1"
+    volumes:
+      - clamav-db:/var/lib/clamav
+      - clamav-log:/var/log/clamav
+      - ./clamav/clamd.conf:/etc/clamav/clamd.conf:ro
+      - ./clamav/freshclam.conf:/etc/clamav/freshclam.conf:ro
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/3310 && printf 'PING\\n' >&3 && IFS= read -r line <&3 && [ \"$$line\" = PONG ]"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 300s
+    networks:
+      - nexus-net
+
+  malware-bridge:
+    build:
+      context: ./malware-bridge
+      dockerfile: Dockerfile
+    image: ${BRIDGE_IMAGE:-nexus-malware-bridge:local}
+    container_name: nexus-malware-bridge
+    restart: unless-stopped
+    environment:
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: "3310"
+      MAX_SCAN_BYTES: "${MAX_SCAN_BYTES:-209715200}"
+      BRIDGE_PORT: "8082"
+    ports:
+      - "127.0.0.1:${MALWARE_BRIDGE_PORT:-8082}:8082"
+    depends_on:
+      clamav:
+        condition: service_healthy
+    networks:
+      - nexus-net
+
+volumes:
+  nexus-data:
+  clamav-db:
+  clamav-log:
+
+networks:
+  nexus-net:
+    driver: bridge
