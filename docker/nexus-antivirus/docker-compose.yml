@@ -15,6 +15,9 @@ services:
         -Xms${NEXUS_XMS:-1g} -Xmx${NEXUS_XMX:-2g}
         -Djava.net.preferIPv4Stack=true
       NEXUS_CACHEBUSTER: ${NEXUS_CACHEBUSTER:-docker-1}
+      MALWARE_BRIDGE_URL: ${MALWARE_BRIDGE_URL:-http://malware-bridge:8082/scan}
+      NEXUS_MALWARE_ENABLED: "${NEXUS_MALWARE_ENABLED:-true}"
+      MAX_SCAN_BYTES: "${MAX_SCAN_BYTES:-209715200}"
     volumes:
       - nexus-data:/nexus-data
     depends_on:

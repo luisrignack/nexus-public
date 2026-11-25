@@ -57,7 +57,7 @@ El `Dockerfile` hace la compilación completa (JDK 21, Node 24, `corepack yarn i
 ```bash
 docker compose ps                       # espera a que nexus esté healthy
 curl -i http://localhost:8081/service/rest/v1/status
-docker compose exec nexus cat /nexus-data/etc/admin.password
+docker compose exec nexus cat /nexus-data/admin.password
 ```
 
 - Usuario: `admin`; contraseña inicial: la del fichero anterior. Cámbiala al entrar.
@@ -116,14 +116,21 @@ docker compose up -d
 
 ## Estado de la integración
 
-El stack **proporciona el motor antivirus y una API de escaneo**, pero el fork todavía no llama a
-esa API automáticamente al publicar un asset. Los pasos pendientes para cerrar el ciclo son:
+El fork ya puede escanear **bajo demanda desde la propia REST de Nexus**:
 
-1. Módulo Java que, en `AssetUploadedEvent`, envíe el blob a `malware-bridge:8082/scan`.
-2. Guardar el veredicto en atributos del componente y bloquear/mover a cuarentena si es `INFECTED`.
-3. Sustituir el stub `GET /internal/ui/malware/counts` por recuentos reales.
+```bash
+# Login previo y cookie/sesión de admin
+curl -u admin:<password> -H 'Content-Type: application/json' \
+  -d '{"repository":"maven-releases","path":"/com/ejemplo/x.jar"}' \
+  http://localhost:8081/service/rest/internal/ui/malware/scan
 
-Mientras tanto, el bridge sirve para escaneos bajo demanda y para integraciones externas vía webhook.
+curl -u admin:<password> \
+  http://localhost:8081/service/rest/internal/ui/malware/counts
+```
+
+El veredicto se guarda en los atributos del asset (`nxMalwareVerdict`, `nxMalwareSignature`) y los
+recuentos ya no son un stub. Pendiente para la Fase 2: escaneo automático en `AssetUploadedEvent`,
+bloqueo/cuarentena de assets `INFECTED` y re-escaneo cuando se actualicen las firmas.
 
 ## Solución de problemas
 

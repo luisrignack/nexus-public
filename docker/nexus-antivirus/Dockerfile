@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # Multi-stage build: compila el fork desde el código fuente y genera una imagen de ejecución
 # que contiene solo la assembly y un JRE.
 FROM maven:3.9.9-eclipse-temurin-21 AS build

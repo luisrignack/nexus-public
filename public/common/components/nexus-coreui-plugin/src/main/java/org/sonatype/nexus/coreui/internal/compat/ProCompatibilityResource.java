@@ -13,7 +13,6 @@
 package org.sonatype.nexus.coreui.internal.compat;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,15 +43,4 @@ public class ProCompatibilityResource
     return Collections.emptyList();
   }
 
-  @RequiresAuthentication
-  @GET
-  @Path("/malware/counts")
-  public Map<String, Object> malwareCounts() {
-    Map<String, Object> result = new LinkedHashMap<>();
-    result.put("counts", Collections.emptyMap());
-    result.put("totalCount", 0);
-    result.put("hdsAvailable", false);
-    result.put("hcEnabledRepos", Collections.emptyList());
-    return result;
-  }
 }

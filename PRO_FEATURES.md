@@ -70,8 +70,27 @@ Tras regenerar la assembly y reiniciar:
 - `/v1/user-telemetry/javascript` y `/config` → 200; `/events` solo acepta POST.
 - Cache-buster de recursos UI: `nexus.webresources.cachebuster=fork-pro-1`.
 
-## 6. Fuera de alcance (por esfuerzo/riesgo)
+## 6. Escaneo de malware bajo demanda (Fase 1)
+
+- `MalwareScanService` y `MalwareScanResource` en `nexus-coreui-plugin`:
+  - `POST /service/rest/internal/ui/malware/scan` con `{"repository":"...","path":"..."}`.
+  - `GET /service/rest/internal/ui/malware/counts` devuelve recuentos reales por repositorio.
+  - El servicio localiza el asset con `AssetStore.readPath()`, lee el blob con
+    `BlobStoreLocator`, lo envía al bridge por HTTP y persiste `nxMalwareVerdict` /
+    `nxMalwareSignature` en los atributos del asset.
+  - Configurable con `nexus.malware.bridgeUrl`, `nexus.malware.enabled` y
+    `nexus.malware.maxBytes` (inyectados por `entrypoint.sh` en Docker).
+- Se retiró el stub de `/malware/counts` de `ProCompatibilityResource` para evitar duplicidad.
+
+Verificación E2E en el stack Docker: repositorio `raw` con el fichero EICAR de prueba;
+`POST /scan` devolvió `INFECTED` / `Eicar-Signature` y `GET /counts` devolvió
+`{counts:{malware-test:{INFECTED:1}}, totalCount:1, infectedCount:1}`.
+
+Pendiente (Fase 2): escaneo automático en `AssetUploadedEvent`, cuarentena/bloqueo y tarea de
+re-escaneo tras actualizar firmas.
+
+## 7. Fuera de alcance (por esfuerzo/riesgo)
 
 No incluidos en esta entrega: restore automático del backup, tags con productor real, Crowd,
-SCIM, IP allowlist, service-account tokens, papelera, escaneo de malware con cuarentena,
+SCIM, IP allowlist, service-account tokens, papelera, cuarentena automática de malware,
 blob stores Azure/GCS (excluido explícitamente), replicación, HA y FIPS.
