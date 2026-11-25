@@ -21,6 +21,29 @@ This is the open source codebase of Nexus Repository Core. This contains functio
 
 For a fully-featured version of Nexus Repository, download the Community Edition binary from https://www.sonatype.com/products/nexus-community-edition-download. Community Edition includes additional format support such as npm, Docker, NuGet, PyPI and many others. It also allows use of an external PostgreSQL database that allows you to deploy Nexus Repository under Kubernetes.
 
+## Fork local (rama `feature/pub-format`)
+
+Este fork está rebaseado sobre `release-3.98.1-01` y añade funciones tipo Pro implementadas
+desde especificaciones públicas, sin copiar código propietario de Sonatype:
+
+- Formato **Pub/Flutter** (hosted, proxy y group): `PubFormat`, recetas REST y tests.
+- **SAML 2.0 SSO** con OpenSAML 4.0.1 (Apache 2.0), realm, login SP-initiated, ACS y REST de
+  configuración. Detalles en [SAML.md](SAML.md).
+- **LDAP** con opciones avanzadas, realm propio, REST ampliado y pantalla de administración
+  activada también en la UI clásica. Detalles en [LDAP.md](LDAP.md).
+- **Tema azul** en la UI clásica y en la vista moderna (Nexus One), incluidos logos e iconos
+  de la Welcome. Detalles y procedimiento de reconstrucción en [UI_THEME.md](UI_THEME.md).
+
+### Notas de construcción del fork
+
+El enforcer de 3.98 exige JDK 25, pero la matriz oficial soporta Java 21 en runtime: compilar
+con JDK 21 y `-Denforcer.skip=true`. Para los módulos frontend usar Node 24 (con Node 26 falla
+`corepack yarn install`). El tag no incluye `yarn.lock`, así que se generó con
+`nodeLinker: node-modules` en `.yarnrc.yml` porque Maven invoca Yarn con `--immutable`.
+
+La instancia local se sirve desde
+`public/selfhosted/assemblies/nexus-repository-core/target/assembly` en `http://localhost:8081`.
+
 #### Issues
 
 If you are using Nexus Repository Core or Community Edition and need to report an issue or request an enhancement, [open an issue here](https://github.com/sonatype/nexus-public/issues).
