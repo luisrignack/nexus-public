@@ -132,7 +132,7 @@
   <div id="loading-background">
     <div id="loading-content">
       <img id="loading-logo" src="$raptureUrl/resources/images/sonatype-repository-logo-loading.svg?$urlSuffix"
-        alt="Gestor de repositorios empresarial Manager Logo"/>
+        alt="Gestor de repositorios empresarial"/>
       <div class="loading-indicator">
         <i class="fas fa-circle-notch fa-spin"></i>
         <span id="loading-msg">Loading ...</span>

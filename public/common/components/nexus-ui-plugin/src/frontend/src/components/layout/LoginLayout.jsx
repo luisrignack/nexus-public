@@ -65,7 +65,7 @@ export default function LoginLayout({ children }) {
                 src={getLogo()}
                 alt="Gestor de repositorios empresarial"
                 className="nxrm-login-header__logo"
-                width={220}
+                width={132}
                 height={32}
                 decoding="async"
               />
