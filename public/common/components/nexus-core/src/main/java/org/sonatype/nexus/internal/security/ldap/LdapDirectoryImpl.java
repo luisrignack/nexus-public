@@ -115,7 +115,7 @@ public class LdapDirectoryImpl
 
     Set<String> groupIds = resolveGroups(configuration, user);
     return new UserInfo(
-        ldapEscape(String.valueOf(user.attributes.get(configuration.getUserIdAttribute()))),
+        firstAttribute(user.attributes, configuration.getUserIdAttribute()),
         firstAttribute(user.attributes, configuration.getUserRealNameAttribute()),
         firstAttribute(user.attributes, configuration.getUserLastNameAttribute()),
         firstAttribute(user.attributes, configuration.getUserCompanyAttribute()),
@@ -133,10 +133,10 @@ public class LdapDirectoryImpl
         throw new IllegalStateException("Failed to bind to the LDAP server");
       }
       for (UserEntry user : searchUsers(configuration, service, "*", configuration.getSizeLimit() > 0
-            ? configuration.getSizeLimit() : configuration.getMaxIncidentsCount())) {
+            ? configuration.getSizeLimit() : configuration.getMaxIncidentsCount(), false)) {
         Set<String> groupIds = resolveGroups(configuration, service, user);
         users.add(new UserInfo(
-            ldapEscape(String.valueOf(user.attributes.get(configuration.getUserIdAttribute()))),
+            firstAttribute(user.attributes, configuration.getUserIdAttribute()),
             firstAttribute(user.attributes, configuration.getUserRealNameAttribute()),
             firstAttribute(user.attributes, configuration.getUserLastNameAttribute()),
             firstAttribute(user.attributes, configuration.getUserCompanyAttribute()),
@@ -314,8 +314,22 @@ public class LdapDirectoryImpl
       final String username,
       final int limit) throws NamingException
   {
+    return searchUsers(configuration, service, username, limit, true);
+  }
+
+  /**
+   * @param literalUsername when true the username is escaped before being placed in the filter;
+   *   pass false only for the "list all users" case, where the caller supplies the wildcard itself
+   */
+  private java.util.List<UserEntry> searchUsers(
+      final LdapConfiguration configuration,
+      final DirContext service,
+      final String username,
+      final int limit,
+      final boolean literalUsername) throws NamingException
+  {
     String base = relativeDn(configuration, configuration.getUserBaseDn());
-    String filter = userSearchFilter(configuration, username);
+    String filter = userSearchFilter(configuration, username, literalUsername);
 
     SearchControls controls = new SearchControls();
     controls.setSearchScope(configuration.isUserSubtree() ? SearchControls.SUBTREE_SCOPE : SearchControls.ONELEVEL_SCOPE);
@@ -344,8 +358,12 @@ public class LdapDirectoryImpl
    * the optional custom filter from {@code userLdapFilter} is embedded (and parenthesized) as an
    * additional AND term.
    */
-  private static String userSearchFilter(final LdapConfiguration configuration, final String username) {
-    String escaped = rfc4515Escape(username);
+  static String userSearchFilter(
+      final LdapConfiguration configuration,
+      final String username,
+      final boolean literalUsername)
+  {
+    String escaped = literalUsername ? rfc4515Escape(username) : username;
     String behavior = configuration.getSearchBehavior() == null ? "EXACT" : configuration.getSearchBehavior();
     String pattern = switch (behavior.toUpperCase(java.util.Locale.ROOT)) {
       case "SUBANY" -> "*" + escaped + "*";
@@ -588,7 +606,7 @@ public class LdapDirectoryImpl
       controls.setTimeLimit(configuration.getTimeLimitSeconds() * 1000);
     }
 
-    String username = String.valueOf(user.attributes.get(configuration.getUserIdAttribute()));
+    String username = firstAttribute(user.attributes, configuration.getUserIdAttribute());
     String userBase = relativeDn(configuration, configuration.getUserBaseDn());
     try {
       NamingEnumeration<SearchResult> groups = service.search(groupBase, searchFilter.toString(), controls);
@@ -653,7 +671,7 @@ public class LdapDirectoryImpl
     Set<String> groupIds = new java.util.LinkedHashSet<>();
     String groupBase = relativeDn(configuration, configuration.getGroupBaseDn());
     String memberValue = memberValue(configuration, user.dn,
-        String.valueOf(user.attributes.get(configuration.getUserIdAttribute())));
+        firstAttribute(user.attributes, configuration.getUserIdAttribute()));
 
     String groupIdAttribute = configuration.getGroupIdAttribute() != null
         ? configuration.getGroupIdAttribute() : "cn";

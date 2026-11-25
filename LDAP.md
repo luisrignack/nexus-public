@@ -54,9 +54,31 @@ los de la UI actual (`username`, `realName`, `membership`, `company`).
 
 | Conjunto | Resultado |
 |---|---|
-| `nexus-security` + `nexus-core` (`mvn test -Denforcer.skip=true`) | ✅ 584 tests en verde |
+| `nexus-security` + `nexus-core` (`mvn test -Denforcer.skip=true`) | ✅ todos en verde |
 | Jest: `ldapFormMachine`, `LdapForm`, `useLdapApi` | ✅ 220 tests en verde |
 | Biome lint sobre los archivos cambiados | ✅ solo 4 avisos preexistentes en cadenas `${...}` |
+| E2E: assembly 3.98.1-01 en Docker + LDAP en memoria (UnboundID) | ✅ ver abajo |
 
-Pendiente: prueba E2E contra un LDAP real (Active Directory/OpenLDAP), en especial las reglas
-`memberURL` y el comportamiento de búsqueda por substring.
+### E2E con directorio LDAP real
+
+Se arrancó la assembly del fork en Docker contra un LDAP en memoria con dos usuarios y grupos
+estáticos, y se comprobaron los endpoints:
+
+- `POST verify-connection` → `200`.
+- `POST verify-login` (usuario/contraseña en Base64) → `200`.
+- `POST verify-user-mapping` → `200`, con `userId` correcto (`juan`, `ana`), `lastName`, `company`
+  y los roles derivados de los grupos (`juan` → `devs`).
+- `GET templates`, `DELETE cache`, `POST create`, `GET read` y `DELETE` → correctos; los diez
+  campos nuevos se persisten y se devuelven en el XO.
+
+Durante esta prueba se detectaron y corrigieron dos defectos del código heredado:
+
+1. `verify-user-mapping` escapaba el comodín `*` usado para listar usuarios, por lo que siempre
+   devolvía una lista vacía. Ahora la búsqueda de listado no escapa el comodín; las búsquedas por
+   nombre de usuario siguen escapando su entrada (RFC 4515).
+2. El identificador de usuario se construía con `String.valueOf(Attribute)` y salía como
+   `uid: juan` en lugar de `juan`. Se usa `firstAttribute(...)` en las cuatro rutas afectadas
+   (autenticación, verificación de mapeo, grupos dinámicos y formato de miembro de grupo).
+
+Pendiente: validar reglas `memberURL` reales y búsquedas por substring (`SUBANY`/`SUBINIT`/
+`SUBFINAL`) contra un directorio de producción.
