@@ -63,14 +63,14 @@ function formatCompact(n: number | undefined | null): string {
   }).format(n);
 }
 
-function getEditionColor(edition?: string): 'green' | 'blue' | 'gray' | 'orange' {
+function getEditionColor(edition?: string): 'blue' | 'blue' | 'gray' | 'orange' {
   if (!edition) return 'gray';
   const upper = edition.toUpperCase();
-  if (upper.includes('PRO')) return 'green';
+  if (upper.includes('PRO')) return 'blue';
   if (upper.includes('STARTER')) return 'blue';
   if (upper.includes('OSS') || upper.includes('CORE')) return 'gray';
   if (upper.includes('COMMUNITY') || upper === 'CE') return 'orange';
-  return 'green';
+  return 'blue';
 }
 
 function getEditionLabel(edition?: string): string {

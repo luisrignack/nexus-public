@@ -69,7 +69,7 @@ export function FirewallCardDisplay(
         <Flex align="center" justify="between" gap="3">
           <Flex align="center" gap="3">
             <Box className="nxrm-firewall-card__icon">
-              <ShieldCheck size={22} color="var(--green-9)" aria-hidden />
+              <ShieldCheck size={22} color="var(--blue-9)" aria-hidden />
             </Box>
             <Box className="nxrm-firewall-card__content">
               <Flex align="center" gap="2" mb="1">

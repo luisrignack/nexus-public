@@ -128,7 +128,7 @@ function MetricCardWithChart({
               )}
               {percentChange != null && (
                 <Badge
-                  color={percentChange >= 0 ? 'green' : 'red'}
+                  color={percentChange >= 0 ? 'blue' : 'red'}
                   variant="solid"
                   size="1"
                   className="nxrm-metric-card__change"

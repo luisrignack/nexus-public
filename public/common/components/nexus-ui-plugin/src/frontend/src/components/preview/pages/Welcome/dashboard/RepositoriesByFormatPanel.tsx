@@ -223,7 +223,7 @@ export function RepositoriesByFormatPanel({
 
                       <Table.Cell justify="center" className="repos-by-format-panel__online-cell">
                         <Flex align="center" gap="1" justify="center" wrap="nowrap" style={{ whiteSpace: 'nowrap' }}>
-                          <Text size="2" color="green">{row.onlineCount}</Text>
+                          <Text size="2" color="blue">{row.onlineCount}</Text>
                           <Text size="2" color="gray">/</Text>
                           <Text size="2" color={row.offlineCount > 0 ? 'red' : 'gray'}>
                             {row.offlineCount}

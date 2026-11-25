@@ -407,7 +407,7 @@ export default function GlobalHeader({routes = {}, accountMenuLabel}) {
         <Button
           ref={buttonRef}
           variant="soft"
-          color="green"
+          color="blue"
           size="2"
           className={isFeedbackTooLong ? 'nxrm-global-header-radix__clickable--disabled' : 'nxrm-global-header-radix__clickable'}
           onClick={switchToClassicUI}
@@ -467,7 +467,7 @@ export default function GlobalHeader({routes = {}, accountMenuLabel}) {
                   </a>
                 </Box>
                 {Boolean(editionId) && (
-                  <Badge color="green" variant="solid" size="1">
+                  <Badge color="blue" variant="solid" size="1">
                     {getEditionText()}
                   </Badge>
                 )}
@@ -490,7 +490,7 @@ export default function GlobalHeader({routes = {}, accountMenuLabel}) {
                     <Tooltip content="Switch to Classic UI">
                       <Button
                         variant="soft"
-                        color="green"
+                        color="blue"
                         className="nxrm-global-header-radix__clickable"
                         aria-label="Switch to Classic UI"
                         title="Switch to Classic UI"
@@ -510,7 +510,7 @@ export default function GlobalHeader({routes = {}, accountMenuLabel}) {
                         <Popover.Trigger asChild>
                           <Button
                             variant="soft"
-                            color="green"
+                            color="blue"
                             className="nxrm-global-header-radix__clickable"
                             aria-label="Switch to Classic UI"
                             aria-haspopup="dialog"
@@ -549,7 +549,7 @@ export default function GlobalHeader({routes = {}, accountMenuLabel}) {
                     <Tooltip content="Switch to Nexus One UI">
                       <Button
                         variant="soft"
-                        color="green"
+                        color="blue"
                         onClick={switchToNexusOneUI}
                         className="nxrm-global-header-radix__clickable"
                         aria-label="Switch to Nexus One UI"

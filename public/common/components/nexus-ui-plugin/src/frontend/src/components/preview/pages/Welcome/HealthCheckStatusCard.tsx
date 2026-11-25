@@ -37,9 +37,9 @@ import './HealthCheckStatusCard.scss';
 const PROTECT_HREF = '#preview/browse/malwarerisk';
 const BROWSE_HREF = '#preview/browse';
 
-function RhcIcon({ color }: { color: 'green' | 'red' | 'amber' | 'gray' }) {
+function RhcIcon({ color }: { color: 'blue' | 'red' | 'amber' | 'gray' }) {
   const size = 22;
-  if (color === 'green') return <ShieldCheck size={size} color="var(--green-9)" />;
+  if (color === 'blue') return <ShieldCheck size={size} color="var(--blue-9)" />;
   if (color === 'red') return <ShieldAlert size={size} color="var(--red-9)" />;
   if (color === 'amber') return <Shield size={size} color="var(--amber-9)" />;
   return <Shield size={size} color="var(--gray-8)" />;
@@ -52,10 +52,10 @@ function RhcIcon({ color }: { color: 'green' | 'red' | 'amber' | 'gray' }) {
  * - GREEN: 100% repos have RHC enabled
  * - GRAY: No proxy repos exist
  */
-function getColorByPercentage(enabledCount: number, totalCount: number): 'green' | 'red' | 'amber' | 'gray' {
+function getColorByPercentage(enabledCount: number, totalCount: number): 'blue' | 'red' | 'amber' | 'gray' {
   if (totalCount === 0) return 'gray';
   const percentage = (enabledCount / totalCount) * 100;
-  if (percentage >= 100) return 'green';
+  if (percentage >= 100) return 'blue';
   if (percentage >= 50) return 'amber';
   return 'red';
 }

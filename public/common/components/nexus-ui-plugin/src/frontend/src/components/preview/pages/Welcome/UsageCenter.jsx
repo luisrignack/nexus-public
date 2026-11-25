@@ -74,7 +74,7 @@ const {OVER_LIMITS, APPROACHING_LIMITS, UNDER_LIMITS} = HEADER;
 const STATUS_CONFIG = {
   over:  {label: OVER_LIMITS.STATUS_INDICATOR,       color: 'var(--red-9)',    bg: 'var(--red-2)',    border: 'var(--red-6)'},
   near:  {label: APPROACHING_LIMITS.STATUS_INDICATOR, color: 'var(--yellow-9)', bg: 'var(--yellow-2)', border: 'var(--yellow-6)'},
-  below: {label: UNDER_LIMITS.STATUS_INDICATOR,       color: 'var(--green-9)',  bg: 'var(--green-2)',  border: 'var(--green-6)'},
+  below: {label: UNDER_LIMITS.STATUS_INDICATOR,       color: 'var(--blue-9)',  bg: 'var(--blue-2)',  border: 'var(--blue-6)'},
 };
 
 function computeCEStatus(usage) {
