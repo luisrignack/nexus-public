@@ -13,31 +13,39 @@ No hace falta instalar ClamAV ni Trivy/Grype en el host: todo corre en contenedo
 ## Requisitos
 
 - Docker 24+ con Compose v2 (o Podman + `podman-compose`).
-- ~4 GB de RAM libres (Nexus 2 GB + ClamAV).
-- Puertos `8081` (Nexus) y, opcionalmente, `8082` (bridge de escaneo en localhost).
-- Salida a internet para la primera compilación (Maven/npm) y para descargar firmas de ClamAV.
+- ~6 GB de RAM libres (Nexus 2 GB + PostgreSQL 1 GB + ClamAV).
+- Puertos `8081` (Nexus) y, opcionalmente, `8082` (bridge de escaneo en localhost). PostgreSQL no se
+  publica: solo escucha en la red interna `nexus-net`.
+- Salida a internet para la primera compilación (Maven/npm), descargar imágenes y firmas de ClamAV.
+- **Todas las imágenes se toman del mirror DaoCloud** (`docker.m.daocloud.io`), no de Docker Hub.
+  Si la PC de destino todavía no lo tiene configurado, copia `docker/daemon.json.example` a
+  `/etc/docker/daemon.json` y reinicia Docker (`sudo systemctl restart docker`). El tar de imágenes
+  generado con `scripts/save-images.sh` evita tener que descargar nada en la PC remota.
+- **Cambiar `POSTGRES_PASSWORD` en `.env`** antes del primer arranque.
 
 ## Opción A — llevar solo esta carpeta (imagen preconstruida)
 
 En la PC donde compilaste:
 
+En la PC donde compilaste (el script exporta **Nexus + bridge + ClamAV + PostgreSQL** en un tar):
+
 ```bash
 cd docker/nexus-antivirus
 cp .env.example .env
 docker compose build
-docker image save nexus-fork:3.98.1-01-local nexus-malware-bridge:local \
-  -o nexus-antivirus-images.tar
+./scripts/save-images.sh
 ```
 
-Copia a la otra PC **la carpeta `docker/nexus-antivirus` y el `.tar`**:
+Copia a la otra PC **la carpeta `docker/nexus-antivirus` y el `.tar`**. Allí:
 
 ```bash
-docker load -i nexus-antivirus-images.tar
 cd docker/nexus-antivirus
-cp .env.example .env        # si no la copiaste
-# Comenta el bloque `build:` de docker-compose.yml para usar solo las imágenes cargadas
-docker compose up -d
+./scripts/load-and-deploy.sh nexus-antivirus-images.tar
 ```
+
+El script carga las imágenes, crea `.env` si no existe, valida que hayas cambiado
+`POSTGRES_PASSWORD` y levanta el stack. También puedes hacerlo a mano con `docker load -i` y
+`docker compose up -d`.
 
 ## Opción B — llevar el repositorio y compilar allí
 
@@ -55,12 +63,14 @@ El `Dockerfile` hace la compilación completa (JDK 21, Node 24, `corepack yarn i
 ## Primera puesta en marcha
 
 ```bash
-docker compose ps                       # espera a que nexus esté healthy
+docker compose ps                       # postgres, clamav y bridge deben estar healthy
 curl -i http://localhost:8081/service/rest/v1/status
 docker compose exec nexus cat /nexus-data/admin.password
 ```
 
 - Usuario: `admin`; contraseña inicial: la del fichero anterior. Cámbiala al entrar.
+- Nexus arranca solo cuando PostgreSQL responde `pg_isready`, por lo que el esquema se crea desde cero
+  en el volumen `postgres-data` en el primer arranque.
 - La primera arrancada de ClamAV descarga las firmas: puede tardar varios minutos. El `healthcheck`
   tiene `start_period: 300s` y Nexus espera a que esté sano antes de arrancar.
 
@@ -94,20 +104,29 @@ curl --data-binary @fichero -H 'Content-Type: application/octet-stream' \
 
 ## Datos y copias de seguridad
 
-- `nexus-data`: base de datos H2, blobs y configuración (`etc/nexus.properties`).
-- `clamav-db`: firmas descargadas (evita volver a descargarlas).
-- `clamav-log`: logs de `clamd`/`freshclam`.
+| Volumen | Contenido |
+|---|---|
+| `nexus-data` | Blobs, configuración (`etc/nexus.properties`) y contraseña inicial de admin |
+| `postgres-data` | Base de datos PostgreSQL (todo el metadata de repositorios, usuarios y tareas) |
+| `clamav-db` | Firmas descargadas (evita volver a descargarlas) |
+| `clamav-log` | Logs de `clamd`/`freshclam` |
+
+Copia completa consistente:
 
 ```bash
-docker compose down
+docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-nexus}" "${POSTGRES_DB:-nexus}" \
+  > nexus-postgres.sql
 docker run --rm -v nexus-antivirus_nexus-data:/data -v "$PWD:/backup" \
   alpine tar czf /backup/nexus-data.tgz -C /data .
-docker compose up -d
 ```
+
+Restauración: `docker compose down`, restaurar `nexus-data.tgz`, `docker compose up -d postgres`,
+cargar `psql -f nexus-postgres.sql` y después levantar el resto con `docker compose up -d`.
 
 ## Configuración
 
-- `.env`: puertos, tamaños de JVM, tags de imagen y `MAX_SCAN_BYTES`.
+- `.env`: puertos, tamaños de JVM, tags de imagen, `MAX_SCAN_BYTES`, parámetros de PostgreSQL y
+  motor de escaneo (`SCAN_ENGINE`; ver `KASPERSKY.md`).
 - `entrypoint.sh` añade a `$KARAF_DATA/etc/nexus.properties` (sin sobrescribir lo existente):
   - `nexus.previewui.audit.enabled=true`
   - `nexus.webresources.cachebuster=${NEXUS_CACHEBUSTER}`

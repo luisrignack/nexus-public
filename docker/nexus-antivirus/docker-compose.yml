@@ -20,9 +20,17 @@ services:
       NEXUS_MALWARE_ON_UPLOAD: "${NEXUS_MALWARE_ON_UPLOAD:-true}"
       NEXUS_MALWARE_DELETE_INFECTED: "${NEXUS_MALWARE_DELETE_INFECTED:-false}"
       MAX_SCAN_BYTES: "${MAX_SCAN_BYTES:-209715200}"
+      # Datastore PostgreSQL (el source de entorno tiene prioridad sobre H2 embebido)
+      NEXUS_DATASTORE_NEXUS_JDBCURL: "jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nexus}"
+      NEXUS_DATASTORE_NEXUS_USERNAME: "${POSTGRES_USER:-nexus}"
+      NEXUS_DATASTORE_NEXUS_PASSWORD: "${POSTGRES_PASSWORD:-nexus}"
+      NEXUS_DATASTORE_NEXUS_SCHEMA: "${POSTGRES_SCHEMA:-public}"
+      NEXUS_DATASTORE_NEXUS_ADVANCED: "${NEXUS_DATASTORE_ADVANCED:-maximumPoolSize=20}"
     volumes:
       - nexus-data:/nexus-data
     depends_on:
+      postgres:
+        condition: service_healthy
       clamav:
         condition: service_healthy
       malware-bridge:
@@ -30,8 +38,28 @@ services:
     networks:
       - nexus-net
 
+  postgres:
+    image: ${POSTGRES_IMAGE:-docker.m.daocloud.io/library/postgres:15-alpine}
+    container_name: nexus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nexus}
+      POSTGRES_USER: ${POSTGRES_USER:-nexus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nexus}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nexus} -d ${POSTGRES_DB:-nexus}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - nexus-net
+
   clamav:
-    image: ${CLAMAV_IMAGE:-clamav/clamav:1.4.7-debian}
+    image: ${CLAMAV_IMAGE:-docker.m.daocloud.io/clamav/clamav:1.4.7-debian}
     container_name: nexus-clamav
     restart: unless-stopped
     environment:
@@ -82,6 +110,7 @@ services:
 
 volumes:
   nexus-data:
+  postgres-data:
   clamav-db:
   clamav-log:
 

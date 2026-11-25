@@ -1,6 +1,6 @@
 # Multi-stage build: compila el fork desde el código fuente y genera una imagen de ejecución
 # que contiene solo la assembly y un JRE.
-FROM maven:3.9.9-eclipse-temurin-21 AS build
+FROM docker.m.daocloud.io/library/maven:3.9.9-eclipse-temurin-21 AS build
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends curl ca-certificates gnupg \
@@ -19,7 +19,7 @@ RUN mvn -B -Denforcer.skip=true -Dnode.version=v24.21.0 -DskipTests install -Ppu
  && mvn -B -Denforcer.skip=true -Dnode.version=v24.21.0 -DskipTests \
       -pl public/selfhosted/assemblies/nexus-repository-core package -Ppublic
 
-FROM eclipse-temurin:21-jre-jammy
+FROM docker.m.daocloud.io/library/eclipse-temurin:21-jre-jammy
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends curl \
