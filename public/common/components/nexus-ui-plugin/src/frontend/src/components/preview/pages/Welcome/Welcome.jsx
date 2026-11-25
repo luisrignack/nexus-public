@@ -24,6 +24,7 @@ import { toURIParams } from '../../../../interface/urlUtil';
 import { getVersionMajorMinor } from '../../../../interface/versionUtil';
 import welcomeMachine from '../../../pages/user/Welcome/WelcomeMachine';
 import OutreachActions from './OutreachActions';
+import { MalwareAlertsPanel } from './MalwareAlertsPanel';
 import MalwareStatusCard from './MalwareStatusCard';
 import HealthCheckStatusCard from './HealthCheckStatusCard';
 import CELimitsAlerts from './CELimitsAlerts';
@@ -146,6 +147,7 @@ function WelcomeDashboard({
 
         <Tabs.Content value="overview">
           <Flex direction="column" gap="6" pt="4">
+            <MalwareAlertsPanel />
             <ErrorBoundary>
               <QuickActionStatsPanel
                 onConnectClick={() => outreachRef.current?.openConnectModal?.()}
