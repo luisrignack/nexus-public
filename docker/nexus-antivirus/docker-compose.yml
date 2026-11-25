@@ -17,6 +17,8 @@ services:
       NEXUS_CACHEBUSTER: ${NEXUS_CACHEBUSTER:-docker-1}
       MALWARE_BRIDGE_URL: ${MALWARE_BRIDGE_URL:-http://malware-bridge:8082/scan}
       NEXUS_MALWARE_ENABLED: "${NEXUS_MALWARE_ENABLED:-true}"
+      NEXUS_MALWARE_ON_UPLOAD: "${NEXUS_MALWARE_ON_UPLOAD:-true}"
+      NEXUS_MALWARE_DELETE_INFECTED: "${NEXUS_MALWARE_DELETE_INFECTED:-false}"
       MAX_SCAN_BYTES: "${MAX_SCAN_BYTES:-209715200}"
     volumes:
       - nexus-data:/nexus-data

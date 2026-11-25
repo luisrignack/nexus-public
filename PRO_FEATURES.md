@@ -86,8 +86,21 @@ Verificación E2E en el stack Docker: repositorio `raw` con el fichero EICAR de 
 `POST /scan` devolvió `INFECTED` / `Eicar-Signature` y `GET /counts` devolvió
 `{counts:{malware-test:{INFECTED:1}}, totalCount:1, infectedCount:1}`.
 
-Pendiente (Fase 2): escaneo automático en `AssetUploadedEvent`, cuarentena/bloqueo y tarea de
-re-escaneo tras actualizar firmas.
+### Fase 2 — escaneo automático
+
+- `MalwareAutoScanSubscriber` se suscribe al bus de eventos y reacciona a `AssetCreatedEvent` y
+  `AssetUploadedEvent` (no a `AssetAttributesEvent`, para evitar bucles). Se registra explícitamente
+  con `EventManager` porque el bundle se carga en su propio contexto.
+- `nexus.malware.onUpload` (por defecto `false` en el código, `true` en el stack Docker) activa el
+  escaneo automático; `nexus.malware.deleteInfected=true` elimina el asset si el veredicto es
+  `INFECTED` (cuarentena por borrado; por defecto desactivado).
+- `POST /service/rest/internal/ui/malware/rescan` re-escanea todos los assets con blob, pensado
+  para ejecutarse tras actualizar las firmas de ClamAV.
+
+Verificación E2E: subir el fichero EICAR a un repositorio `raw` generó
+`Automatic malware scan of auto-test9:/eicar.txt -> INFECTED` sin llamar a `/scan`, y `/counts`
+mostró el repositorio con un asset infectado. El re-escaneo manual devolvió
+`{scanned: N, infected: N}`.
 
 ## 7. Fuera de alcance (por esfuerzo/riesgo)
 

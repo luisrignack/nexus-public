@@ -129,8 +129,16 @@ curl -u admin:<password> \
 ```
 
 El veredicto se guarda en los atributos del asset (`nxMalwareVerdict`, `nxMalwareSignature`) y los
-recuentos ya no son un stub. Pendiente para la Fase 2: escaneo automático en `AssetUploadedEvent`,
-bloqueo/cuarentena de assets `INFECTED` y re-escaneo cuando se actualicen las firmas.
+recuentos ya no son un stub. El stack activa el escaneo automático al publicar con
+`NEXUS_MALWARE_ON_UPLOAD=true`. Para re-escanear tras una actualización de firmas:
+
+```bash
+curl -u admin:<password> -X POST \
+  http://localhost:8081/service/rest/internal/ui/malware/rescan
+```
+
+Si se define `NEXUS_MALWARE_DELETE_INFECTED=true`, los assets con veredicto `INFECTED` se eliminan
+automáticamente (cuarentena por borrado). Por defecto solo se marcan.
 
 ## Solución de problemas
 

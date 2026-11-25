@@ -26,6 +26,8 @@ ensure_property "nexus.health.check.encryption" "false"
 ensure_property "nexus.malware.bridgeUrl" "${MALWARE_BRIDGE_URL:-http://malware-bridge:8082/scan}"
 ensure_property "nexus.malware.enabled" "${NEXUS_MALWARE_ENABLED:-true}"
 ensure_property "nexus.malware.maxBytes" "${MAX_SCAN_BYTES:-209715200}"
+ensure_property "nexus.malware.onUpload" "${NEXUS_MALWARE_ON_UPLOAD:-true}"
+ensure_property "nexus.malware.deleteInfected" "${NEXUS_MALWARE_DELETE_INFECTED:-false}"
 
 # Permite pasar opciones JVM adicionales desde el entorno del contenedor.
 exec "${KARAF_HOME:-/opt/sonatype/nexus}/bin/nexus" run
