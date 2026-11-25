@@ -5999,18 +5999,18 @@ tr.x-grid-subtable-row {
 .x-btn-over.x-btn-nx-mode-medium {
     border-color: #575757;
     background-image: none;
-    background-color: #29b473;
+    background-color: #006BBF;
 }
 
 .x-keyboard-mode .x-btn-focus.x-btn-over.x-btn-nx-mode-medium {
     background-image: none;
-    background-color: #29b473;
-    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #3ebc81), color-stop(50%, #29b473), color-stop(51%, #27ab6d), color-stop(0%, #29b473));
-    background-image: -webkit-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: -moz-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: -o-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: -ms-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
+    background-color: #006BBF;
+    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #3ebc81), color-stop(50%, #006BBF), color-stop(51%, #27ab6d), color-stop(0%, #006BBF));
+    background-image: -webkit-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: -moz-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: -o-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: -ms-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
     -webkit-box-shadow: #575757 0 1px 0px 0 inset, #575757 0 -1px 0px 0 inset, #575757 -1px 0 0px 0 inset, #575757 1px 0 0px 0 inset;
     -moz-box-shadow: #575757 0 1px 0px 0 inset, #575757 0 -1px 0px 0 inset, #575757 -1px 0 0px 0 inset, #575757 1px 0 0px 0 inset;
     box-shadow: #575757 0 1px 0px 0 inset, #575757 0 -1px 0px 0 inset, #575757 -1px 0 0px 0 inset, #575757 1px 0 0px 0 inset;
@@ -6020,19 +6020,19 @@ tr.x-grid-subtable-row {
 .x-btn.x-btn-pressed.x-btn-nx-mode-medium {
     border-color: #575757;
     background-image: none;
-    background-color: #29b473;
+    background-color: #006BBF;
 }
 
 .x-keyboard-mode .x-btn-focus.x-btn-menu-active.x-btn-nx-mode-medium,
 .x-keyboard-mode .x-btn-focus.x-btn-pressed.x-btn-nx-mode-medium {
     background-image: none;
-    background-color: #29b473;
-    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #29b473), color-stop(50%, #27ab6d), color-stop(51%, #29b473), color-stop(0%, #3ebc81));
-    background-image: -webkit-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: -moz-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: -o-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: -ms-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
+    background-color: #006BBF;
+    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #006BBF), color-stop(50%, #27ab6d), color-stop(51%, #006BBF), color-stop(0%, #3ebc81));
+    background-image: -webkit-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: -moz-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: -o-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: -ms-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
     -webkit-box-shadow: #545454 0 1px 0px 0 inset, #545454 0 -1px 0px 0 inset, #545454 -1px 0 0px 0 inset, #545454 1px 0 0px 0 inset;
     -moz-box-shadow: #545454 0 1px 0px 0 inset, #545454 0 -1px 0px 0 inset, #545454 -1px 0 0px 0 inset, #545454 1px 0 0px 0 inset;
     box-shadow: #545454 0 1px 0px 0 inset, #545454 0 -1px 0px 0 inset, #545454 -1px 0 0px 0 inset, #545454 1px 0 0px 0 inset;
@@ -6077,7 +6077,7 @@ tr.x-grid-subtable-row {
 }
 
 .x-btn-over .x-btn-nx-mode-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-mode-medium-over-fbg.gif);
 }
 
@@ -6096,7 +6096,7 @@ tr.x-grid-subtable-row {
 }
 
 .x-keyboard-mode .x-btn-focus.x-btn-over .x-btn-nx-mode-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-mode-medium-focus-over-fbg.gif);
 }
 
@@ -6124,7 +6124,7 @@ tr.x-grid-subtable-row {
 
 .x-btn.x-btn-menu-active .x-btn-nx-mode-medium-mc,
 .x-btn.x-btn-pressed .x-btn-nx-mode-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-mode-medium-pressed-fbg.gif);
 }
 
@@ -6152,7 +6152,7 @@ tr.x-grid-subtable-row {
 
 .x-keyboard-mode .x-btn-focus.x-btn-menu-active .x-btn-nx-mode-medium-mc,
 .x-keyboard-mode .x-btn-focus.x-btn-pressed .x-btn-nx-mode-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-mode-medium-focus-pressed-fbg.gif);
 }
 
@@ -6403,11 +6403,11 @@ tr.x-grid-subtable-row {
 }
 
 .nx-header-panel .nx-health-button-green span span {
-    color: #29b473;
+    color: #006BBF;
 }
 
 .nx-header-panel .nx-health-button-green span span {
-    color: #29b473;
+    color: #006BBF;
 }
 
 .x-btn-nx-header-medium {
@@ -6664,18 +6664,18 @@ tr.x-grid-subtable-row {
 .x-btn-over.x-btn-nx-header-medium {
     border-color: #575757;
     background-image: none;
-    background-color: #29b473;
+    background-color: #006BBF;
 }
 
 .x-keyboard-mode .x-btn-focus.x-btn-over.x-btn-nx-header-medium {
     background-image: none;
-    background-color: #29b473;
-    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #3ebc81), color-stop(50%, #29b473), color-stop(51%, #27ab6d), color-stop(0%, #29b473));
-    background-image: -webkit-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: -moz-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: -o-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: -ms-linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
-    background-image: linear-gradient(top, #3ebc81, #29b473 50%, #27ab6d 51%, #29b473);
+    background-color: #006BBF;
+    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #3ebc81), color-stop(50%, #006BBF), color-stop(51%, #27ab6d), color-stop(0%, #006BBF));
+    background-image: -webkit-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: -moz-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: -o-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: -ms-linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
+    background-image: linear-gradient(top, #3ebc81, #006BBF 50%, #27ab6d 51%, #006BBF);
     -webkit-box-shadow: #575757 0 1px 0px 0 inset, #575757 0 -1px 0px 0 inset, #575757 -1px 0 0px 0 inset, #575757 1px 0 0px 0 inset;
     -moz-box-shadow: #575757 0 1px 0px 0 inset, #575757 0 -1px 0px 0 inset, #575757 -1px 0 0px 0 inset, #575757 1px 0 0px 0 inset;
     box-shadow: #575757 0 1px 0px 0 inset, #575757 0 -1px 0px 0 inset, #575757 -1px 0 0px 0 inset, #575757 1px 0 0px 0 inset;
@@ -6685,19 +6685,19 @@ tr.x-grid-subtable-row {
 .x-btn.x-btn-pressed.x-btn-nx-header-medium {
     border-color: #575757;
     background-image: none;
-    background-color: #29b473;
+    background-color: #006BBF;
 }
 
 .x-keyboard-mode .x-btn-focus.x-btn-menu-active.x-btn-nx-header-medium,
 .x-keyboard-mode .x-btn-focus.x-btn-pressed.x-btn-nx-header-medium {
     background-image: none;
-    background-color: #29b473;
-    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #29b473), color-stop(50%, #27ab6d), color-stop(51%, #29b473), color-stop(0%, #3ebc81));
-    background-image: -webkit-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: -moz-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: -o-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: -ms-linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
-    background-image: linear-gradient(top, #29b473, #27ab6d 50%, #29b473 51%, #3ebc81);
+    background-color: #006BBF;
+    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #006BBF), color-stop(50%, #27ab6d), color-stop(51%, #006BBF), color-stop(0%, #3ebc81));
+    background-image: -webkit-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: -moz-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: -o-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: -ms-linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
+    background-image: linear-gradient(top, #006BBF, #27ab6d 50%, #006BBF 51%, #3ebc81);
     -webkit-box-shadow: #545454 0 1px 0px 0 inset, #545454 0 -1px 0px 0 inset, #545454 -1px 0 0px 0 inset, #545454 1px 0 0px 0 inset;
     -moz-box-shadow: #545454 0 1px 0px 0 inset, #545454 0 -1px 0px 0 inset, #545454 -1px 0 0px 0 inset, #545454 1px 0 0px 0 inset;
     box-shadow: #545454 0 1px 0px 0 inset, #545454 0 -1px 0px 0 inset, #545454 -1px 0 0px 0 inset, #545454 1px 0 0px 0 inset;
@@ -6742,7 +6742,7 @@ tr.x-grid-subtable-row {
 }
 
 .x-btn-over .x-btn-nx-header-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-header-medium-over-fbg.gif);
 }
 
@@ -6761,7 +6761,7 @@ tr.x-grid-subtable-row {
 }
 
 .x-keyboard-mode .x-btn-focus.x-btn-over .x-btn-nx-header-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-header-medium-focus-over-fbg.gif);
 }
 
@@ -6789,7 +6789,7 @@ tr.x-grid-subtable-row {
 
 .x-btn.x-btn-menu-active .x-btn-nx-header-medium-mc,
 .x-btn.x-btn-pressed .x-btn-nx-header-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-header-medium-pressed-fbg.gif);
 }
 
@@ -6817,7 +6817,7 @@ tr.x-grid-subtable-row {
 
 .x-keyboard-mode .x-btn-focus.x-btn-menu-active .x-btn-nx-header-medium-mc,
 .x-keyboard-mode .x-btn-focus.x-btn-pressed .x-btn-nx-header-medium-mc {
-    background-color: #29b473;
+    background-color: #006BBF;
     background-image: url(images/btn/btn-nx-header-medium-focus-pressed-fbg.gif);
 }
 
@@ -7408,7 +7408,7 @@ tr.x-grid-subtable-row {
 
 .x-panel-nx-feature-menu .x-panel-body-nx-feature-menu .x-grid-item-selected .x-grid-cell {
     color: #fff;
-    background-color: #29b473;
+    background-color: #006BBF;
 }
 
 .x-panel-nx-feature-menu .x-panel-body-nx-feature-menu .x-grid-item-selected .x-grid-cell:hover {
@@ -8901,7 +8901,7 @@ tr.x-grid-subtable-row {
 }
 
 .x-panel-nx-developer .nx-color.citrus {
-    background-color: #84c900;
+    background-color: #2476C3;
 }
 
 .x-panel-nx-developer .nx-color.free-speech-red {
@@ -8917,7 +8917,7 @@ tr.x-grid-subtable-row {
 }
 
 .x-panel-nx-developer .nx-color.pigment-green {
-    background-color: #0b9743;
+    background-color: #0047B2;
 }
 
 .x-panel-nx-developer .nx-color.madang {
@@ -9053,7 +9053,7 @@ tr.x-grid-subtable-row {
 }
 
 .x-panel-nx-developer .nx-color.dark-pigment-green {
-    background-color: #0b893d;
+    background-color: #003B7A;
 }
 
 .x-panel-nx-developer .nx-color.salem {

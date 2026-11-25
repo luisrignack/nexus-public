@@ -7723,12 +7723,12 @@
     border-style: solid;
     background-image: none;
     background-color: #23a156;
-    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #23a156), color-stop(0%, #0b893d));
-    background-image: -webkit-linear-gradient(top, #23a156, #0b893d);
-    background-image: -moz-linear-gradient(top, #23a156, #0b893d);
-    background-image: -o-linear-gradient(top, #23a156, #0b893d);
-    background-image: -ms-linear-gradient(top, #23a156, #0b893d);
-    background-image: linear-gradient(top, #23a156, #0b893d);
+    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #23a156), color-stop(0%, #003B7A));
+    background-image: -webkit-linear-gradient(top, #23a156, #003B7A);
+    background-image: -moz-linear-gradient(top, #23a156, #003B7A);
+    background-image: -o-linear-gradient(top, #23a156, #003B7A);
+    background-image: -ms-linear-gradient(top, #23a156, #003B7A);
+    background-image: linear-gradient(top, #23a156, #003B7A);
 }
 
 .x-btn-nx-success-small-mc {
@@ -7962,12 +7962,12 @@
     border-color: #070707;
     background-image: none;
     background-color: #23a156;
-    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #23a156), color-stop(0%, #0b893d));
-    background-image: -webkit-linear-gradient(top, #23a156, #0b893d);
-    background-image: -moz-linear-gradient(top, #23a156, #0b893d);
-    background-image: -o-linear-gradient(top, #23a156, #0b893d);
-    background-image: -ms-linear-gradient(top, #23a156, #0b893d);
-    background-image: linear-gradient(top, #23a156, #0b893d);
+    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #23a156), color-stop(0%, #003B7A));
+    background-image: -webkit-linear-gradient(top, #23a156, #003B7A);
+    background-image: -moz-linear-gradient(top, #23a156, #003B7A);
+    background-image: -o-linear-gradient(top, #23a156, #003B7A);
+    background-image: -ms-linear-gradient(top, #23a156, #003B7A);
+    background-image: linear-gradient(top, #23a156, #003B7A);
     -webkit-box-shadow: #191919 0 1px 0px 0 inset, #191919 0 -1px 0px 0 inset, #191919 -1px 0 0px 0 inset, #191919 1px 0 0px 0 inset;
     -moz-box-shadow: #191919 0 1px 0px 0 inset, #191919 0 -1px 0px 0 inset, #191919 -1px 0 0px 0 inset, #191919 1px 0 0px 0 inset;
     box-shadow: #191919 0 1px 0px 0 inset, #191919 0 -1px 0px 0 inset, #191919 -1px 0 0px 0 inset, #191919 1px 0 0px 0 inset;
@@ -8052,12 +8052,12 @@
 .x-btn.x-btn-disabled.x-btn-nx-success-small {
     background-image: none;
     background-color: #23a156;
-    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #23a156), color-stop(0%, #0b893d));
-    background-image: -webkit-linear-gradient(top, #23a156, #0b893d);
-    background-image: -moz-linear-gradient(top, #23a156, #0b893d);
-    background-image: -o-linear-gradient(top, #23a156, #0b893d);
-    background-image: -ms-linear-gradient(top, #23a156, #0b893d);
-    background-image: linear-gradient(top, #23a156, #0b893d);
+    background-image: -webkit-gradient(linear, top, bottom, color-stop(0%, #23a156), color-stop(0%, #003B7A));
+    background-image: -webkit-linear-gradient(top, #23a156, #003B7A);
+    background-image: -moz-linear-gradient(top, #23a156, #003B7A);
+    background-image: -o-linear-gradient(top, #23a156, #003B7A);
+    background-image: -ms-linear-gradient(top, #23a156, #003B7A);
+    background-image: linear-gradient(top, #23a156, #003B7A);
 }
 
 .x-keyboard-mode .x-btn-focus .x-btn-nx-success-small-tl,
@@ -11865,11 +11865,11 @@
 
 .x-toast.success {
     background-color: #f5f5f5;
-    border: thin solid #84c900;
+    border: thin solid #2476C3;
 }
 
 .x-toast.success .icon {
-    background-color: #84c900;
+    background-color: #2476C3;
 }
 
 .x-toast.success .text {
@@ -11877,7 +11877,7 @@
 }
 
 .x-toast.success .dismiss a {
-    color: #84c900;
+    color: #2476C3;
 }
 
 .x-toast.info {
