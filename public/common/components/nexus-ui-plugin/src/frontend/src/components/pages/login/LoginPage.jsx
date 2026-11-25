@@ -26,10 +26,12 @@ import "./LoginPage.scss";
 import '@radix-ui/themes/styles.css';
 
 function getMarkOnlyLogoUrl() {
+  // Cache-bust the recolored mark so browsers do not reuse the old green SVG.
+  const logo = 'static/rapture/resources/favicon.svg?_c=fork-blue-8';
   try {
-    return ExtJS.urlOf('static/rapture/resources/favicon.svg');
+    return ExtJS.urlOf(logo);
   } catch {
-    return '/static/rapture/resources/favicon.svg';
+    return '/' + logo;
   }
 }
 
