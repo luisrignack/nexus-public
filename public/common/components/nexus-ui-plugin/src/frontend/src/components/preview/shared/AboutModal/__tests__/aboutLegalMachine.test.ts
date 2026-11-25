@@ -35,7 +35,7 @@ const COPYRIGHT_DOCUMENT = `<!DOCTYPE html>
 </head>
 <body>
   <p>
-    All use of and access to Sonatype Nexus Repository Professional is governed by these
+    All use of and access to Gestor de repositorios empresarial Professional is governed by these
     <a href="http://links.sonatype.com/products/nxrm/tos/pro" target="_blank" rel="noopener">terms and conditions</a>.
   </p>
 <p>

@@ -20,7 +20,7 @@ export default {
   API: {
     MENU: {
       text: 'API',
-      description: 'Learn how to interact with Sonatype Nexus Repository programmatically',
+      description: 'Learn how to interact with Gestor de repositorios empresarial programmatically',
       icon: faPlug
     },
   }

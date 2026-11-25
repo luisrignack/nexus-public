@@ -14,7 +14,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Repository - Sonatype Nexus Repository</title>
+  <title>Repository - Gestor de repositorios empresarial</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
 #* START favicon links and meta
@@ -43,7 +43,7 @@
     </div>
     <div class="product-id">
       <div class="product-id__line-1">
-        <span class="product-name">Sonatype Nexus Repository</span>
+        <span class="product-name">Gestor de repositorios empresarial</span>
       </div>
       <div class="product-id__line-2">
         <span class="product-spec">$nexusBrandedEditionAndVersion</span>

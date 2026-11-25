@@ -42,7 +42,7 @@ export default function LeftNavigationMenu() {
       onToggleClick={onToggleClick}
       toggleOpenIcon={faArrowLeft}
       toggleCloseIcon={faArrowRight}
-      logoAltText="Sonatype Nexus Repository"
+      logoAltText="Gestor de repositorios empresarial"
       logoLink="#"
     >
       <LeftNavigationMenuItem

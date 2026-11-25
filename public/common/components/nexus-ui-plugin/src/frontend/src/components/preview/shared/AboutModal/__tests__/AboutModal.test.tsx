@@ -30,7 +30,7 @@ const COPYRIGHT_DOCUMENT = `<!DOCTYPE html>
 <head><title>Copyright</title><style>body { font-size: 14px; }</style></head>
 <body>
   <p>
-    All use of and access to Sonatype Nexus Repository Professional is governed by these
+    All use of and access to Gestor de repositorios empresarial Professional is governed by these
     <a href="http://links.sonatype.com/products/nxrm/tos/pro" target="_blank" rel="noopener">${LEGAL_MARKER}</a>.
   </p>
 <p>Copyright &copy; 2008-Present, Sonatype, Inc. All rights reserved.</p>
@@ -69,7 +69,7 @@ describe('AboutModal', () => {
 
   it('renders the modal title when open', async () => {
     renderWithTheme(<AboutModal {...SELF_HOSTED_PROPS} />);
-    expect(screen.getByText('About Sonatype Nexus Repository')).toBeInTheDocument();
+    expect(screen.getByText('About Gestor de repositorios empresarial')).toBeInTheDocument();
     await screen.findByTestId('about-modal-legal');
   });
 

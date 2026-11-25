@@ -18,7 +18,7 @@ export default {
       DESCRIPTION: 'Please complete the onboarding steps to configure your instance.',
     },
     WELCOME: {
-      LOGO_ALT: 'Sonatype Nexus Repository',
+      LOGO_ALT: 'Gestor de repositorios empresarial',
       TITLE: `Let's Get You Set Up`,
       DESCRIPTION:
         'This wizard will guide you through a few quick steps to get your Nexus Repository ready for use.',

@@ -14,7 +14,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>$esc.html($errorCode) - Sonatype Nexus Repository</title>
+  <title>$esc.html($errorCode) - Gestor de repositorios empresarial</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
 #* START favicon links and meta

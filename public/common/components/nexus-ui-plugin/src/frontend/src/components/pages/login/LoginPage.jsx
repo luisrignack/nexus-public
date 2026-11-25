@@ -26,8 +26,8 @@ import "./LoginPage.scss";
 import '@radix-ui/themes/styles.css';
 
 function getMarkOnlyLogoUrl() {
-  // Cache-bust the recolored mark so browsers do not reuse the old green SVG.
-  const logo = 'static/rapture/resources/favicon.svg?_c=fork-blue-8';
+  // Cache-bust the ETECSA mark so browsers do not reuse the old logo.
+  const logo = 'static/rapture/resources/favicon.svg?_c=etecsa-1';
   try {
     return ExtJS.urlOf(logo);
   } catch {

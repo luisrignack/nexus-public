@@ -21,9 +21,9 @@ import './Welcome.scss';
 
 function getWelcomeLogoUrl(): string {
   try {
-    return ExtJS.urlOf('static/rapture/resources/favicon.svg');
+    return ExtJS.urlOf('static/rapture/resources/favicon.svg?_c=etecsa-1');
   } catch {
-    return '/static/rapture/resources/favicon.svg';
+    return '/static/rapture/resources/favicon.svg?_c=etecsa-1';
   }
 }
 

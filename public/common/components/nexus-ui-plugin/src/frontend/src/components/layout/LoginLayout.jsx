@@ -58,12 +58,12 @@ export default function LoginLayout({ children }) {
               href={homeHref}
               className="nxrm-login-header__link"
               title="Home"
-              aria-label="Sonatype Nexus Repository home"
+              aria-label="Gestor de repositorios empresarial home"
               onClick={handleLogoClick}
             >
               <img
                 src={getLogo()}
-                alt="Sonatype Nexus Repository"
+                alt="Gestor de repositorios empresarial"
                 className="nxrm-login-header__logo"
                 width={220}
                 height={32}

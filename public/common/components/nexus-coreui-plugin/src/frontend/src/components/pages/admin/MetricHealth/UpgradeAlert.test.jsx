@@ -84,7 +84,7 @@ describe('Upgrade Alert', () => {
     const {container} = await renderView('nexusNeedsUpgrade1Year');
 
     const alert = container.querySelector('.nx-alert');
-    const alertMessage = PENDING.OLDER_LABEL + ' You are currently running a Sonatype Nexus Repository version that is ' +
+    const alertMessage = PENDING.OLDER_LABEL + ' You are currently running a Gestor de repositorios empresarial version that is ' +
       'in extended maintenance. See our Sunsetting information for details about our product development lifecycle. ' +
       'Also see our release notes to learn more about the newest Nexus Repository version available for your instance.';
 
@@ -96,7 +96,7 @@ describe('Upgrade Alert', () => {
     const {container} = await renderView('nexusNeeds18MonthsUpgrade');
 
     const alert = container.querySelector('.nx-alert');
-    const alertMessage = PENDING.OLDER_LABEL + ' You are currently running a sunsetted Sonatype Nexus Repository version. ' +
+    const alertMessage = PENDING.OLDER_LABEL + ' You are currently running a sunsetted Gestor de repositorios empresarial version. ' +
       'See our Sunsetting information for details about our product development lifecycle. Also see our release notes to ' +
       'learn more about the newest Nexus Repository version available for your instance.';
 

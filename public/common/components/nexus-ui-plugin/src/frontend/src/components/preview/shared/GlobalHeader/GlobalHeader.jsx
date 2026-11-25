@@ -461,7 +461,7 @@ export default function GlobalHeader({routes = {}, accountMenuLabel}) {
                   <a href={`${contextPath}#${isPreviewUI ? 'preview/browse/welcome' : 'browse/welcome'}`} title="Home" aria-label="Home">
                     <img
                       src={getLogo()}
-                      alt="Sonatype Nexus Repository"
+                      alt="Gestor de repositorios empresarial"
                       className="nxrm-global-header-radix__logo"
                     />
                   </a>

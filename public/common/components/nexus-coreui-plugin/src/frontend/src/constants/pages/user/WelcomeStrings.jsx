@@ -113,7 +113,7 @@ export default {
           METRIC_NAME: 'component_total_count',
           METRIC_NAME_PRO_POSTGRESQL: 'component_total_count',
           AGGREGATE_PERIOD_30_D: 'peak_recorded_count_30d',
-          TOOLTIP_PRO: 'Sonatype Nexus Repository Pro using an embedded database performs best when your total component counts remain under the threshold. If you are exceeding the threshold, we strongly recommend migrating to a PostgreSQL database.',
+          TOOLTIP_PRO: 'Gestor de repositorios empresarial Pro using an embedded database performs best when your total component counts remain under the threshold. If you are exceeding the threshold, we strongly recommend migrating to a PostgreSQL database.',
           TOOLTIP_CE: (limit) => `Community Edition tracks the total components stored in this instance. If usage exceeds the ${limit.toLocaleString()} component limit, the date will be displayed, and write restrictions will apply until usage is reduced.`
         },
         REQUESTS_PER_MINUTE: {
@@ -126,7 +126,7 @@ export default {
           METRIC_NAME_PRO_POSTGRESQL: 'requests_per_minute',
           AGGREGATE_PERIOD_24_H: 'last_24h',
           AGGREGATE_PERIOD_30_D: 'last_30d',
-          TOOLTIP_PRO: 'Measures requests per minute to repository endpoints for all repositories in your Sonatype Nexus Repository Pro instance.'
+          TOOLTIP_PRO: 'Measures requests per minute to repository endpoints for all repositories in your Gestor de repositorios empresarial Pro instance.'
         },
         REQUESTS_PER_DAY: {
           TITLE: 'Requests Per Day',
@@ -137,7 +137,7 @@ export default {
           METRIC_NAME: 'peak_requests_per_day',
           METRIC_NAME_PRO_POSTGRESQL: 'peak_requests_per_day_30d',
           AGGREGATE_PERIOD_30_D: 'peak_recorded_count_30d',
-          TOOLTIP_PRO: 'Sonatype Nexus Repository Pro using an embedded database performs best when your requests per day remain under the threshold. If you are exceeding the threshold, we strongly recommend migrating to a PostgreSQL database.',
+          TOOLTIP_PRO: 'Gestor de repositorios empresarial Pro using an embedded database performs best when your requests per day remain under the threshold. If you are exceeding the threshold, we strongly recommend migrating to a PostgreSQL database.',
           TOOLTIP_CE: (limit) => `Community Edition tracks the total daily requests to this instance. If usage exceeds the ${limit.toLocaleString()} request limit, the date will be displayed, and write restrictions will apply until usage is reduced.`
         },
         MONTHLY_REQUESTS: {

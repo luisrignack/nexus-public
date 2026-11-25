@@ -34,6 +34,7 @@ desde especificaciones públicas, sin copiar código propietario de Sonatype:
 - **Tema azul** en la UI clásica y en la vista moderna (Nexus One), incluidos logos e iconos
   de la Welcome. Detalles y procedimiento de reconstrucción en [UI_THEME.md](UI_THEME.md).
 - **Auditoría, stubs de UI, Data Store y Webhooks**: ver [PRO_FEATURES.md](PRO_FEATURES.md).
+- **Identidad visual ETECSA** (logos, isotipos y textos): ver [BRANDING.md](BRANDING.md).
 
 ### Notas de construcción del fork
 

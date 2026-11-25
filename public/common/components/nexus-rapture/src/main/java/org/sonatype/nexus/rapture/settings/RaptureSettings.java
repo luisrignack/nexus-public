@@ -22,7 +22,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 public class RaptureSettings
 {
-  public static final String DEFAULT_TITLE = "Sonatype Nexus Repository";
+  public static final String DEFAULT_TITLE = "Gestor de repositorios empresarial";
 
   public static final boolean DEFAULT_DEBUG_ALLOWED = true;
 

@@ -41,7 +41,7 @@ const testData = {
     required: true,
     disabled: false,
     readOnly: false,
-    initialValue: 'Sonatype Nexus Repository',
+    initialValue: 'Gestor de repositorios empresarial',
     attributes: { long: true },
   },
 
@@ -329,7 +329,7 @@ const createMockContext = (data, fieldValidationErrors = {}, fieldDefinitions = 
 export default function TestForm() {
   const [formData, setFormData] = useState({
     httpHeader: '',
-    title: 'Sonatype Nexus Repository',
+    title: 'Gestor de repositorios empresarial',
     outreachContentUrl: 'https://links.sonatype.com/products/nexus/outreach',
     baseUrl: '',
     lastDownloadedInterval: '12',
@@ -421,7 +421,7 @@ export default function TestForm() {
     // Reset form to initial state
     setFormData({
       httpHeader: '',
-      title: 'Sonatype Nexus Repository',
+      title: 'Gestor de repositorios empresarial',
       outreachContentUrl: 'https://links.sonatype.com/products/nexus/outreach',
       baseUrl: '',
       lastDownloadedInterval: '12',

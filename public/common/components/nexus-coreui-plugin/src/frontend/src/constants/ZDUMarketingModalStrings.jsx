@@ -20,7 +20,7 @@ export default {
     },
     ABOUT: {
       TITLE: 'Upgrade Without Downtime',
-      DESCRIPTION: 'Upgrade all of your Sonatype Nexus Repository Pro instances in your highly available multi-node ' +
+      DESCRIPTION: 'Upgrade all of your Gestor de repositorios empresarial Pro instances in your highly available multi-node ' +
         'cluster without interrupting service availability'
     },
     BENEFITS: {

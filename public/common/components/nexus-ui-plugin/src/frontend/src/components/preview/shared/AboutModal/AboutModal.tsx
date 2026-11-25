@@ -19,7 +19,7 @@ import { useAboutModal } from './useAboutModal';
 import './AboutModal.scss';
 
 export const ABOUT_MODAL_STRINGS = {
-  TITLE: 'About Sonatype Nexus Repository',
+  TITLE: 'About Gestor de repositorios empresarial',
   LEGAL_TITLE: 'Legal Terms and Copyright',
   CLOSE: 'Close',
   RETRY: 'Retry',

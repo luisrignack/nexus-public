@@ -148,33 +148,33 @@ export function getEditionShortDisplayName(editionId: string | undefined | null)
 
 // Logo assets — consolidated here so both self-hosted and cloud reference one copy
 // Pro+ and Enterprise use the Pro logo as a stopgap until design provides new assets
-import headerWordmarkLogo from '../art/logos/logo-header-wordmark.svg';
-import headerWordmarkDarkLogo from '../art/logos/logo-header-wordmark-dark.svg';
-import headerMarkLogo from '../art/logos/logo-header-mark.svg';
-import headerMarkDarkLogo from '../art/logos/logo-header-mark-dark.svg';
-import coreLogo from '../art/logos/logo-core-edition-header.svg';
-import coreDarkLogo from '../art/logos/logo-core-edition-header-dark.svg';
-import ceLogo from '../art/logos/logo-community-edition-header.svg';
-import ceDarkLogo from '../art/logos/logo-community-edition-header-dark.svg';
-import proLogo from '../art/logos/logo-pro-edition-header.svg';
-import proDarkLogo from '../art/logos/logo-pro-edition-header-dark.svg';
-import proPlusLogo from '../art/logos/logo-pro-plus-edition-header.svg';
-import proPlusDarkLogo from '../art/logos/logo-pro-plus-edition-header-dark.svg';
-import enterpriseLogo from '../art/logos/logo-enterprise-edition-header.svg';
-import enterpriseDarkLogo from '../art/logos/logo-enterprise-edition-header-dark.svg';
+import headerWordmarkLogo from '../art/logos/logo-etecsa-wordmark.png';
+import headerWordmarkDarkLogo from '../art/logos/logo-etecsa-wordmark-dark.png';
+import headerMarkLogo from '../art/logos/logo-etecsa-isotipo.png';
+import headerMarkDarkLogo from '../art/logos/logo-etecsa-isotipo-dark.png';
+import coreLogo from '../art/logos/logo-etecsa-wordmark.png';
+import coreDarkLogo from '../art/logos/logo-etecsa-wordmark-dark.png';
+import ceLogo from '../art/logos/logo-etecsa-wordmark.png';
+import ceDarkLogo from '../art/logos/logo-etecsa-wordmark-dark.png';
+import proLogo from '../art/logos/logo-etecsa-wordmark.png';
+import proDarkLogo from '../art/logos/logo-etecsa-wordmark-dark.png';
+import proPlusLogo from '../art/logos/logo-etecsa-wordmark.png';
+import proPlusDarkLogo from '../art/logos/logo-etecsa-wordmark-dark.png';
+import enterpriseLogo from '../art/logos/logo-etecsa-wordmark.png';
+import enterpriseDarkLogo from '../art/logos/logo-etecsa-wordmark-dark.png';
 
 /**
  * Logos are served as static assets with long-lived caching. Bump this token when
  * the SVG artwork changes so browsers fetch the new file instead of a cached copy.
  */
-const LOGO_CACHEBUSTER = '?_c=fork-blue-6';
+const LOGO_CACHEBUSTER = '?_c=etecsa-1';
 
 function withLogoCacheBuster(url: string): string {
   return `${url}${LOGO_CACHEBUSTER}`;
 }
 
 /**
- * Returns the common "sonatype nexus repository" wordmark for use in the global
+ * Returns the common ETECSA wordmark for use in the global
  * header. The wordmark contains no edition text — the edition is shown separately
  * as a badge next to the logo.
  */
@@ -183,9 +183,8 @@ export function getHeaderWordmarkLogo(isDark: boolean): string {
 }
 
 /**
- * Returns the mark-only Sonatype logo (hexagon, no wordmark text) for the global
- * header at the smallest widths, where the full wordmark does not fit. The hexagon
- * is copied from the wordmark asset so the mark matches it.
+ * Returns the mark-only ETECSA logo (isotipo, no wordmark text) for the global
+ * header at the smallest widths, where the full wordmark does not fit.
  */
 export function getHeaderMarkLogo(isDark: boolean): string {
   return withLogoCacheBuster(isDark ? headerMarkDarkLogo : headerMarkLogo);

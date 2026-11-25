@@ -15,9 +15,9 @@
 <!DOCTYPE html>
 <html lang="en" class="nx-html">
 <head>
-  <title>Sonatype Nexus Repository</title>
+  <title>Gestor de repositorios empresarial</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta name="description" content="Sonatype Nexus Repository"/>
+  <meta name="description" content="Gestor de repositorios empresarial"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
 #* START favicon links and meta
@@ -132,7 +132,7 @@
   <div id="loading-background">
     <div id="loading-content">
       <img id="loading-logo" src="$raptureUrl/resources/images/sonatype-repository-logo-loading.svg?$urlSuffix"
-        alt="Sonatype Nexus Repository Manager Logo"/>
+        alt="Gestor de repositorios empresarial Manager Logo"/>
       <div class="loading-indicator">
         <i class="fas fa-circle-notch fa-spin"></i>
         <span id="loading-msg">Loading ...</span>

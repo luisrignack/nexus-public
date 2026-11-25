@@ -142,8 +142,8 @@ describe('getEditionLogo', () => {
     expect(getEditionLogo('nexus-unknown-edition', false)).toBe(getEditionLogo(EDITION_CORE, false));
   });
 
-  it('returns the mock asset path (confirming SVGs resolve in test environment)', () => {
-    expect(getEditionLogo(EDITION_PRO, false)).toBe(MOCK_ASSET);
+  it('returns the mock asset path with cache buster (confirming logos resolve in test environment)', () => {
+    expect(getEditionLogo(EDITION_PRO, false)).toBe(`${MOCK_ASSET}?_c=etecsa-1`);
   });
 });
 

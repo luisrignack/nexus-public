@@ -400,7 +400,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
         '<div class="panel nx-subsection"><h3 class="title"><span class="icon"></span>What is a repository?</h3>' +
         '<p>A repository is a storage location where components, such as packages, libraries, binaries, and containers, ' +
         'are retrieved so they can be installed or used. Creating and managing repositories is an essential part of ' +
-        'your Nexus Repository Manager configuration since it allows you to expose content to your end users as well ' +
+        'your Gestor de repositorios empresarial configuration since it allows you to expose content to your end users as well ' +
         'as provide a location for them to store more content. For more information, check ' +
         '<a href="http://links.sonatype.com/products/nxrm3/docs/repository" target="_blank" rel="noopener noreferrer">the documentation</a>.</p></div>',
     Repository_RepositoryFeature_Delete_Button: 'Delete repository',
@@ -441,7 +441,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_DockerProxyFacet_IndexTypeCustom_BoxLabel: 'Custom index',
     Repository_Facet_DockerProxyFacet_IndexUrl_HelpText: 'Location of Docker index',
     Repository_Facet_DockerProxyFacet_ForeignLayers_FieldLabel: 'Foreign Layer Caching',
-    Repository_Facet_DockerProxyFacet_ForeignLayers_HelpText: 'Allow Nexus Repository Manager to download and cache foreign layers',
+    Repository_Facet_DockerProxyFacet_ForeignLayers_HelpText: 'Allow Gestor de repositorios empresarial to download and cache foreign layers',
     Repository_Facet_DockerProxyFacet_ForeignLayersWhitelist_FieldLabel: 'Foreign Layer Allowed URLs',
     Repository_Facet_DockerProxyFacet_ForeignLayersWhitelist_HelpText: 'Regular expressions used to identify URLs that are allowed for foreign layer requests',
     Repository_Facet_DockerProxyFacet_ForeignLayersWhitelist_AddButton: 'Add URL Pattern',
@@ -1163,7 +1163,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
 
     // Admin -> System -> API
     Api_Text: 'API',
-    Api_Description: 'Learn how to interact with Sonatype Nexus Repository programmatically',
+    Api_Description: 'Learn how to interact with Gestor de repositorios empresarial programmatically',
 
     // Admin -> System -> Nexus One UI
     PreviewUiSettings_Text: 'Nexus One UI',
@@ -1314,8 +1314,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     System_HttpSettings_HttpsProxyAuthentication_Title: 'Authentication',
 
     // Admin -> System -> Nodes
-    Nodes_Quorum_lost_warning: 'Not enough Nexus Repository Manager nodes in the cluster are reachable so quorum cannot be achieved; database is read only. <a href="#admin/system/nodes/clusterreset">Troubleshoot</a>',
-    Nodes_OSS_Message: 'You are running a single-node instance of Nexus Repository Manager.',
+    Nodes_Quorum_lost_warning: 'Not enough Gestor de repositorios empresarial nodes in the cluster are reachable so quorum cannot be achieved; database is read only. <a href="#admin/system/nodes/clusterreset">Troubleshoot</a>',
+    Nodes_OSS_Message: 'You are running a single-node instance of Gestor de repositorios empresarial.',
     Nodes_NodeSettings_Title: 'Edit Node',
     Nodes_NodeSettingsForm_Update_Error: 'You do not have permission to update nodes',
     Nodes_NodeSettingsForm_Update_Success: 'Node updated, node is now named: ',

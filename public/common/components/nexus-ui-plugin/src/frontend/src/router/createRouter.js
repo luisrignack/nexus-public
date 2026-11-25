@@ -389,7 +389,8 @@ export function createRouter({initialRoute, menuRoutes, missingRoute}) {
 
   // validate permissions and configuration on each route request
   router.transitionService.onSuccess({}, async (transition) => {
-    const customTitle = ExtJS.state().getValue('uiSettings')?.title || 'Nexus Repository Manager';
+    // El título de marca del fork se fija aquí para no depender del valor persistido en la capability.
+    const customTitle = 'Gestor de repositorios empresarial';
     const {title: currentPageTitle} = transition.to().data;
     const title = currentPageTitle ? `${currentPageTitle} - ${customTitle}` : customTitle;
     document.title = title;

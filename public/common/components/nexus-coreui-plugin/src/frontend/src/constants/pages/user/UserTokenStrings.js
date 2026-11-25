@@ -20,7 +20,7 @@ export default {
   USER_TOKEN: {
     MENU: {
       text: 'User Token',
-      description: 'Access Sonatype Nexus Repository without the use of passwords',
+      description: 'Access Gestor de repositorios empresarial without the use of passwords',
       icon: faKey
     },
     CAPTION: 'Token Information',

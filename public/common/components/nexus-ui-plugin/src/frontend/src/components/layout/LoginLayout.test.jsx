@@ -27,7 +27,7 @@ import LoginLayout from "./LoginLayout";
 const HEADER_IMG_SELECTOR = ".nxrm-login-header img";
 const HEADER_LINK_SELECTOR = ".nxrm-login-header a";
 const EDITION_BADGE_SELECTOR = ".nxrm-login-header__edition-badge";
-const NEUTRAL_LOGO_ALT = "Sonatype Nexus Repository";
+const NEUTRAL_LOGO_ALT = "Gestor de repositorios empresarial";
 
 jest.mock("../../interface/ExtJS", () => ({
   ExtJS: {
@@ -155,7 +155,7 @@ describe("LoginLayout", () => {
 
       expect(container.querySelector(HEADER_LINK_SELECTOR)).toHaveAttribute(
         "aria-label",
-        "Sonatype Nexus Repository home"
+        "Gestor de repositorios empresarial home"
       );
     });
 
@@ -186,7 +186,7 @@ describe("LoginLayout", () => {
 
       expect(container.querySelector(HEADER_LINK_SELECTOR)).toHaveAttribute(
         "aria-label",
-        "Sonatype Nexus Repository home"
+        "Gestor de repositorios empresarial home"
       );
     });
   });

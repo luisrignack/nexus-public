@@ -44,7 +44,7 @@ describe('Welcome', () => {
 
   it('renders the logo with alt text', () => {
     render(<Welcome />);
-    const logo = screen.getByAltText('Sonatype Nexus Repository');
+    const logo = screen.getByAltText('Gestor de repositorios empresarial');
     expect(logo).toBeInTheDocument();
     expect(logo.tagName).toBe('IMG');
     expect(logo).toHaveAttribute('src', expect.stringContaining('favicon.svg'));

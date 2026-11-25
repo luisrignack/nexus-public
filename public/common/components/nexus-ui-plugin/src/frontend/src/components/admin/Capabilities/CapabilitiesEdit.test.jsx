@@ -133,7 +133,7 @@ const CAPABILITY_TYPES = [
         disabled: false,
         readOnly: false,
         regexValidation: null,
-        initialValue: "Sonatype Nexus Repository",
+        initialValue: "Gestor de repositorios empresarial",
         attributes: {},
         minValue: null,
         maxValue: null,
