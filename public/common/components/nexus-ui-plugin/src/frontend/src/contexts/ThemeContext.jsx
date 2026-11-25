@@ -117,7 +117,7 @@ function applyTheme(theme) {
   
   // 3. Set data-* attributes that Radix may use for theming
   document.body.setAttribute('data-is-root-theme', 'true');
-  document.body.setAttribute('data-accent-color', 'green');
+  document.body.setAttribute('data-accent-color', 'blue');
   document.body.setAttribute('data-gray-color', 'slate');
   document.body.setAttribute('data-radius', 'medium');
 }

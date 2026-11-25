@@ -72,7 +72,7 @@ export default function LoginLayout({ children }) {
             </a>
             {Boolean(editionId) && (
               <Badge
-                color="green"
+                color="blue"
                 variant="solid"
                 size="1"
                 className="nxrm-login-header__edition-badge"

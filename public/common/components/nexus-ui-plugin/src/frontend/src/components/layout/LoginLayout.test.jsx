@@ -136,7 +136,7 @@ describe("LoginLayout", () => {
       );
     });
 
-    it("renders the edition as a solid green Radix Badge, not a hand-rolled span", () => {
+    it("renders the edition as a solid blue Radix Badge, not a hand-rolled span", () => {
       // Guards the review decision to use the Radix Badge instead of CSS tokens.
       setStateValues({ [EDITION_ID_STATE_KEY]: EDITION_PRO_PLUS });
 
