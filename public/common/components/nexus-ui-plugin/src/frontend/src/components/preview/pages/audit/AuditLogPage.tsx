@@ -29,12 +29,13 @@ import {
   Inset,
   TextField,
 } from '@radix-ui/themes';
-import { AlertCircle, RefreshCw, ChevronDown, ChevronUp, Search, X, Filter, Info } from 'lucide-react';
+import { AlertCircle, RefreshCw, ChevronDown, ChevronUp, Search, X, Filter, Info, Download } from 'lucide-react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 
 import type { AuditFilters, AuditCategory } from '@sonatype/nexus-ui-plugin';
 import {
   useAuditLogApi,
+  downloadAuditLog,
   formatAuditEvent,
   formatTimestamp,
   CATEGORY_COLORS,
@@ -235,6 +236,15 @@ export function AuditLogPage() {
                   <Button variant="ghost" size="2" onClick={refetch} disabled={loading}>
                     <RefreshCw size={16} />
                     Refresh
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="2"
+                    onClick={() => downloadAuditLog(filters)}
+                    title="Export current filters as CSV"
+                  >
+                    <Download size={16} />
+                    Export CSV
                   </Button>
                 </Flex>
               }

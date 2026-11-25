@@ -22,7 +22,6 @@ import {
   CapabilitiesList,
   CapabilitiesCreate,
   CapabilitiesEdit,
-  PRO_AND_COMMUNITY_EDITIONS,
   PRO_FAMILY_EDITIONS,
 } from '@sonatype/nexus-ui-plugin';
 import { ROUTE_NAMES } from '../routeNames/routeNames';
@@ -205,7 +204,6 @@ export const adminRoutes = [
       visibilityRequirements: {
         bundle: 'nexus-pro-datastore-plugin',
         permissions: ['nexus:*'],
-        editions: PRO_AND_COMMUNITY_EDITIONS,
       },
       title: ADMIN.REPOSITORY.DATASTORE.TITLE,
     },

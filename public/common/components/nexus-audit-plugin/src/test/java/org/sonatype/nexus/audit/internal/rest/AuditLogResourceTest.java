@@ -122,7 +122,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findAll(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Arrays.asList(event1, event2));
 
-    Response response = underTest.exportAuditLog(null, null, null, null, null, null);
+    Response response = underTest.exportAuditLog(null, null, null, null, null, null, null);
 
     assertThat(response.getStatus(), is(200));
     assertThat(response.getHeaderString("Content-Disposition"), containsString("attachment; filename=\"audit-log-"));
@@ -147,7 +147,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findByDomains(any(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Collections.emptyList());
 
-    Response response = underTest.exportAuditLog(Arrays.asList("security"), null, null, null, null, null);
+    Response response = underTest.exportAuditLog(Arrays.asList("security"), null, null, null, null, null, null);
 
     assertThat(response.getStatus(), is(200));
     verify(auditEventStore).findByDomains(any(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0));
@@ -160,7 +160,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findByDomains(eq(domains), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Collections.emptyList());
 
-    Response response = underTest.exportAuditLog(null, domains, null, null, null, null);
+    Response response = underTest.exportAuditLog(null, domains, null, null, null, null, null);
 
     assertThat(response.getStatus(), is(200));
     verify(auditEventStore).findByDomains(eq(domains), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000),
@@ -172,7 +172,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findAll(isNull(), eq("created"), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Collections.emptyList());
 
-    Response response = underTest.exportAuditLog(null, null, Arrays.asList("created"), null, null, null);
+    Response response = underTest.exportAuditLog(null, null, Arrays.asList("created"), null, null, null, null);
 
     assertThat(response.getStatus(), is(200));
     verify(auditEventStore).findAll(isNull(), eq("created"), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0));
@@ -186,7 +186,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findAll(isNull(), isNull(), isNull(), isNull(), any(), any(), eq(10000), eq(0)))
         .thenReturn(Collections.emptyList());
 
-    Response response = underTest.exportAuditLog(null, null, null, null, startDate, endDate);
+    Response response = underTest.exportAuditLog(null, null, null, null, startDate, endDate, null);
 
     assertThat(response.getStatus(), is(200));
     verify(auditEventStore).findAll(isNull(), isNull(), isNull(), isNull(), any(OffsetDateTime.class),
@@ -205,7 +205,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findAll(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Collections.singletonList(event));
 
-    Response response = underTest.exportAuditLog(null, null, null, null, null, null);
+    Response response = underTest.exportAuditLog(null, null, null, null, null, null, null);
 
     StreamingOutput output = (StreamingOutput) response.getEntity();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -240,7 +240,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findAll(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Arrays.asList(eventFormula, eventPlus, eventMinus, eventAt, eventPipe, eventPercent));
 
-    Response response = underTest.exportAuditLog(null, null, null, null, null, null);
+    Response response = underTest.exportAuditLog(null, null, null, null, null, null, null);
 
     StreamingOutput output = (StreamingOutput) response.getEntity();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -258,7 +258,7 @@ public class AuditLogResourceTest
 
   @Test
   public void testGetAuditLog_InvalidPage() {
-    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, 0, 20);
+    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, null, 0, 20);
 
     assertThat(response.getStatus(), is(400));
     assertThat(response.getEntity().toString(), containsString("Page must be >= 1"));
@@ -271,7 +271,7 @@ public class AuditLogResourceTest
     when(auditEventStore.count(isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
         .thenReturn(0);
 
-    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, 1, 500);
+    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, null, 1, 500);
 
     assertThat(response.getStatus(), is(200));
     // Verify limit was capped at 100
@@ -285,7 +285,7 @@ public class AuditLogResourceTest
     when(auditEventStore.count(isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
         .thenReturn(0);
 
-    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, 1, 20);
+    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, null, 1, 20);
 
     assertThat(response.getStatus(), is(200));
   }
@@ -300,7 +300,7 @@ public class AuditLogResourceTest
     when(auditEventStore.count(isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
         .thenReturn(0);
 
-    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, 1, 20);
+    Response response = underTest.getAuditLog(null, null, null, null, null, null, null, null, 1, 20);
 
     assertThat(response.getStatus(), is(200));
   }
@@ -311,7 +311,7 @@ public class AuditLogResourceTest
     authenticateUser("noreaduser");
 
     try {
-      underTest.getAuditLog(null, null, null, null, null, null, null, 1, 20);
+      underTest.getAuditLog(null, null, null, null, null, null, null, null, 1, 20);
       fail("Expected AuthorizationException for insufficient permissions");
     }
     catch (org.apache.shiro.authz.AuthorizationException e) {
@@ -324,7 +324,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findAll(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Collections.emptyList());
 
-    Response response = underTest.exportAuditLog(null, null, null, null, null, null);
+    Response response = underTest.exportAuditLog(null, null, null, null, null, null, null);
 
     assertThat(response.getStatus(), is(200));
   }
@@ -337,7 +337,7 @@ public class AuditLogResourceTest
     when(auditEventStore.findAll(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(10000), eq(0)))
         .thenReturn(Collections.emptyList());
 
-    Response response = underTest.exportAuditLog(null, null, null, null, null, null);
+    Response response = underTest.exportAuditLog(null, null, null, null, null, null, null);
 
     assertThat(response.getStatus(), is(200));
   }
@@ -348,7 +348,7 @@ public class AuditLogResourceTest
     authenticateUser("noreaduser");
 
     try {
-      underTest.exportAuditLog(null, null, null, null, null, null);
+      underTest.exportAuditLog(null, null, null, null, null, null, null);
       fail("Expected AuthorizationException for insufficient permissions");
     }
     catch (org.apache.shiro.authz.AuthorizationException e) {

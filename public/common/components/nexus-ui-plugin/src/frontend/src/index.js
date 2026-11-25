@@ -420,7 +420,11 @@ export { FeatureGate, withFeatureGate, withCloudExcluded } from './components/pr
 // AuditCategory, AuditEvent, AuditLogResponse) live in the sibling index.d.ts
 // so consumers can import them via the package name:
 // `import type { AuditFilters } from '@sonatype/nexus-ui-plugin'`.
-export { useAuditLogApi } from './utils/audit/useAuditLogApi';
+export {
+  useAuditLogApi,
+  buildAuditLogParams,
+  downloadAuditLog,
+} from './utils/audit/useAuditLogApi';
 export { formatAuditEvent, formatTimestamp } from './utils/audit/auditEventFormatter';
 export {
   CATEGORY_COLORS,

@@ -92,6 +92,65 @@ public class AuditEventStore
     return dao().countByDomains(domains, type, initiator, repositoryName, startDate, endDate);
   }
 
+  @Transactional
+  public List<AuditEventData> findAllWithSearch(
+      final String domain,
+      final String type,
+      final String initiator,
+      final String repositoryName,
+      final OffsetDateTime startDate,
+      final OffsetDateTime endDate,
+      final String searchPattern,
+      final int limit,
+      final int offset)
+  {
+    return dao().findAllWithSearch(domain, type, initiator, repositoryName, startDate, endDate,
+        searchPattern, limit, offset);
+  }
+
+  @Transactional
+  public int countWithSearch(
+      final String domain,
+      final String type,
+      final String initiator,
+      final String repositoryName,
+      final OffsetDateTime startDate,
+      final OffsetDateTime endDate,
+      final String searchPattern)
+  {
+    return dao().countWithSearch(domain, type, initiator, repositoryName, startDate, endDate, searchPattern);
+  }
+
+  @Transactional
+  public List<AuditEventData> findByDomainsWithSearch(
+      final Collection<String> domains,
+      final String type,
+      final String initiator,
+      final String repositoryName,
+      final OffsetDateTime startDate,
+      final OffsetDateTime endDate,
+      final String searchPattern,
+      final int limit,
+      final int offset)
+  {
+    return dao().findByDomainsWithSearch(domains, type, initiator, repositoryName, startDate, endDate,
+        searchPattern, limit, offset);
+  }
+
+  @Transactional
+  public int countByDomainsWithSearch(
+      final Collection<String> domains,
+      final String type,
+      final String initiator,
+      final String repositoryName,
+      final OffsetDateTime startDate,
+      final OffsetDateTime endDate,
+      final String searchPattern)
+  {
+    return dao().countByDomainsWithSearch(domains, type, initiator, repositoryName, startDate, endDate,
+        searchPattern);
+  }
+
   /**
    * Delete a single batch of rows older than {@code cutoff}. Returns the number of rows deleted.
    * The batch bound protects against long-lived row locks and unbounded transaction size; callers

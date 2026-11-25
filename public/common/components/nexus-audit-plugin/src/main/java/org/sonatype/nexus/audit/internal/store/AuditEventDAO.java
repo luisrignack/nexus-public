@@ -44,6 +44,51 @@ public interface AuditEventDAO
       @Param("startDate") OffsetDateTime startDate,
       @Param("endDate") OffsetDateTime endDate);
 
+  /**
+   * Variants of the standard queries with a free-text pattern applied to domain, type,
+   * context and initiator. Pattern is pre-built by the caller (already lower-cased and
+   * wrapped in %), so the SQL stays portable between H2 and PostgreSQL.
+   */
+  List<AuditEventData> findAllWithSearch(
+      @Param("domain") String domain,
+      @Param("type") String type,
+      @Param("initiator") String initiator,
+      @Param("repositoryName") String repositoryName,
+      @Param("startDate") OffsetDateTime startDate,
+      @Param("endDate") OffsetDateTime endDate,
+      @Param("searchPattern") String searchPattern,
+      @Param("limit") int limit,
+      @Param("offset") int offset);
+
+  int countWithSearch(
+      @Param("domain") String domain,
+      @Param("type") String type,
+      @Param("initiator") String initiator,
+      @Param("repositoryName") String repositoryName,
+      @Param("startDate") OffsetDateTime startDate,
+      @Param("endDate") OffsetDateTime endDate,
+      @Param("searchPattern") String searchPattern);
+
+  List<AuditEventData> findByDomainsWithSearch(
+      @Param("domains") Collection<String> domains,
+      @Param("type") String type,
+      @Param("initiator") String initiator,
+      @Param("repositoryName") String repositoryName,
+      @Param("startDate") OffsetDateTime startDate,
+      @Param("endDate") OffsetDateTime endDate,
+      @Param("searchPattern") String searchPattern,
+      @Param("limit") int limit,
+      @Param("offset") int offset);
+
+  int countByDomainsWithSearch(
+      @Param("domains") Collection<String> domains,
+      @Param("type") String type,
+      @Param("initiator") String initiator,
+      @Param("repositoryName") String repositoryName,
+      @Param("startDate") OffsetDateTime startDate,
+      @Param("endDate") OffsetDateTime endDate,
+      @Param("searchPattern") String searchPattern);
+
   void insert(AuditEventData data);
 
   /**

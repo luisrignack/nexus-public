@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 import org.sonatype.nexus.audit.internal.store.AuditEventData;
 import org.sonatype.nexus.audit.internal.store.AuditEventStore;
@@ -137,6 +140,7 @@ public class AuditLogResource
       @QueryParam("startDate") final String startDate,
       @QueryParam("endDate") final String endDate,
       @QueryParam("repositoryName") final String repositoryName,
+      @QueryParam("q") final String q,
       @QueryParam("page") @DefaultValue("1") final int page,
       @QueryParam("limit") @DefaultValue("20") final int limit)
   {
@@ -163,46 +167,67 @@ public class AuditLogResource
 
       String singleType = types != null && types.size() == 1 ? types.get(0) : null;
       String singleInitiator = initiators != null && initiators.size() == 1 ? initiators.get(0) : null;
+      String searchPattern = buildSearchPattern(q);
 
       if (targetDomains.isEmpty()) {
         // No domain filter - query all
-        events = auditEventStore.findAll(
-            null,
-            singleType,
-            singleInitiator,
-            repositoryName,
-            parsedStartDate,
-            parsedEndDate,
-            validatedLimit,
-            offset);
+        if (searchPattern != null) {
+          events = auditEventStore.findAllWithSearch(
+              null, singleType, singleInitiator, repositoryName, parsedStartDate, parsedEndDate,
+              searchPattern, validatedLimit, offset);
+          totalCount = auditEventStore.countWithSearch(
+              null, singleType, singleInitiator, repositoryName, parsedStartDate, parsedEndDate,
+              searchPattern);
+        }
+        else {
+          events = auditEventStore.findAll(
+              null,
+              singleType,
+              singleInitiator,
+              repositoryName,
+              parsedStartDate,
+              parsedEndDate,
+              validatedLimit,
+              offset);
 
-        totalCount = auditEventStore.count(
-            null,
-            singleType,
-            singleInitiator,
-            repositoryName,
-            parsedStartDate,
-            parsedEndDate);
+          totalCount = auditEventStore.count(
+              null,
+              singleType,
+              singleInitiator,
+              repositoryName,
+              parsedStartDate,
+              parsedEndDate);
+        }
       }
       else {
         // Domain filter specified
-        events = auditEventStore.findByDomains(
-            targetDomains,
-            singleType,
-            singleInitiator,
-            repositoryName,
-            parsedStartDate,
-            parsedEndDate,
-            validatedLimit,
-            offset);
+        if (searchPattern != null) {
+          events = auditEventStore.findByDomainsWithSearch(
+              targetDomains, singleType, singleInitiator, repositoryName, parsedStartDate, parsedEndDate,
+              searchPattern, validatedLimit, offset);
+          totalCount = auditEventStore.countByDomainsWithSearch(
+              targetDomains, singleType, singleInitiator, repositoryName, parsedStartDate, parsedEndDate,
+              searchPattern);
+        }
+        else {
+          events = auditEventStore.findByDomains(
+              targetDomains,
+              singleType,
+              singleInitiator,
+              repositoryName,
+              parsedStartDate,
+              parsedEndDate,
+              validatedLimit,
+              offset);
 
-        totalCount = auditEventStore.countByDomains(
-            targetDomains,
-            singleType,
-            singleInitiator,
-            repositoryName,
-            parsedStartDate,
-            parsedEndDate);
+          totalCount = auditEventStore.countByDomains(
+              targetDomains,
+              singleType,
+              singleInitiator,
+              repositoryName,
+              parsedStartDate,
+              parsedEndDate);
+        }
       }
 
       // Build response
@@ -247,7 +272,8 @@ public class AuditLogResource
       @QueryParam("types") final List<String> types,
       @QueryParam("initiators") final List<String> initiators,
       @QueryParam("startDate") final String startDate,
-      @QueryParam("endDate") final String endDate)
+      @QueryParam("endDate") final String endDate,
+      @QueryParam("q") final String q)
   {
     try {
       // Parse date range
@@ -262,34 +288,26 @@ public class AuditLogResource
 
       // Query events
       List<AuditEventData> events;
+      String searchPattern = buildSearchPattern(q);
+      String singleType = types != null && types.size() == 1 ? types.get(0) : null;
+      String singleInitiator = initiators != null && initiators.size() == 1 ? initiators.get(0) : null;
 
       if (targetDomains.isEmpty()) {
-        String singleType = types != null && types.size() == 1 ? types.get(0) : null;
-        String singleInitiator = initiators != null && initiators.size() == 1 ? initiators.get(0) : null;
-
-        events = auditEventStore.findAll(
-            null,
-            singleType,
-            singleInitiator,
-            null,
-            parsedStartDate,
-            parsedEndDate,
-            exportLimit,
-            0);
+        events = searchPattern != null
+            ? auditEventStore.findAllWithSearch(
+                null, singleType, singleInitiator, null, parsedStartDate, parsedEndDate,
+                searchPattern, exportLimit, 0)
+            : auditEventStore.findAll(
+                null, singleType, singleInitiator, null, parsedStartDate, parsedEndDate, exportLimit, 0);
       }
       else {
-        String singleType = types != null && types.size() == 1 ? types.get(0) : null;
-        String singleInitiator = initiators != null && initiators.size() == 1 ? initiators.get(0) : null;
-
-        events = auditEventStore.findByDomains(
-            targetDomains,
-            singleType,
-            singleInitiator,
-            null,
-            parsedStartDate,
-            parsedEndDate,
-            exportLimit,
-            0);
+        events = searchPattern != null
+            ? auditEventStore.findByDomainsWithSearch(
+                targetDomains, singleType, singleInitiator, null, parsedStartDate, parsedEndDate,
+                searchPattern, exportLimit, 0)
+            : auditEventStore.findByDomains(
+                targetDomains, singleType, singleInitiator, null, parsedStartDate, parsedEndDate,
+                exportLimit, 0);
       }
 
       // Generate CSV filename with timestamp
@@ -421,6 +439,18 @@ public class AuditLogResource
   /**
    * Parse ISO 8601 date string to OffsetDateTime.
    */
+  /**
+   * Builds the lower-cased LIKE pattern used by the search variants of the store queries.
+   * Returns null when no search term was supplied so the original queries remain unchanged.
+   */
+  @Nullable
+  private String buildSearchPattern(final String q) {
+    if (q == null || q.trim().isEmpty()) {
+      return null;
+    }
+    return "%" + q.trim().toLowerCase(Locale.ROOT) + "%";
+  }
+
   private OffsetDateTime parseDate(final String dateStr) {
     if (dateStr == null || dateStr.trim().isEmpty()) {
       return null;

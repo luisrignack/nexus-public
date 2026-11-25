@@ -29,6 +29,58 @@ interface UseAuditLogApiResult {
 }
 
 /**
+ * Builds the query string shared by the audit log listing and the CSV export.
+ */
+export function buildAuditLogParams(
+  filters: AuditFilters,
+  page?: number,
+  limit?: number
+): URLSearchParams {
+  const params = new URLSearchParams();
+  if (page != null) {
+    params.append('page', page.toString());
+  }
+  if (limit != null) {
+    params.append('limit', limit.toString());
+  }
+
+  for (const cat of filters.categories) {
+    params.append('categories', cat);
+  }
+  for (const type of filters.eventTypes) {
+    params.append('types', type);
+  }
+  for (const init of filters.initiators) {
+    params.append('initiators', init);
+  }
+
+  if (filters.dateRange !== 'custom') {
+    params.append('startDate', getStartDateForRange(filters.dateRange));
+    params.append('endDate', new Date().toISOString());
+  } else if (filters.customStartDate && filters.customEndDate) {
+    params.append('startDate', filters.customStartDate);
+    params.append('endDate', filters.customEndDate);
+  }
+
+  if (filters.searchQuery) {
+    params.append('q', filters.searchQuery);
+  }
+  if (filters.repositoryName) {
+    params.append('repositoryName', filters.repositoryName);
+  }
+  return params;
+}
+
+/**
+ * Downloads the current filtered view as CSV. The export endpoint sets
+ * Content-Disposition: attachment, so navigating to it keeps the page in place.
+ */
+export function downloadAuditLog(filters: AuditFilters): void {
+  const params = buildAuditLogParams(filters);
+  window.location.href = `/service/rest/internal/ui/audit-log/export?${params.toString()}`;
+}
+
+/**
  * Hook for fetching audit log events from the REST API.
  */
 export function useAuditLogApi({
@@ -49,47 +101,8 @@ export function useAuditLogApi({
       setError(null);
 
       try {
-        // Build query parameters
-        const params = new URLSearchParams();
-        params.append('page', page.toString());
-        params.append('limit', limit.toString());
-
-        // Add category filters
-        for (const cat of filters.categories) {
-          params.append('categories', cat);
-        }
-
-        // Add event type filters
-        for (const type of filters.eventTypes) {
-          params.append('types', type);
-        }
-
-        // Add initiator filters
-        for (const init of filters.initiators) {
-          params.append('initiators', init);
-        }
-
-        // Add date range
-        if (filters.dateRange !== 'custom') {
-          const endDate = new Date().toISOString();
-          const startDate = getStartDateForRange(filters.dateRange);
-          params.append('startDate', startDate);
-          params.append('endDate', endDate);
-        } else if (filters.customStartDate && filters.customEndDate) {
-          params.append('startDate', filters.customStartDate);
-          params.append('endDate', filters.customEndDate);
-        }
-
-        // Add search query (future enhancement - backend needs to support this)
-        if (filters.searchQuery) {
-          params.append('q', filters.searchQuery);
-        }
-
-        // Add repository filter
-        if (filters.repositoryName) {
-          params.append('repositoryName', filters.repositoryName);
-        }
-
+        // Build query parameters once, shared with the CSV export
+        const params = buildAuditLogParams(filters, page, limit);
         const url = `/service/rest/internal/ui/audit-log?${params.toString()}`;
         const response = await restClient.get<AuditLogResponse>(url);
 

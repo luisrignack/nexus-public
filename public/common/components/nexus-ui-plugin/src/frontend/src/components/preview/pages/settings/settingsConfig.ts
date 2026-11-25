@@ -23,7 +23,6 @@
 
 import Permissions from '../../../../constants/Permissions';
 import {
-  PRO_AND_COMMUNITY_EDITIONS,
   PRO_FAMILY_EDITIONS,
   type EditionId,
 } from '../../../../interface/editionUtils';
@@ -155,13 +154,10 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
         description: 'Configure repository metadata database',
         searchTerms: ['database', 'postgresql', 'h2', 'jdbc'],
         cloudExcluded: true,
-        // NEXUS-54019: match Classic/Default UI (adminRoutes.js DATASTORE.ROOT) — gates on nexus:*
-        // (admin-only screen) AND requires the pro-datastore bundle, restricted to PRO/COMMUNITY.
-        // Without the bundle+editions gates the tile shows on editions where the screen is absent.
+        // Fork: admin-only screen; the bundle is activated by DatastorePluginDescriptorImpl.
         visibilityRequirements: {
           requiresPermission: 'nexus:*',
           bundle: 'nexus-pro-datastore-plugin',
-          editions: PRO_AND_COMMUNITY_EDITIONS,
         },
       },
       {
@@ -468,6 +464,14 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
         path: 'system/capabilities',
         label: 'Capabilities',
         description: 'Configure system capabilities and integrations',
+        visibilityRequirements: { requiresPermission: 'nexus:capabilities:read' },
+      },
+      {
+        id: 'webhooks',
+        path: 'system/capabilities',
+        label: 'Webhooks',
+        description: 'Configure global and repository webhooks (Webhook capabilities)',
+        searchTerms: ['webhook', 'notification', 'http'],
         visibilityRequirements: { requiresPermission: 'nexus:capabilities:read' },
       },
       {

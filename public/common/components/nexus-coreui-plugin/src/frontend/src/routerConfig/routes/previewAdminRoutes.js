@@ -82,7 +82,6 @@ import {
   UsagePage,
   IqServerPage,
   HostedRepoEvaluationSetupPage,
-  PRO_AND_COMMUNITY_EDITIONS,
   PRO_FAMILY_EDITIONS,
 } from '@sonatype/nexus-ui-plugin';
 import {lazyLoad} from './lazyLoad';
@@ -450,7 +449,6 @@ export const previewAdminRoutes = [
         // feature does not exist and then dead-ends.
         bundle: 'nexus-pro-datastore-plugin',
         requiresPermission: Permissions.ADMIN,
-        editions: PRO_AND_COMMUNITY_EDITIONS,
       },
     },
   },

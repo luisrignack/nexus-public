@@ -63,6 +63,92 @@
     </if>
   </sql>
 
+  <sql id="searchCondition">
+    <if test="searchPattern != null and searchPattern != ''">
+      AND (
+        LOWER(domain) LIKE #{searchPattern}
+        OR LOWER(type) LIKE #{searchPattern}
+        OR LOWER(context) LIKE #{searchPattern}
+        OR LOWER(initiator) LIKE #{searchPattern}
+      )
+    </if>
+  </sql>
+
+  <sql id="whereClauseWithSearch">
+    <where>
+      <if test="domain != null">
+        AND domain = #{domain}
+      </if>
+      <if test="type != null">
+        AND type = #{type}
+      </if>
+      <if test="initiator != null">
+        AND initiator = #{initiator}
+      </if>
+      <if test="startDate != null">
+        AND timestamp &gt;= #{startDate}
+      </if>
+      <if test="endDate != null">
+        AND timestamp &lt;= #{endDate}
+      </if>
+      <include refid="repositoryNameCondition"/>
+      <include refid="searchCondition"/>
+    </where>
+  </sql>
+
+  <sql id="whereClauseMultipleDomainsWithSearch">
+    <where>
+      <if test="domains != null and domains.size() > 0">
+        AND domain IN
+        <foreach item="d" collection="domains" open="(" separator="," close=")">
+          #{d}
+        </foreach>
+      </if>
+      <if test="type != null">
+        AND type = #{type}
+      </if>
+      <if test="initiator != null">
+        AND initiator = #{initiator}
+      </if>
+      <if test="startDate != null">
+        AND timestamp &gt;= #{startDate}
+      </if>
+      <if test="endDate != null">
+        AND timestamp &lt;= #{endDate}
+      </if>
+      <include refid="repositoryNameCondition"/>
+      <include refid="searchCondition"/>
+    </where>
+  </sql>
+
+  <select id="findAllWithSearch" resultMap="auditEventResult">
+    SELECT id, domain, type, context, timestamp, initiator, node_id, attributes
+    FROM audit_events
+    <include refid="whereClauseWithSearch"/>
+    ORDER BY timestamp DESC
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <select id="countWithSearch" resultType="int">
+    SELECT COUNT(*)
+    FROM audit_events
+    <include refid="whereClauseWithSearch"/>
+  </select>
+
+  <select id="findByDomainsWithSearch" resultMap="auditEventResult">
+    SELECT id, domain, type, context, timestamp, initiator, node_id, attributes
+    FROM audit_events
+    <include refid="whereClauseMultipleDomainsWithSearch"/>
+    ORDER BY timestamp DESC
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <select id="countByDomainsWithSearch" resultType="int">
+    SELECT COUNT(*)
+    FROM audit_events
+    <include refid="whereClauseMultipleDomainsWithSearch"/>
+  </select>
+
   <sql id="whereClause">
     <where>
       <if test="domain != null">
