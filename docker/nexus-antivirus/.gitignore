@@ -1,0 +1,5 @@
+# Artefactos locales de despliegue (no se suben a Git; se copian a la otra PC)
+nexus-antivirus-images.tar
+nexus-antivirus-images.tar.gz
+clamav-db.tgz
+.env

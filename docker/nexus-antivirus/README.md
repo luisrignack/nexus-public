@@ -27,7 +27,8 @@ No hace falta instalar ClamAV ni Trivy/Grype en el host: todo corre en contenedo
 
 En la PC donde compilaste:
 
-En la PC donde compilaste (el script exporta **Nexus + bridge + ClamAV + PostgreSQL** en un tar):
+En la PC donde compilaste (el script exporta **Nexus + bridge + ClamAV + PostgreSQL** en un
+`.tar.gz`). **Sin internet también hace falta la firma de ClamAV**: se incluye `clamav-db.tgz`.
 
 ```bash
 cd docker/nexus-antivirus
@@ -36,16 +37,19 @@ docker compose build
 ./scripts/save-images.sh
 ```
 
-Copia a la otra PC **la carpeta `docker/nexus-antivirus` y el `.tar`**. Allí:
+Copia a la otra PC **la carpeta completa `docker/nexus-antivirus`**, que ya contiene
+`nexus-antivirus-images.tar.gz` (~1,3 GB, con las 4 imágenes) y `clamav-db.tgz` (~108 MB, firmas
+de ClamAV). Allí:
 
 ```bash
 cd docker/nexus-antivirus
-./scripts/load-and-deploy.sh nexus-antivirus-images.tar
+./scripts/load-and-deploy.sh nexus-antivirus-images.tar.gz
 ```
 
-El script carga las imágenes, crea `.env` si no existe, valida que hayas cambiado
-`POSTGRES_PASSWORD` y levanta el stack. También puedes hacerlo a mano con `docker load -i` y
-`docker compose up -d`.
+El script carga las imágenes, restaura las firmas de ClamAV en el volumen, crea `.env` si no existe,
+valida que hayas cambiado `POSTGRES_PASSWORD` y levanta el stack. **No necesita internet.**
+También puedes hacerlo a mano con `docker load -i`, creando el volumen `clamav-db` desde
+`clamav-db.tgz`, y después `docker compose up -d`.
 
 ## Opción B — llevar el repositorio y compilar allí
 
