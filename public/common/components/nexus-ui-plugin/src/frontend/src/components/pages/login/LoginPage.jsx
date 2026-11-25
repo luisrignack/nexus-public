@@ -100,9 +100,11 @@ export default function LoginPage() {
             <Heading as="h1" size="6" weight="medium" className="login-card__title">
               {LOGIN_TITLE}
             </Heading>
-            <Text size="3" color="gray" className="login-card__subtitle">
-              {LOGIN_SUBTITLE}
-            </Text>
+            {LOGIN_SUBTITLE && (
+              <Text size="3" color="gray" className="login-card__subtitle">
+                {LOGIN_SUBTITLE}
+              </Text>
+            )}
           </Flex>
 
           {/* Error Message */}

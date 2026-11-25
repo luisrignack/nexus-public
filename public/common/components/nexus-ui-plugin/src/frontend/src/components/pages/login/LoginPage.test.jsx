@@ -144,7 +144,6 @@ describe('LoginPage', () => {
 
       expect(screen.getByTestId('login-tile')).toBeInTheDocument();
       expect(screen.getByText(UIStrings.LOGIN_TITLE)).toBeInTheDocument();
-      expect(screen.getByText(UIStrings.LOGIN_SUBTITLE)).toBeInTheDocument();
       expect(screen.getByTestId('login-form')).toBeInTheDocument();
       expect(screen.queryByTestId('sso-login-button')).not.toBeInTheDocument();
       expect(screen.queryByText(UIStrings.SSO_DIVIDER_LABEL)).not.toBeInTheDocument();
@@ -213,7 +212,6 @@ describe('LoginPage', () => {
 
       expect(screen.getByTestId('login-tile')).toBeInTheDocument();
       expect(screen.getByText(UIStrings.LOGIN_TITLE)).toBeInTheDocument();
-      expect(screen.getByText(UIStrings.LOGIN_SUBTITLE)).toBeInTheDocument();
       expect(screen.queryByTestId('login-form')).not.toBeInTheDocument();
       expect(screen.queryByTestId('sso-login-button')).not.toBeInTheDocument();
       expect(screen.queryByText(UIStrings.SSO_DIVIDER_LABEL)).not.toBeInTheDocument();
