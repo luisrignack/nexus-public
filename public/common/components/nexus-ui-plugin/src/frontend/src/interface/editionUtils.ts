@@ -164,12 +164,22 @@ import enterpriseLogo from '../art/logos/logo-enterprise-edition-header.svg';
 import enterpriseDarkLogo from '../art/logos/logo-enterprise-edition-header-dark.svg';
 
 /**
+ * Logos are served as static assets with long-lived caching. Bump this token when
+ * the SVG artwork changes so browsers fetch the new file instead of a cached copy.
+ */
+const LOGO_CACHEBUSTER = '?_c=fork-blue-6';
+
+function withLogoCacheBuster(url: string): string {
+  return `${url}${LOGO_CACHEBUSTER}`;
+}
+
+/**
  * Returns the common "sonatype nexus repository" wordmark for use in the global
  * header. The wordmark contains no edition text — the edition is shown separately
  * as a badge next to the logo.
  */
 export function getHeaderWordmarkLogo(isDark: boolean): string {
-  return isDark ? headerWordmarkDarkLogo : headerWordmarkLogo;
+  return withLogoCacheBuster(isDark ? headerWordmarkDarkLogo : headerWordmarkLogo);
 }
 
 /**
@@ -178,7 +188,7 @@ export function getHeaderWordmarkLogo(isDark: boolean): string {
  * is copied from the wordmark asset so the mark matches it.
  */
 export function getHeaderMarkLogo(isDark: boolean): string {
-  return isDark ? headerMarkDarkLogo : headerMarkLogo;
+  return withLogoCacheBuster(isDark ? headerMarkDarkLogo : headerMarkLogo);
 }
 
 /**
@@ -188,16 +198,22 @@ export function getHeaderMarkLogo(isDark: boolean): string {
  * combined with an edition badge.
  */
 export function getEditionLogo(editionId: string | undefined | null, isDark: boolean): string {
+  let logo: string;
   switch (editionId) {
     case EDITION_COMMUNITY:
-      return isDark ? ceDarkLogo : ceLogo;
+      logo = isDark ? ceDarkLogo : ceLogo;
+      break;
     case EDITION_PRO:
-      return isDark ? proDarkLogo : proLogo;
+      logo = isDark ? proDarkLogo : proLogo;
+      break;
     case EDITION_PRO_PLUS:
-      return isDark ? proPlusDarkLogo : proPlusLogo;
+      logo = isDark ? proPlusDarkLogo : proPlusLogo;
+      break;
     case EDITION_ENTERPRISE:
-      return isDark ? enterpriseDarkLogo : enterpriseLogo;
+      logo = isDark ? enterpriseDarkLogo : enterpriseLogo;
+      break;
     default:
-      return isDark ? coreDarkLogo : coreLogo;
+      logo = isDark ? coreDarkLogo : coreLogo;
   }
+  return withLogoCacheBuster(logo);
 }
